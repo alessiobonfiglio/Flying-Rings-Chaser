@@ -1,17 +1,23 @@
+import {default as utils} from "/source/utils.js"
+
 class WebGlManager
 {
-    #context;
+    #gl;
     #vertexShaderSource;
     #fragmentShaderSource;
-    #positionAttributeLocation;
+    #positionAttributeLocation;    
+    #matrixUniformLocation;
     #program;
     #positionBuffer;    
+    #indexBuffer;
+    #vao;
+    camera;
 
     #instantiatedObjects = [];
 
     constructor(context, vertexShaderSource, fragmentShaderSource)
     {
-        this.#context = context;        
+        this.#gl = context;        
         this.#vertexShaderSource = vertexShaderSource;
         this.#fragmentShaderSource = fragmentShaderSource;
     }
@@ -20,18 +26,19 @@ class WebGlManager
     initialize() 
     {
         // create GLSL shaders, upload the GLSL source, compile the shaders
-        var vertexShader = this.#createShader(this.#context, this.#context.VERTEX_SHADER, this.#vertexShaderSource);
-        var fragmentShader = this.#createShader(this.#context, this.#context.FRAGMENT_SHADER, this.#fragmentShaderSource);
+        var vertexShader = this.#createShader(this.#gl, this.#gl.VERTEX_SHADER, this.#vertexShaderSource);
+        var fragmentShader = this.#createShader(this.#gl, this.#gl.FRAGMENT_SHADER, this.#fragmentShaderSource);
 
         // Link the two shaders into a program
-        this.#program = this.#createProgram(this.#context, vertexShader, fragmentShader);
+        this.#program = this.#createProgram(this.#gl, vertexShader, fragmentShader);
 
         // look up where the vertex data needs to go.
-        this.#positionAttributeLocation = this.#context.getAttribLocation(this.#program, "a_position");
+        this.#positionAttributeLocation = this.#gl.getAttribLocation(this.#program, "a_position");
 
-         // Create a buffer and put three 2d clip space points in it
-        this.#positionBuffer = this.#context.createBuffer();
-
+        this.#matrixUniformLocation = this.#gl.getUniformLocation(this.#program, "matrix");
+        this.#positionBuffer = this.#gl.createBuffer();
+        this.#indexBuffer = this.#gl.createBuffer();;
+        this.#vao = this.#gl.createVertexArray();
     }    
 
     instantiate(gameObject) 
@@ -48,47 +55,65 @@ class WebGlManager
     // Private
     draw()
     {
-        var canvas = this.#context.canvas;
+        var canvas = this.#gl.canvas;
 
         // canvas full screen
         this.#resizeCanvasToDisplaySize(canvas);
 
         // Tell WebGL how to convert from clip space to pixels
-        this.#context.viewport(0, 0, canvas.width, canvas.height);
+        this.#gl.viewport(0, 0, canvas.width, canvas.height);
         
         // Clear the canvas
-        this.#context.clearColor(0, 0, 0, 0);
-        this.#context.clear(this.#context.COLOR_BUFFER_BIT);
-        
-        this.#context.useProgram(this.#program);
-        this.#context.enableVertexAttribArray(this.#positionAttributeLocation);
+        this.#gl.clearColor(0, 0, 0, 0);
+        this.#gl.clear(this.#gl.COLOR_BUFFER_BIT | this.#gl.DEPTH_BUFFER_BIT);
+        this.#gl.enable(this.#gl.DEPTH_TEST);
+        this.#gl.useProgram(this.#program);
+        this.#gl.enableVertexAttribArray(this.#positionAttributeLocation);
+        this.#gl.vertexAttribPointer(this.#positionAttributeLocation, 3, this.#gl.FLOAT, false, 0, 0);
 
-         // Bind the position buffer.
-        this.#context.bindBuffer(this.#context.ARRAY_BUFFER, this.#positionBuffer);
+        // Bind the position buffer.
+        this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, this.#positionBuffer);
+        this.#gl.bindBuffer(this.#gl.ELEMENT_ARRAY_BUFFER, this.#indexBuffer);
 
-        var totPoints = 0;
+
+        var totVertices = this.#fillVerticesBuffer(); 
+
+        var viewMatrix = this.camera ? this.camera.viewMatrix() : utils.MakeView(3.0, 3.0, 2.5, -45.0, -40.0); // default viewMatrix 
+        // setup transformation matrix from local coordinates to Clip Camera coordinates
         for(var gameObject of this.#instantiatedObjects)
         {
-            var points = gameObject.getVertices();
-            
-            // add the points to the buffer
-            this.#context.bufferData(this.#context.ARRAY_BUFFER, new Float32Array(points), this.#context.STATIC_DRAW);            
-            totPoints += points.length;
+            var canvas = this.#gl.canvas;
+            var worldMatrix = gameObject.worldMatrix();
+            var perspectiveMatrix = utils.MakePerspective(90, canvas.width/canvas.height, 0.1, 100.0);
+            var mat = utils.multiplyAllMatrices(perspectiveMatrix, viewMatrix, worldMatrix)
+            this.#gl.uniformMatrix4fv(this.#matrixUniformLocation, this.#gl.FALSE, utils.transposeMatrix(mat));
+        }
+    
+        // draw
+        var primitiveType = this.#gl.TRIANGLES;
+        var offset = 0;        
+        this.#gl.drawArrays(primitiveType, offset, totVertices);
+    }
+
+    
+
+    #fillVerticesBuffer()
+    {
+        var totVertices = 0;
+        for(var gameObject of this.#instantiatedObjects)
+        {
+            // add the vertices to the buffer
+            this.#gl.bufferData(this.#gl.ARRAY_BUFFER, new Float32Array(gameObject.vertices), this.#gl.STATIC_DRAW);            
+
+            //add the indices to the buffer
+            this.#gl.bufferData(this.#gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(gameObject.indices), this.#gl.STATIC_DRAW); 
+
+            totVertices += gameObject.vertices.length;
+            this.#gl.bindVertexArray(this.#vao);
+            this.#gl.drawElements(this.#gl.TRIANGLES, gameObject.indices.length, this.#gl.UNSIGNED_SHORT, 0 );
         }
 
-         // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-        var size = 2;          // 2 components per iteration
-        var type = this.#context.FLOAT;   // the data is 32bit floats
-        var normalize = false; // don't normalize the data
-        var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
-        var offset = 0;        // start at the beginning of the buffer
-        this.#context.vertexAttribPointer(this.#positionAttributeLocation, size, type, normalize, stride, offset);
-
-
-        // draw
-        var primitiveType = this.#context.TRIANGLES;
-        var offset = 0;        
-        this.#context.drawArrays(primitiveType, offset, totPoints);
+        return totVertices;
     }
 
 
