@@ -131,13 +131,12 @@ class WebGlManager
         gl.attachShader(program, fragmentShader);
         gl.linkProgram(program);
         var success = gl.getProgramParameter(program, gl.LINK_STATUS);
-        if (success) {
-            return program;
-        } else {
-            console.log(gl.getProgramInfoLog(program));  // eslint-disable-line
+        if (!success) 
+        {
             gl.deleteProgram(program);
             throw Error("Program filed to link:" + gl.getProgramInfoLog (program));
-          }
+        }
+        return program;
     }
 
     #createShader(gl, type, source)
@@ -146,19 +145,18 @@ class WebGlManager
         gl.shaderSource(shader, source);
         gl.compileShader(shader);
         var success = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
-        if (success) {
-          return shader;
-        } else {
+        if (!success)
+        {
             console.log(gl.getShaderInfoLog(shader));
-            if(type == gl.VERTEX_SHADER){
+            if(type == gl.VERTEX_SHADER)
                 alert("Error in Vertex Shader: " + gl.getShaderInfoLog(vertexShader));
-            }
-            if(type == gl.FRAGMENT_SHADER){
+            else if(type == gl.FRAGMENT_SHADER){
                 alert("Error in Fragment Shader: " + gl.getShaderInfoLog(vertexShader));
             }
             gl.deleteShader(shader);
             throw Error("Could not compile shader:" + gl.getShaderInfoLog(shader));
-          }
+        }
+        return shader;
     }
 
     #resizeCanvasToDisplaySize(canvas, multiplier)
