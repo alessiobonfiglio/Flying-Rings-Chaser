@@ -1,5 +1,4 @@
 import express from "express";
-import { join } from 'path';
 import path from 'path';
 
 const __dirname = path.resolve();

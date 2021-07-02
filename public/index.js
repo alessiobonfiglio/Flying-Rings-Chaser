@@ -20,7 +20,6 @@ function main(gl) {
   webGlManager.instantiate(cube2);
 
   refresh(webGlManager);
-  // translate(gameObject);
 }
 
 
@@ -94,11 +93,10 @@ async function init() {
 
     // load the shader files
     await utils.loadFiles([shaderDir + 'vs.glsl', shaderDir + 'fs.glsl'], function (shaderText) {
-      var vertexShaderSource =  shaderText[0];
-      var fragmentShaderSource = shaderText[1];
+      vertexShaderSource = shaderText[0];
+      fragmentShaderSource = shaderText[1];
     });
     
-    console.log(vertexShaderSource);
     main(gl);
 }
 

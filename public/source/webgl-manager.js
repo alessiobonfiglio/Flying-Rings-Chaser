@@ -37,7 +37,7 @@ class WebGlManager
 
         this.#matrixUniformLocation = this.#gl.getUniformLocation(this.#program, "matrix");
         this.#positionBuffer = this.#gl.createBuffer();
-        this.#indexBuffer = this.#gl.createBuffer();;
+        this.#indexBuffer = this.#gl.createBuffer();
         this.#vao = this.#gl.createVertexArray();
     }    
 
@@ -88,7 +88,6 @@ class WebGlManager
 
             this.#gl.bindVertexArray(this.#vao);
 
-            var canvas = this.#gl.canvas;
             var worldMatrix = gameObject.worldMatrix();
             var perspectiveMatrix = utils.MakePerspective(90, canvas.width/canvas.height, 0.1, 100.0);
             var mat = utils.multiplyAllMatrices(perspectiveMatrix, viewMatrix, worldMatrix)
@@ -106,8 +105,13 @@ class WebGlManager
         gl.attachShader(program, fragmentShader);
         gl.linkProgram(program);
         var success = gl.getProgramParameter(program, gl.LINK_STATUS);
-        if (success) 
-          return program;
+        if (success) {
+            return program;
+        } else {
+            console.log(gl.getProgramInfoLog(program));  // eslint-disable-line
+            gl.deleteProgram(program);
+            throw Error("Program filed to link:" + gl.getProgramInfoLog (program));
+          }
     }
 
     #createShader(gl, type, source)
@@ -116,8 +120,19 @@ class WebGlManager
         gl.shaderSource(shader, source);
         gl.compileShader(shader);
         var success = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
-        if (success) 
+        if (success) {
           return shader;
+        } else {
+            console.log(gl.getShaderInfoLog(shader));
+            if(type == gl.VERTEX_SHADER){
+                alert("Error in Vertex Shader: " + gl.getShaderInfoLog(vertexShader));
+            }
+            if(type == gl.FRAGMENT_SHADER){
+                alert("Error in Fragment Shader: " + gl.getShaderInfoLog(vertexShader));
+            }
+            gl.deleteShader(shader);
+            throw Error("Could not compile shader:" + gl.getShaderInfoLog(shader));
+          }
     }
 
     #resizeCanvasToDisplaySize(canvas, multiplier)
