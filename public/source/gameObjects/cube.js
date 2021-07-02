@@ -1,4 +1,4 @@
-import {default as GameObject} from "/source/GameObjects/gameObject.js"
+import {default as GameObject} from "/source/gameObjects/gameObject.js"
 
 class Cube extends GameObject
 {
