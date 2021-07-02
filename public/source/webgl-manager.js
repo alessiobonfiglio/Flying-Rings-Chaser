@@ -76,30 +76,8 @@ class WebGlManager
         this.#gl.bindBuffer(this.#gl.ELEMENT_ARRAY_BUFFER, this.#indexBuffer);
 
 
-        var totVertices = this.#fillVerticesBuffer(); 
-
         var viewMatrix = this.camera ? this.camera.viewMatrix() : utils.MakeView(3.0, 3.0, 2.5, -45.0, -40.0); // default viewMatrix 
         // setup transformation matrix from local coordinates to Clip Camera coordinates
-        for(var gameObject of this.#instantiatedObjects)
-        {
-            var canvas = this.#gl.canvas;
-            var worldMatrix = gameObject.worldMatrix();
-            var perspectiveMatrix = utils.MakePerspective(90, canvas.width/canvas.height, 0.1, 100.0);
-            var mat = utils.multiplyAllMatrices(perspectiveMatrix, viewMatrix, worldMatrix)
-            this.#gl.uniformMatrix4fv(this.#matrixUniformLocation, this.#gl.FALSE, utils.transposeMatrix(mat));
-        }
-    
-        // draw
-        var primitiveType = this.#gl.TRIANGLES;
-        var offset = 0;        
-        this.#gl.drawArrays(primitiveType, offset, totVertices);
-    }
-
-    
-
-    #fillVerticesBuffer()
-    {
-        var totVertices = 0;
         for(var gameObject of this.#instantiatedObjects)
         {
             // add the vertices to the buffer
@@ -108,12 +86,16 @@ class WebGlManager
             //add the indices to the buffer
             this.#gl.bufferData(this.#gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(gameObject.indices), this.#gl.STATIC_DRAW); 
 
-            totVertices += gameObject.vertices.length;
             this.#gl.bindVertexArray(this.#vao);
+
+            var canvas = this.#gl.canvas;
+            var worldMatrix = gameObject.worldMatrix();
+            var perspectiveMatrix = utils.MakePerspective(90, canvas.width/canvas.height, 0.1, 100.0);
+            var mat = utils.multiplyAllMatrices(perspectiveMatrix, viewMatrix, worldMatrix)
+            this.#gl.uniformMatrix4fv(this.#matrixUniformLocation, this.#gl.FALSE, utils.transposeMatrix(mat));
+
             this.#gl.drawElements(this.#gl.TRIANGLES, gameObject.indices.length, this.#gl.UNSIGNED_SHORT, 0 );
         }
-
-        return totVertices;
     }
 
 

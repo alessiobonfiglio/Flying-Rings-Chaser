@@ -22,8 +22,8 @@ function main() {
   cube1.position = [5,0,0];
 
   var cube2 = new Cube();
-  webGlManager.instantiate(cube2);
   webGlManager.instantiate(cube1);
+  webGlManager.instantiate(cube2);
 
   refresh(webGlManager);
   // translate(gameObject);
