@@ -1,18 +1,12 @@
 import {default as WebGlManager} from "/source/webgl-manager.js"
 import {default as Cube} from "/source/gameObjects/cube.js"
 import {default as Camera} from "/source/gameObjects/camera.js"
+import {default as utils} from "/source/utils.js"
 
-function main() {
-  // Get A WebGL context
-  var canvas = document.querySelector("#c");
-  var gl = canvas.getContext("webgl2");
-  if (!gl) {
-    return;
-  }
+var vertexShaderSource;
+var fragmentShaderSource;
 
-  // Get the strings for our GLSL shaders
-  var vertexShaderSource = document.querySelector("#vertex-shader-2d").text;
-  var fragmentShaderSource = document.querySelector("#fragment-shader-2d").text;
+function main(gl) {
   
   var webGlManager = new WebGlManager(gl, vertexShaderSource, fragmentShaderSource);
   webGlManager.camera = buildCamera();
@@ -83,4 +77,29 @@ function minus(a)
   return [-a[0], -a[1]];
 }
 
-main(document);
+async function init() {
+  
+    var path = window.location.pathname;
+    var page = path.split("/").pop();
+    var baseDir = window.location.href.replace(page, '');
+    var shaderDir = baseDir+"shaders/";
+
+    // Get A WebGL context
+    var canvas = document.getElementById("c");
+    var gl = canvas.getContext("webgl2");
+    if (!gl) {
+        document.write("GL context not opened");
+        return;
+    }
+
+    // load the shader files
+    await utils.loadFiles([shaderDir + 'vs.glsl', shaderDir + 'fs.glsl'], function (shaderText) {
+      var vertexShaderSource =  shaderText[0];
+      var fragmentShaderSource = shaderText[1];
+    });
+    
+    console.log(vertexShaderSource);
+    main(gl);
+}
+
+window.onload = init;
