@@ -55,7 +55,8 @@ class WebGlManager
     
     destroy(gameObject)
     {
-        // todo
+        var index = this.#instantiatedObjects.indexOf(gameObject);
+        this.#instantiatedObjects.splice(index, 1);
     }
 
 

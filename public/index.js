@@ -3,6 +3,8 @@ import {default as Cube} from "/source/gameObjects/cube.js"
 import {default as Camera} from "/source/gameObjects/camera.js"
 import {default as utils} from "/source/utils.js"
 
+
+
 function main(gl, vertexShaderSource, fragmentShaderSource) 
 {
   var webGlManager = new WebGlManager(gl, vertexShaderSource, fragmentShaderSource);
@@ -17,6 +19,7 @@ function main(gl, vertexShaderSource, fragmentShaderSource)
   webGlManager.instantiate(cube2);
 
   refresh(webGlManager);
+  tmp(cube1, webGlManager);
 }
 
 
@@ -42,17 +45,10 @@ async function refresh(glManager)
   }
 }
 
-async function translate(gameObject)
+async function tmp(gameObject, glManager)
 {
-  var deltaPos = [0.01, 0, 0];
-  while(true) 
-  {    
-    var x = gameObject.position[0];
-    if(x < -0.3 || x > 1.3)
-      deltaPos = minus(deltaPos);
-    gameObject.position = sum(gameObject.position, deltaPos);
-    await delay(20);
-  }
+  await delay(3000);
+  glManager.destroy(gameObject);
 }
 
 
