@@ -3,11 +3,8 @@ import {default as Cube} from "/source/gameObjects/cube.js"
 import {default as Camera} from "/source/gameObjects/camera.js"
 import {default as utils} from "/source/utils.js"
 
-var vertexShaderSource;
-var fragmentShaderSource;
-
-function main(gl) {
-  
+function main(gl, vertexShaderSource, fragmentShaderSource) 
+{
   var webGlManager = new WebGlManager(gl, vertexShaderSource, fragmentShaderSource);
   webGlManager.camera = buildCamera();
   webGlManager.initialize();
@@ -90,14 +87,18 @@ async function init() {
         document.write("GL context not opened");
         return;
     }
-
+    
+    
     // load the shader files
+    var vertexShaderSource;
+    var fragmentShaderSource;
+    
     await utils.loadFiles([shaderDir + 'vs.glsl', shaderDir + 'fs.glsl'], function (shaderText) {
       vertexShaderSource = shaderText[0];
       fragmentShaderSource = shaderText[1];
     });
     
-    main(gl);
+    main(gl, vertexShaderSource, fragmentShaderSource);
 }
 
 window.onload = init;
