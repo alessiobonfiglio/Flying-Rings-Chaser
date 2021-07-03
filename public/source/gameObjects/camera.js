@@ -8,8 +8,7 @@ class Camera
 
     viewMatrix()
     {
-        var ret = utils.MakeView(this.position[0], this.position[1], this.position[2], this.horizontalAngle, this.verticalAngle);
-        return ret;
+        return utils.MakeView(this.position[0], this.position[1], this.position[2], this.horizontalAngle, this.verticalAngle);
     }
 }
 

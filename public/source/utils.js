@@ -5,6 +5,14 @@
 
 var utils={
 
+createAndCompileShaders:function(gl, shaderText) {
+
+	var vertexShader = utils.createShader(gl, gl.VERTEX_SHADER, shaderText[0]);
+	var fragmentShader = utils.createShader(gl, gl.FRAGMENT_SHADER, shaderText[1]);
+
+	return utils.createProgram(gl, vertexShader, fragmentShader);
+},
+
 createShader:function(gl, type, source) {
   var shader = gl.createShader(type);
   gl.shaderSource(shader, source);
@@ -14,8 +22,12 @@ createShader:function(gl, type, source) {
     return shader;
   }else{
     console.log(gl.getShaderInfoLog(shader));  // eslint-disable-line
+    if (type == gl.VERTEX_SHADER)
+    	alert("ERROR IN VERTEX SHADER : " + gl.getShaderInfoLog(vertexShader));
+    else if (type == gl.FRAGMENT_SHADER)
+    	alert("ERROR IN FRAGMENT SHADER : " + gl.getShaderInfoLog(fragmentShader));
     gl.deleteShader(shader);
-    throw "could not compile shader:" + gl.getShaderInfoLog(shader);
+    throw Error("could not compile shader:" + gl.getShaderInfoLog(shader));
   }
 
 },
@@ -29,10 +41,9 @@ createProgram:function(gl, vertexShader, fragmentShader) {
   if (success) {
     return program;
   }else{
-     throw ("program filed to link:" + gl.getProgramInfoLog (program));
     console.log(gl.getProgramInfoLog(program));  // eslint-disable-line
     gl.deleteProgram(program);
-    return undefined;
+		throw Error("program filed to link:" + gl.getProgramInfoLog (program));
   }
 },
 
@@ -61,11 +72,19 @@ createProgram:function(gl, vertexShader, fragmentShader) {
 		//send the request
 		xmlHttp.send();
 	},
+	get_objstr:async function(url){
+		var response = await fetch(url);
+		if (!response.ok) {
+			alert('Network response was not ok');
+			return;
+		}
+		return response.text();
+	},
 	
 	//function to convert decimal value of colors 
 	decimalToHex: function(d, padding) {
 		var hex = Number(d).toString(16);
-		padding = typeof (padding) === "undefined" || padding === null ? padding = 2 : padding;
+		padding = typeof (padding) === "undefined" || padding === null ? 2 : padding;
 
 		while (hex.length < padding) {
 			hex = "0" + hex;
@@ -143,7 +162,6 @@ createProgram:function(gl, vertexShader, fragmentShader) {
 			context.bindTexture(context.TEXTURE_2D, texture);
 			
 			context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, image);
-			//context.pixelStorei(context.UNPACK_FLIP_Y_WEBGL, 1);
 			context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_S, context.CLAMP_TO_EDGE); 
 			context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_T, context.CLAMP_TO_EDGE);
 			context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.LINEAR);
@@ -369,7 +387,7 @@ createProgram:function(gl, vertexShader, fragmentShader) {
 		det = m[0] * inv[0] + m[1] * inv[4] + m[2] * inv[8] + m[3] * inv[12];
 
 		if (det == 0)
-			return out = this.identityMatrix();
+			return this.identityMatrix();
 
 		det = 1.0 / det;
 
@@ -385,7 +403,6 @@ createProgram:function(gl, vertexShader, fragmentShader) {
 		
 		var row, column, row_offset;
 		
-		row_offset=0;
 		for (row = 0; row < 4; ++row) {
 			row_offset = row * 4;
 			for (column = 0; column < 4; ++column){
@@ -401,7 +418,6 @@ createProgram:function(gl, vertexShader, fragmentShader) {
 		
 		var row, column, row_offset;
 		
-		row_offset=0;
 		for (row = 0; row < 4; ++row) {
 			row_offset = row * 4;
 			for (column = 0; column < 4; ++column){
@@ -515,6 +531,17 @@ createProgram:function(gl, vertexShader, fragmentShader) {
 		return out; 
 	},
 
+  MakeRotateXYZMatrix: function(rx, ry, rz, s){
+    //Creates a world matrix for an object.
+      var Rx = this.MakeRotateXMatrix(ry);                
+      var Ry = this.MakeRotateYMatrix(rx);
+      var Rz = this.MakeRotateZMatrix(rz);
+      
+      out = this.multiplyMatrices(Ry, Rz);
+      out = this.multiplyMatrices(Rx, out);
+      return out;
+  },
+
 	MakeScaleMatrix: function(s) {
 	// Create a transform matrix for proportional scale
 
@@ -572,7 +599,7 @@ createProgram:function(gl, vertexShader, fragmentShader) {
 		},
 
 	MakeView: function(cx, cy, cz, elev, ang) {
-	// Creates in {out} a view matrix. The camera is centerd in ({cx}, {cy}, {cz}).
+	// Creates in {out} a view matrix. The camera is centered in ({cx}, {cy}, {cz}).
 	// It looks {ang} degrees on y axis, and {elev} degrees on the x axis.
 		
 		var T = [];

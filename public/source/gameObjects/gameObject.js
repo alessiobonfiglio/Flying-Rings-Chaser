@@ -1,4 +1,4 @@
-import {default as utils} from "/source/utils.js"
+import {default as utils} from "../utils.js"
 
 class GameObject // should be an abstract class if js allows that
 {
@@ -13,6 +13,16 @@ class GameObject // should be an abstract class if js allows that
         return this._vertices;
     }
 
+    get normals()
+    {
+        return this._normals;
+    }
+
+    get texcoords()
+    {
+        return this._texcoords;
+    }
+
     get indices()
     {
         return this._indices;
@@ -23,9 +33,18 @@ class GameObject // should be an abstract class if js allows that
     {        
         var scaleMat = utils.MakeScaleNuMatrix(this.scale[0], this.scale[1], this.scale[2]);
         var worldMatWithNoScale  = utils.MakeWorld(this.position[0], this.position[1], this.position[2], this.orientation[0], this.orientation[1], this.orientation[2], 1);
-        var ret = utils.multiplyMatrices(worldMatWithNoScale, scaleMat);
+        return utils.multiplyMatrices(worldMatWithNoScale, scaleMat);
+    }
 
-        return ret;
+    async init()
+    {
+        let objStr = await utils.get_objstr(this._sourceFile);
+        let objModel = new OBJ.Mesh(objStr);
+    
+        this._vertices = objModel.vertices;
+        this._normals = objModel.normals;
+        this._indices = objModel.indices;
+        this._texcoords = objModel.textures;
     }
 }
 

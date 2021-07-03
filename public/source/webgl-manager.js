@@ -5,10 +5,13 @@ class WebGlManager
     #gl;
     #vertexShaderSource;
     #fragmentShaderSource;
-    #positionAttributeLocation;    
+    #positionAttributeLocation;
+    #normalAttributeLocation;
     #matrixUniformLocation;
     #program;
-    #positionBuffer;    
+    #positionBuffer;
+    #normalBuffer
+    #texcoordBuffer
     #indexBuffer;
     #vao;
     #instantiatedObjects = [];
@@ -40,9 +43,12 @@ class WebGlManager
 
         // look up where the vertex data needs to go.
         this.#positionAttributeLocation = this.#gl.getAttribLocation(this.#program, "a_position");
+        this.#normalAttributeLocation = this.#gl.getAttribLocation(this.#program, "a_normal");
 
         this.#matrixUniformLocation = this.#gl.getUniformLocation(this.#program, "matrix");
         this.#positionBuffer = this.#gl.createBuffer();
+        this.#normalBuffer = this.#gl.createBuffer();
+        this.#texcoordBuffer = this.#gl.createBuffer();
         this.#indexBuffer = this.#gl.createBuffer();
         this.#vao = this.#gl.createVertexArray();
     }    
@@ -74,13 +80,13 @@ class WebGlManager
         this.#gl.clearColor(0, 0, 0, 0);
         this.#gl.clear(this.#gl.COLOR_BUFFER_BIT | this.#gl.DEPTH_BUFFER_BIT);
 
-        // Poistion Attriute Setup
+        // Position Attribute Setup
         this.#gl.enableVertexAttribArray(this.#positionAttributeLocation);
         this.#gl.vertexAttribPointer(this.#positionAttributeLocation, 3, this.#gl.FLOAT, false, 0, 0);
 
-        // Bind position and indices buffer.
-        this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, this.#positionBuffer);
-        this.#gl.bindBuffer(this.#gl.ELEMENT_ARRAY_BUFFER, this.#indexBuffer);
+        // Normal Attribute Setup
+        this.#gl.enableVertexAttribArray(this.#normalAttributeLocation);
+        this.#gl.vertexAttribPointer(this.#normalAttributeLocation, 3, this.#gl.FLOAT, false, 0, 0);
         
         this.#drawGameObjects();
     }
@@ -96,12 +102,20 @@ class WebGlManager
             this.#gl.bindVertexArray(this.#vao);
 
             // add the vertices to the buffer
-            this.#gl.bufferData(this.#gl.ARRAY_BUFFER, new Float32Array(gameObject.vertices), this.#gl.STATIC_DRAW);            
+            this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, this.#positionBuffer);
+            this.#gl.bufferData(this.#gl.ARRAY_BUFFER, new Float32Array(gameObject.vertices), this.#gl.STATIC_DRAW);
+
+            // add the normals to the buffer
+            //this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, this.#normalBuffer);
+            //this.#gl.bufferData(this.#gl.ARRAY_BUFFER, new Float32Array(gameObject.normals), this.#gl.STATIC_DRAW);
+
+            // add the texture coordinates to the buffer
+            //this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, this.#texcoordBuffer);
+            //this.#gl.bufferData(this.#gl.ARRAY_BUFFER, new Float32Array(gameObject.texcoords), this.#gl.STATIC_DRAW);
 
             //add the indices to the buffer
             this.#gl.bindBuffer(this.#gl.ELEMENT_ARRAY_BUFFER, this.#indexBuffer);
-            this.#gl.bufferData(this.#gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(gameObject.indices), this.#gl.STATIC_DRAW); 
-            
+            this.#gl.bufferData(this.#gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(gameObject.indices), this.#gl.STATIC_DRAW);
 
             // Computing transformation matrix
             var matrix = this.#computeMatrix(gameObject, viewMatrix);
@@ -120,9 +134,7 @@ class WebGlManager
         var canvas = this.#gl.canvas;
         var worldMatrix = gameObject.worldMatrix();
         var perspectiveMatrix = utils.MakePerspective(90, canvas.width/canvas.height, 0.1, 100.0);
-        var matrix = utils.multiplyAllMatrices(perspectiveMatrix, viewMatrix, worldMatrix)
-
-        return matrix;
+        return utils.multiplyAllMatrices(perspectiveMatrix, viewMatrix, worldMatrix)
     }
 
     #createProgram(gl, vertexShader, fragmentShader)
@@ -149,11 +161,10 @@ class WebGlManager
         if (!success)
         {
             console.log(gl.getShaderInfoLog(shader));
-            if(type == gl.VERTEX_SHADER)
+            if (type == gl.VERTEX_SHADER)
                 alert("Error in Vertex Shader: " + gl.getShaderInfoLog(vertexShader));
-            else if(type == gl.FRAGMENT_SHADER){
-                alert("Error in Fragment Shader: " + gl.getShaderInfoLog(vertexShader));
-            }
+            else if (type == gl.FRAGMENT_SHADER)
+                alert("Error in Fragment Shader: " + gl.getShaderInfoLog(fragmentShader));
             gl.deleteShader(shader);
             throw Error("Could not compile shader:" + gl.getShaderInfoLog(shader));
         }

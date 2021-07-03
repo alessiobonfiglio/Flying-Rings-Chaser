@@ -5,8 +5,11 @@
 precision mediump float;
 out vec4 fragColor;
 
+// Passed in and varied from the vertex shader.
+in vec3 v_normal;
+
 void main() {
     // gl_FragColor is a special variable a fragment shader
     // is responsible for setting
-    fragColor = vec4(0.6, 0.6, 0.1, 1.0);
+    fragColor = vec4(v_normal, 1.0);
 }

@@ -1,8 +1,8 @@
-import {default as WebGlManager} from "/source/webgl-manager.js"
-import {default as Cube} from "/source/gameObjects/cube.js"
-import {default as Camera} from "/source/gameObjects/camera.js"
-import {default as utils} from "/source/utils.js"
-
+import {default as WebGlManager} from "./source/webgl-manager.js"
+import {default as Cube} from "./source/gameObjects/cube.js"
+import {default as Spaceship} from "./source/gameObjects/spaceship.js"
+import {default as Camera} from "./source/gameObjects/camera.js"
+import {default as utils} from "./source/utils.js"
 
 
 function main(gl, vertexShaderSource, fragmentShaderSource) 
@@ -18,7 +18,13 @@ function main(gl, vertexShaderSource, fragmentShaderSource)
   webGlManager.instantiate(cube1);
   webGlManager.instantiate(cube2);
 
-  refresh(webGlManager);
+  var spaceship = new Spaceship();
+  spaceship.position = [-2,0,5];
+  spaceship
+    .init()
+    .then(webGlManager.instantiate(spaceship))
+    .then(refresh(webGlManager));
+
   tmp(cube1, webGlManager);
 }
 
