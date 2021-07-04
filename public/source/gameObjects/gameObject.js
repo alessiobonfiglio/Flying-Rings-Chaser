@@ -28,6 +28,12 @@ class GameObject // should be an abstract class if js allows that
         return this._indices;
     }
 
+    // Color
+    get materialColor()
+    {
+        return this._materialColor;
+    }
+
 
     worldMatrix()
     {        
@@ -42,7 +48,7 @@ class GameObject // should be an abstract class if js allows that
         let objModel = new OBJ.Mesh(objStr);
     
         this._vertices = objModel.vertices;
-        this._normals = objModel.normals;
+        this._normals = objModel.vertexNormals;
         this._indices = objModel.indices;
         this._texcoords = objModel.textures;
     }

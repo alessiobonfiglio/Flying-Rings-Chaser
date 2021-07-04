@@ -72,6 +72,8 @@ class Cube extends GameObject
        -1.0, 0.0, 0.0,  // 22
         0.0, 1.0, 0.0   // 23
    ];
+
+   _materialColor = [0.5, 0.5, 0.5];
 }
 
 export default Cube;

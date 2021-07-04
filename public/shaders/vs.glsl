@@ -1,21 +1,15 @@
 #version 300 es
 
-// an attribute will receive data from a buffer
-in vec4 a_position;
-in vec3 a_normal;
+in vec3 inPosition;
+in vec3 inNormal;
 
-// A matrix to transform the positions by
+out vec3 fsNormal;
+
 uniform mat4 matrix;
+uniform mat4 nMatrix;
 
-// varying to pass the normal to the fragment shader
-out vec3 v_normal;
-
-// all shaders have a main function
 void main() {
-    // gl_Position is a special variable a vertex shader
-    // is responsible for setting
-    gl_Position = matrix * a_position;
+    gl_Position = matrix * vec4(inPosition, 1.0);
 
-    // Pass the normal to the fragment shader
-    v_normal = a_normal;
+    fsNormal = mat3(nMatrix) * inNormal;
 }

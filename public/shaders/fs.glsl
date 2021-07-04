@@ -1,15 +1,17 @@
 #version 300 es
     
-// fragment shaders don't have a default precision so we need
-// to pick one. mediump is a good default
 precision mediump float;
-out vec4 fragColor;
 
-// Passed in and varied from the vertex shader.
-in vec3 v_normal;
+in vec3 fsNormal;
+
+out vec4 outColor;
+
+uniform vec3 mDiffColor;
+uniform vec3 lightDirection;
+uniform vec3 lightColor;
 
 void main() {
-    // gl_FragColor is a special variable a fragment shader
-    // is responsible for setting
-    fragColor = vec4(v_normal, 1.0);
+    vec3 nNormal = normalize(fsNormal);
+    vec3 lambertColor = mDiffColor * lightColor * dot(-lightDirection, nNormal);
+    outColor = vec4(clamp(lambertColor, 0.0, 1.0), 1.0);
 }
