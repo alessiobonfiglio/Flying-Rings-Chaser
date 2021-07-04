@@ -8,20 +8,20 @@ class WebGlManager
 
     #positionAttributeLocation;
     #normalAttributeLocation;
+    #textureAttributeLocation;
 
-    #positionMatrixUniformLocation;
-    #normalMatrixUniformLocation;
-    #matrixUniformLocation
+    #positionUniformLocation;
+    #normalUniformLocation;
+    #textureUniformLocation;
 
     #materialDiffColorHandle;
     #lightDirectionHandle;
     #lightColorHandle;
     #directionalLightColor;
+
     #program;
     #instantiatedObjects = []; // contains a list of {gameObject, vao}
-    #classToVaoMap = new Map(); // maps gameObject class -> vao
-
-
+    #classToVaoMap = new Map(); // maps gameObject class -> [vao, texture]
 
     // Initialization
     constructor(context, vertexShaderSource, fragmentShaderSource)
@@ -34,11 +34,11 @@ class WebGlManager
     initialize() 
     {
         // Create GLSL shaders, upload the GLSL source, compile the shaders
-        var vertexShader = this.#createShader(this.#gl, this.#gl.VERTEX_SHADER, this.#vertexShaderSource);
-        var fragmentShader = this.#createShader(this.#gl, this.#gl.FRAGMENT_SHADER, this.#fragmentShaderSource);
+        var vertexShader = utils.createShader(this.#gl, this.#gl.VERTEX_SHADER, this.#vertexShaderSource);
+        var fragmentShader = utils.createShader(this.#gl, this.#gl.FRAGMENT_SHADER, this.#fragmentShaderSource);
 
         // Link the two shaders into a program
-        this.#program = this.#createProgram(this.#gl, vertexShader, fragmentShader);
+        this.#program = utils.createProgram(this.#gl, vertexShader, fragmentShader);
         this.#gl.useProgram(this.#program);
 
         // Deep test
@@ -47,10 +47,11 @@ class WebGlManager
         // Look up where the vertex data needs to go.
         this.#positionAttributeLocation = this.#gl.getAttribLocation(this.#program, "inPosition");
         this.#normalAttributeLocation = this.#gl.getAttribLocation(this.#program, "inNormal");
+        this.#textureAttributeLocation = this.#gl.getAttribLocation(this.#program, "inTexCoords");
 
-        this.#positionMatrixUniformLocation = this.#gl.getUniformLocation(this.#program, "matrix");
-        this.#normalMatrixUniformLocation = this.#gl.getUniformLocation(this.#program, "nMatrix");
-        this.#matrixUniformLocation = this.#gl.getUniformLocation(this.#program, "matrix");   
+        this.#positionUniformLocation = this.#gl.getUniformLocation(this.#program, "matrix");
+        this.#normalUniformLocation = this.#gl.getUniformLocation(this.#program, "nMatrix");
+        this.#textureUniformLocation = this.#gl.getUniformLocation(this.#program, "objectTexture");
 
         this.#materialDiffColorHandle = this.#gl.getUniformLocation(this.#program, "mDiffColor");
         this.#lightDirectionHandle = this.#gl.getUniformLocation(this.#program, "lightDirection");
@@ -65,8 +66,8 @@ class WebGlManager
     // Public Methods
     instantiate(gameObject) 
     {
-        var vao = this.addGameObjectVaoMap(gameObject);
-        this.#instantiatedObjects.push({gameObject: gameObject, vao: vao});
+        var [vao, texture] = this.#addGameObjectVaoMap(gameObject);
+        this.#instantiatedObjects.push({gameObject: gameObject, vao: vao, texture: texture});
     }
     
     destroy(gameObject)
@@ -74,7 +75,6 @@ class WebGlManager
         var index = this.#instantiatedObjects.indexOf(gameObject);
         this.#instantiatedObjects.splice(index, 1);
     }
-
 
     draw()
     {
@@ -94,7 +94,7 @@ class WebGlManager
     }
 
     // Private Methods
-    addGameObjectVaoMap(gameObject, vao)
+    #addGameObjectVaoMap(gameObject)
     {
         var vao = this.#vaoFromGameObject(gameObject);
         if(!vao)
@@ -122,19 +122,29 @@ class WebGlManager
         this.#gl.enableVertexAttribArray(this.#positionAttributeLocation);
         this.#gl.vertexAttribPointer(this.#positionAttributeLocation, 3, this.#gl.FLOAT, false, 0, 0);
 
-        //setup indices
+        // Setup indices
         var indexBuffer = this.#gl.createBuffer();
         this.#gl.bindBuffer(this.#gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
         this.#gl.bufferData(this.#gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(gameObject.indices), this.#gl.STATIC_DRAW);        
 
-        // normals
+        // Setup normals
         var normalBuffer = this.#gl.createBuffer();
         this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, normalBuffer);
         this.#gl.bufferData(this.#gl.ARRAY_BUFFER, new Float32Array(gameObject.normals), this.#gl.STATIC_DRAW);
         this.#gl.enableVertexAttribArray(this.#normalAttributeLocation);
         this.#gl.vertexAttribPointer(this.#normalAttributeLocation, 3, this.#gl.FLOAT, false, 0, 0);
 
-        return vao;
+        // Setup texture coordinates
+        var textureCoordinateBuffer = this.#gl.createBuffer();
+        this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, textureCoordinateBuffer);
+        this.#gl.bufferData(this.#gl.ARRAY_BUFFER, new Float32Array(gameObject.texcoords), this.#gl.STATIC_DRAW);
+        this.#gl.enableVertexAttribArray(this.#textureAttributeLocation);
+        this.#gl.vertexAttribPointer(this.#textureAttributeLocation, 2, this.#gl.FLOAT, false, 0, 0);
+
+        // Create the texture
+        var texture = utils.getTexture(this.#gl, gameObject._textureFile);
+
+        return [vao, texture];
     }
 
     #drawGameObjects()
@@ -143,15 +153,20 @@ class WebGlManager
         // setup transformation matrix from local coordinates to Clip coordinates
         for(var gameObjectWithVao of this.#instantiatedObjects)
         {
-            var [gameObject, vao] = [gameObjectWithVao.gameObject ,gameObjectWithVao.vao]
-            this.#gl.bindVertexArray(vao);            
+            var [gameObject, vao, texture] = [gameObjectWithVao.gameObject, gameObjectWithVao.vao, gameObjectWithVao.texture]
+            this.#gl.bindVertexArray(vao);
 
             // Computing transformation matrix
             var matrix = this.#computeMatrix(gameObject, viewMatrix);
 
             // Passing the matrix as a uniform to the vertex shader
-            this.#gl.uniformMatrix4fv(this.#positionMatrixUniformLocation, this.#gl.FALSE, utils.transposeMatrix(matrix));
-            this.#gl.uniformMatrix4fv(this.#normalMatrixUniformLocation, this.#gl.FALSE, utils.transposeMatrix(gameObject.worldMatrix()));
+            this.#gl.uniformMatrix4fv(this.#positionUniformLocation, this.#gl.FALSE, utils.transposeMatrix(matrix));
+            this.#gl.uniformMatrix4fv(this.#normalUniformLocation, this.#gl.FALSE, utils.transposeMatrix(gameObject.worldMatrix()));
+
+            // GameObject Texture
+            this.#gl.activeTexture(this.#gl.TEXTURE0);
+            this.#gl.bindTexture(this.#gl.TEXTURE_2D, texture.webglTexture);
+            this.#gl.uniform1i(this.#textureUniformLocation, 0);
 
             // GameObject Color
             this.#gl.uniform3fv(this.#materialDiffColorHandle, gameObject.materialColor);
@@ -161,47 +176,12 @@ class WebGlManager
         }
     }
 
-
     #computeMatrix(gameObject, viewMatrix)
     {
         var canvas = this.#gl.canvas;
         var worldMatrix = gameObject.worldMatrix();
         var perspectiveMatrix = utils.MakePerspective(90, canvas.width/canvas.height, 0.1, 100.0);
         return utils.multiplyAllMatrices(perspectiveMatrix, viewMatrix, worldMatrix)
-    }
-
-    #createProgram(gl, vertexShader, fragmentShader)
-    {
-        var program = gl.createProgram();
-        gl.attachShader(program, vertexShader);
-        gl.attachShader(program, fragmentShader);
-        gl.linkProgram(program);
-        var success = gl.getProgramParameter(program, gl.LINK_STATUS);
-        if (!success) 
-        {
-            gl.deleteProgram(program);
-            throw Error("Program filed to link:" + gl.getProgramInfoLog (program));
-        }
-        return program;
-    }
-
-    #createShader(gl, type, source)
-    {
-        var shader = gl.createShader(type);
-        gl.shaderSource(shader, source);
-        gl.compileShader(shader);
-        var success = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
-        if (!success)
-        {
-            console.log(gl.getShaderInfoLog(shader));
-            if (type == gl.VERTEX_SHADER)
-                alert("Error in Vertex Shader: " + gl.getShaderInfoLog(vertexShader));
-            else if (type == gl.FRAGMENT_SHADER)
-                alert("Error in Fragment Shader: " + gl.getShaderInfoLog(fragmentShader));
-            gl.deleteShader(shader);
-            throw Error("Could not compile shader:" + gl.getShaderInfoLog(shader));
-        }
-        return shader;
     }
 
     #resizeCanvasToDisplaySize(canvas, multiplier)
