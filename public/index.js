@@ -5,7 +5,7 @@ import {default as Camera} from "./source/gameObjects/camera.js"
 import {default as utils} from "./source/utils.js"
 
 
-function main(gl, vertexShaderSource, fragmentShaderSource) 
+async function main(gl, vertexShaderSource, fragmentShaderSource) 
 {
   var webGlManager = new WebGlManager(gl, vertexShaderSource, fragmentShaderSource);
   webGlManager.camera = buildCamera();
@@ -20,10 +20,9 @@ function main(gl, vertexShaderSource, fragmentShaderSource)
 
   var spaceship = new Spaceship();
   spaceship.position = [-2,0,5];
-  spaceship
-    .init()
-    .then(webGlManager.instantiate(spaceship))
-    .then(refresh(webGlManager));
+  await spaceship.init();
+  webGlManager.instantiate(spaceship)
+  refresh(webGlManager);
 
   tmp(cube1, webGlManager);
 }
