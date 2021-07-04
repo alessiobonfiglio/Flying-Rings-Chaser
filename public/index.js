@@ -11,17 +11,18 @@ async function main(gl, vertexShaderSource, fragmentShaderSource)
   webGlManager.camera = buildCamera();
   webGlManager.initialize();
   
-  var cube1 = new Cube();
-  cube1.position = [5,0,0];
-
-  var cube2 = new Cube();
-  webGlManager.instantiate(cube1);
-  webGlManager.instantiate(cube2);
-
   var spaceship = new Spaceship();
   spaceship.position = [-2,0,5];
   await spaceship.init();
-  webGlManager.instantiate(spaceship)
+  
+  var cube1 = new Cube();
+  cube1.position = [5,0,0];
+  
+  var cube2 = new Cube();
+  webGlManager.instantiate(cube1);
+  webGlManager.instantiate(spaceship);
+  webGlManager.instantiate(cube2);
+
   refresh(webGlManager);
 
   tmp(cube1, webGlManager);

@@ -11,23 +11,16 @@ class WebGlManager
 
     #positionMatrixUniformLocation;
     #normalMatrixUniformLocation;
+    #matrixUniformLocation
 
     #materialDiffColorHandle;
     #lightDirectionHandle;
     #lightColorHandle;
     #directionalLightColor;
-
     #program;
-    #positionBuffer;
-    #normalBuffer;
-    #texcoordBuffer;
-    #indexBuffer;
+    #instantiatedObjects = []; // contains a list of {gameObject, vao}
+    #classToVaoMap = new Map(); // maps gameObject class -> vao
 
-    #vao;
-    #instantiatedObjects = [];
-    
-    // Public variables
-    camera;
 
 
     // Initialization
@@ -57,17 +50,11 @@ class WebGlManager
 
         this.#positionMatrixUniformLocation = this.#gl.getUniformLocation(this.#program, "matrix");
         this.#normalMatrixUniformLocation = this.#gl.getUniformLocation(this.#program, "nMatrix");
+        this.#matrixUniformLocation = this.#gl.getUniformLocation(this.#program, "matrix");   
 
         this.#materialDiffColorHandle = this.#gl.getUniformLocation(this.#program, "mDiffColor");
         this.#lightDirectionHandle = this.#gl.getUniformLocation(this.#program, "lightDirection");
         this.#lightColorHandle = this.#gl.getUniformLocation(this.#program, "lightColor");
-
-        this.#positionBuffer = this.#gl.createBuffer();
-        this.#normalBuffer = this.#gl.createBuffer();
-        this.#texcoordBuffer = this.#gl.createBuffer();
-        this.#indexBuffer = this.#gl.createBuffer();
-
-        this.#vao = this.#gl.createVertexArray();
 
         // Lights
         this.#directionalLightColor = [0.1, 1.0, 1.0];
@@ -78,7 +65,8 @@ class WebGlManager
     // Public Methods
     instantiate(gameObject) 
     {
-        this.#instantiatedObjects.push(gameObject);
+        var vao = this.addGameObjectVaoMap(gameObject);
+        this.#instantiatedObjects.push({gameObject: gameObject, vao: vao});
     }
     
     destroy(gameObject)
@@ -105,35 +93,58 @@ class WebGlManager
         this.#drawGameObjects();
     }
 
-
     // Private Methods
+    addGameObjectVaoMap(gameObject, vao)
+    {
+        var vao = this.#vaoFromGameObject(gameObject);
+        if(!vao)
+        {
+            vao = this.#buildVao(gameObject);        
+            this.#classToVaoMap.set(gameObject.constructor.name, vao);
+        }            
+        return vao;
+    }
+
+    #vaoFromGameObject(gameObject)
+    {
+        return this.#classToVaoMap.get(gameObject.constructor.name);        
+    }
+
+    #buildVao(gameObject)
+    {
+        var vao = this.#gl.createVertexArray();
+        this.#gl.bindVertexArray(vao);
+
+        // Setup position buffer
+        var positionBuffer = this.#gl.createBuffer();
+        this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, positionBuffer);
+        this.#gl.bufferData(this.#gl.ARRAY_BUFFER, new Float32Array(gameObject.vertices), this.#gl.STATIC_DRAW);
+        this.#gl.enableVertexAttribArray(this.#positionAttributeLocation);
+        this.#gl.vertexAttribPointer(this.#positionAttributeLocation, 3, this.#gl.FLOAT, false, 0, 0);
+
+        //setup indices
+        var indexBuffer = this.#gl.createBuffer();
+        this.#gl.bindBuffer(this.#gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+        this.#gl.bufferData(this.#gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(gameObject.indices), this.#gl.STATIC_DRAW);        
+
+        // normals
+        var normalBuffer = this.#gl.createBuffer();
+        this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, normalBuffer);
+        this.#gl.bufferData(this.#gl.ARRAY_BUFFER, new Float32Array(gameObject.normals), this.#gl.STATIC_DRAW);
+        this.#gl.enableVertexAttribArray(this.#normalAttributeLocation);
+        this.#gl.vertexAttribPointer(this.#normalAttributeLocation, 3, this.#gl.FLOAT, false, 0, 0);
+
+        return vao;
+    }
+
     #drawGameObjects()
     {
         var viewMatrix = this.camera?.viewMatrix() ?? utils.MakeView(3.0, 3.0, 2.5, -45.0, -40.0); // default viewMatrix 
         // setup transformation matrix from local coordinates to Clip coordinates
-        for(var gameObject of this.#instantiatedObjects)
+        for(var gameObjectWithVao of this.#instantiatedObjects)
         {
-            this.#gl.bindVertexArray(this.#vao);
-
-            // Add the vertices to the buffer
-            this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, this.#positionBuffer);
-            this.#gl.bufferData(this.#gl.ARRAY_BUFFER, new Float32Array(gameObject.vertices), this.#gl.STATIC_DRAW);
-            this.#gl.enableVertexAttribArray(this.#positionAttributeLocation);
-            this.#gl.vertexAttribPointer(this.#positionAttributeLocation, 3, this.#gl.FLOAT, false, 0, 0);
-
-            // Add the normals to the buffer
-            this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, this.#normalBuffer);
-            this.#gl.bufferData(this.#gl.ARRAY_BUFFER, new Float32Array(gameObject.normals), this.#gl.STATIC_DRAW);
-            this.#gl.enableVertexAttribArray(this.#normalAttributeLocation);
-            this.#gl.vertexAttribPointer(this.#normalAttributeLocation, 3, this.#gl.FLOAT, false, 0, 0);
-
-            // Add the texture coordinates to the buffer
-            //this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, this.#texcoordBuffer);
-            //this.#gl.bufferData(this.#gl.ARRAY_BUFFER, new Float32Array(gameObject.texcoords), this.#gl.STATIC_DRAW);
-
-            // Add the indices to the buffer
-            this.#gl.bindBuffer(this.#gl.ELEMENT_ARRAY_BUFFER, this.#indexBuffer);
-            this.#gl.bufferData(this.#gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(gameObject.indices), this.#gl.STATIC_DRAW);
+            var [gameObject, vao] = [gameObjectWithVao.gameObject ,gameObjectWithVao.vao]
+            this.#gl.bindVertexArray(vao);            
 
             // Computing transformation matrix
             var matrix = this.#computeMatrix(gameObject, viewMatrix);
