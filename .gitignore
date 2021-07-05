@@ -118,3 +118,5 @@ dist
 .yarn/install-state.gz
 .pnp.*
 public/mongoose_linux
+
+.idea/
