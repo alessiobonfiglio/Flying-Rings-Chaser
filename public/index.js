@@ -7,9 +7,9 @@ import {default as utils} from "./source/utils.js"
 async function main(gl, vertexShaderSource, fragmentShaderSource) 
 {
   var webGlManager = new WebGlManager(gl, vertexShaderSource, fragmentShaderSource);
-  await setupGlObjects(webGlManager);
   webGlManager.camera = buildCamera();
   webGlManager.initialize();
+  await setupGlObjects(webGlManager);
   
   var spaceship = new Spaceship();
   spaceship.position = [-2,0,5];
@@ -87,7 +87,7 @@ async function init() {
     // de-comment to enable webgl debug (just print errors)
     //gl = WebGLDebugUtils.makeDebugContext(gl);
     // de-comment to enable webgl debug (with verbose logging of every function call)
-    gl = WebGLDebugUtils.makeDebugContext(gl, undefined, logGLCall);
+    //gl = WebGLDebugUtils.makeDebugContext(gl, undefined, logGLCall);
     
     // load the shader files
     var vertexShaderSource;
