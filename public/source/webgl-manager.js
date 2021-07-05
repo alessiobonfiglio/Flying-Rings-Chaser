@@ -21,7 +21,7 @@ class WebGlManager
 
     #program;
     #instantiatedObjects = []; // contains a list of {gameObject, vao}
-    #classToVaoMap = new Map(); // maps gameObject class -> [vao, texture]
+    #classToGlObjectMap = new Map(); // maps gameObject class -> GlObject
 
     // Initialization
     constructor(context, vertexShaderSource, fragmentShaderSource)
@@ -66,8 +66,9 @@ class WebGlManager
     // Public Methods
     instantiate(gameObject) 
     {
-        var [vao, texture] = this.#addGameObjectVaoMap(gameObject);
-        this.#instantiatedObjects.push({gameObject: gameObject, vao: vao, texture: texture});
+        var glObject = this.#classToGlObjectMap.get(gameObject.constructor.name);
+        glObject.texture = utils.getTexture(this.#gl, gameObject._textureFile);
+        this.#instantiatedObjects.push({gameObject: gameObject, glObject: glObject});
     }
     
     destroy(gameObject)
@@ -91,70 +92,60 @@ class WebGlManager
         this.#gl.clear(this.#gl.COLOR_BUFFER_BIT | this.#gl.DEPTH_BUFFER_BIT);
 
         this.#drawGameObjects();
+    }    
+
+    bindGlModel(objModel, className)
+    {
+        var glModel = this.#buildGlObject(objModel);
+        this.#classToGlObjectMap.set(className, glModel);
     }
+
 
     // Private Methods
-    #addGameObjectVaoMap(gameObject)
+    #buildGlObject(objModel)
     {
-        var vao = this.#vaoFromGameObject(gameObject);
-        if(!vao)
-        {
-            vao = this.#buildVao(gameObject);        
-            this.#classToVaoMap.set(gameObject.constructor.name, vao);
-        }            
-        return vao;
-    }
-
-    #vaoFromGameObject(gameObject)
-    {
-        return this.#classToVaoMap.get(gameObject.constructor.name);        
-    }
-
-    #buildVao(gameObject)
-    {
-        var vao = this.#gl.createVertexArray();
+        var vao = this.#gl.createVertexArray();        
         this.#gl.bindVertexArray(vao);
 
         // Setup position buffer
         var positionBuffer = this.#gl.createBuffer();
         this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, positionBuffer);
-        this.#gl.bufferData(this.#gl.ARRAY_BUFFER, new Float32Array(gameObject.vertices), this.#gl.STATIC_DRAW);
+        this.#gl.bufferData(this.#gl.ARRAY_BUFFER, new Float32Array(objModel.vertices), this.#gl.STATIC_DRAW);
         this.#gl.enableVertexAttribArray(this.#positionAttributeLocation);
         this.#gl.vertexAttribPointer(this.#positionAttributeLocation, 3, this.#gl.FLOAT, false, 0, 0);
 
         // Setup indices
         var indexBuffer = this.#gl.createBuffer();
         this.#gl.bindBuffer(this.#gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-        this.#gl.bufferData(this.#gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(gameObject.indices), this.#gl.STATIC_DRAW);        
+        this.#gl.bufferData(this.#gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(objModel.indices), this.#gl.STATIC_DRAW);        
 
         // Setup normals
         var normalBuffer = this.#gl.createBuffer();
         this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, normalBuffer);
-        this.#gl.bufferData(this.#gl.ARRAY_BUFFER, new Float32Array(gameObject.normals), this.#gl.STATIC_DRAW);
+        this.#gl.bufferData(this.#gl.ARRAY_BUFFER, new Float32Array(objModel.vertexNormals), this.#gl.STATIC_DRAW);
         this.#gl.enableVertexAttribArray(this.#normalAttributeLocation);
         this.#gl.vertexAttribPointer(this.#normalAttributeLocation, 3, this.#gl.FLOAT, false, 0, 0);
 
         // Setup texture coordinates
         var textureCoordinateBuffer = this.#gl.createBuffer();
         this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, textureCoordinateBuffer);
-        this.#gl.bufferData(this.#gl.ARRAY_BUFFER, new Float32Array(gameObject.texcoords), this.#gl.STATIC_DRAW);
+        this.#gl.bufferData(this.#gl.ARRAY_BUFFER, new Float32Array(objModel.textures), this.#gl.STATIC_DRAW);
         this.#gl.enableVertexAttribArray(this.#textureAttributeLocation);
         this.#gl.vertexAttribPointer(this.#textureAttributeLocation, 2, this.#gl.FLOAT, false, 0, 0);
 
-        // Create the texture
-        var texture = utils.getTexture(this.#gl, gameObject._textureFile);
+       
 
-        return [vao, texture];
+        return new WebGlObject(vao, objModel);
     }
 
     #drawGameObjects()
     {
         var viewMatrix = this.camera?.viewMatrix() ?? utils.MakeView(3.0, 3.0, 2.5, -45.0, -40.0); // default viewMatrix 
         // setup transformation matrix from local coordinates to Clip coordinates
-        for(var gameObjectWithVao of this.#instantiatedObjects)
+        for(var instance of this.#instantiatedObjects)
         {
-            var [gameObject, vao, texture] = [gameObjectWithVao.gameObject, gameObjectWithVao.vao, gameObjectWithVao.texture]
-            this.#gl.bindVertexArray(vao);
+            var [gameObject, glObject] = [instance.gameObject, instance.glObject];
+            this.#gl.bindVertexArray(glObject.vao);
 
             // Computing transformation matrix
             var matrix = this.#computeMatrix(gameObject, viewMatrix);
@@ -165,14 +156,14 @@ class WebGlManager
 
             // GameObject Texture
             this.#gl.activeTexture(this.#gl.TEXTURE0);
-            this.#gl.bindTexture(this.#gl.TEXTURE_2D, texture.webglTexture);
+            this.#gl.bindTexture(this.#gl.TEXTURE_2D, glObject.texture.webglTexture);
             this.#gl.uniform1i(this.#textureUniformLocation, 0);
 
             // GameObject Color
             this.#gl.uniform3fv(this.#materialDiffColorHandle, gameObject.materialColor);
 
             // Drawing the gameObject
-            this.#gl.drawElements(this.#gl.TRIANGLES, gameObject.indices.length, this.#gl.UNSIGNED_SHORT, 0);
+            this.#gl.drawElements(this.#gl.TRIANGLES, glObject.totIndices, this.#gl.UNSIGNED_SHORT, 0);
         }
     }
 
@@ -207,6 +198,20 @@ class WebGlManager
             Math.sin(dirLightAlpha),
             Math.cos(dirLightAlpha) * Math.sin(dirLightBeta)
         ];
+    }
+}
+
+
+class WebGlObject
+{
+    vao;
+    texture;
+    totIndices;
+    
+    constructor(vao, objModel)
+    {
+        this.vao = vao;
+        this.totIndices = objModel.indices.length;
     }
 }
 

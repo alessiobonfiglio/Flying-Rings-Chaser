@@ -41,17 +41,6 @@ class GameObject // should be an abstract class if js allows that
         var worldMatWithNoScale  = utils.MakeWorld(this.position[0], this.position[1], this.position[2], this.orientation[0], this.orientation[1], this.orientation[2], 1);
         return utils.multiplyMatrices(worldMatWithNoScale, scaleMat);
     }
-
-    async init()
-    {
-        let objStr = await utils.get_objstr(this._sourceFile);
-        let objModel = new OBJ.Mesh(objStr);
-    
-        this._vertices = objModel.vertices;
-        this._normals = objModel.vertexNormals;
-        this._indices = objModel.indices;
-        this._texcoords = objModel.textures;
-    }
 }
 
 export default GameObject;

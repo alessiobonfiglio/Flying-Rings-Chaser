@@ -8,24 +8,16 @@ import {default as utils} from "./source/utils.js"
 async function main(gl, vertexShaderSource, fragmentShaderSource) 
 {
   var webGlManager = new WebGlManager(gl, vertexShaderSource, fragmentShaderSource);
+  await setupGlObjects(webGlManager);
   webGlManager.camera = buildCamera();
   webGlManager.initialize();
   
   var spaceship = new Spaceship();
   spaceship.position = [-2,0,5];
-  await spaceship.init();
   
-  var cube1 = new Cube();
-  cube1.position = [5,0,0];
-  
-  var cube2 = new Cube();
-  webGlManager.instantiate(cube1);
   webGlManager.instantiate(spaceship);
-  webGlManager.instantiate(cube2);
 
   refresh(webGlManager);
-
-  tmp(cube1, webGlManager);
 }
 
 
@@ -51,19 +43,28 @@ async function refresh(glManager)
   }
 }
 
-async function tmp(gameObject, glManager)
-{
-  await delay(3000);
-  glManager.destroy(gameObject);
-}
-
-
 // utils
 function delay(time) {
   return new Promise((resolve) => {
       setTimeout(() => resolve(), time);
   });
 }
+
+
+async function setupGlObjects(glManager)
+{
+  var info =
+  [
+    [Spaceship.sourceFile, "Spaceship"]
+  ];
+
+  for(var [fileName, className] of info)
+  {
+    var objModel = new OBJ.Mesh(await utils.get_objstr(fileName));
+    glManager.bindGlModel(objModel, className);
+  }
+}
+
 
 async function init() {
   
