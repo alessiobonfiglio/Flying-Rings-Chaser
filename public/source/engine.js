@@ -27,7 +27,7 @@ class GameEngine {
 		this.#gameConfig = gameConfig;
 
 		this.#frameInterval = 1000.0 / gameConfig.fpsLimit;
-        this.#frameCount = 0;
+		this.#frameCount = 0;
 	}
 
 	setup() {
@@ -39,7 +39,7 @@ class GameEngine {
 		this.#webGlManager.instantiate(this.#spaceship);
 
 		this.#cubes[0] = new Cube();
-		this.#cubes[0].position = [5,0,0];
+		this.#cubes[0].position = [5, 0, 0];
 		this.#webGlManager.instantiate(this.#cubes[0]);
 		this.#cubes[1] = new Cube();
 		this.#webGlManager.instantiate(this.#cubes[1]);

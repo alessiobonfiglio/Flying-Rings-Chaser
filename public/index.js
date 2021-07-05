@@ -3,6 +3,7 @@ import {default as GameEngine} from "./source/engine.js"
 import {default as Cube} from "./source/gameObjects/cube.js"
 import {default as Spaceship} from "./source/gameObjects/spaceship.js"
 import {default as utils} from "./source/utils.js"
+import DefaultShaderClass from "./shaders/shaderClasses.js";
 
 
 async function setupGlObjects(glManager, gl) {
@@ -13,11 +14,28 @@ async function setupGlObjects(glManager, gl) {
 		];
 
 	for (const [objClass, className] of info) {
-		const objFileName = objClass.sourceFile;
-		const objModel = new OBJ.Mesh(await utils.get_objstr(objFileName));
-		const textureFileName = objClass.textureFile;
-		const texture = utils.getTextureFromImage(gl, await utils.loadImage(textureFileName));
-		glManager.bindGlModel(objModel, texture, className);
+		// load the obj file
+		const objModel = new OBJ.Mesh(await utils.get_objstr(objClass.objFilename));
+		// load the texture
+		const texture = utils.getTextureFromImage(gl, await utils.loadImage(objClass.textureFilename));
+
+		glManager.bindGlModel(objModel, texture, objClass.shaderClass, className);
+	}
+}
+
+async function setupGlShaders(glManager, gl) {
+	const info =
+		[
+			DefaultShaderClass
+		];
+
+	for (const shaderClass of info) {
+		// load the shader files
+		const shaderText = await utils.loadFilesAsync([shaderClass.vertexShaderFilename, shaderClass.fragmentShaderFilename]);
+		const vertexShaderSource = shaderText[0];
+		const fragmentShaderSource = shaderText[1];
+
+		glManager.bindGLShader(shaderClass, vertexShaderSource, fragmentShaderSource);
 	}
 }
 
@@ -31,7 +49,6 @@ async function init() {
 	const path = window.location.pathname;
 	const page = path.split("/").pop();
 	const baseDir = window.location.href.replace(page, '');
-	const shaderDir = baseDir + "shaders/";
 
 	// Get A WebGL context
 	const canvas = document.getElementById("c");
@@ -46,14 +63,10 @@ async function init() {
 	// de-comment to enable webgl debug (with verbose logging of every function call)
 	//gl = WebGLDebugUtils.makeDebugContext(gl, undefined, logGLCall);
 
-	// load the shader files
-	const shaderText = await utils.loadFilesAsync([shaderDir + 'vs.glsl', shaderDir + 'fs.glsl']);
-	const vertexShaderSource = shaderText[0];
-	const fragmentShaderSource = shaderText[1];
-
 	// create and initialize the WebGL manager
-	const webGlManager = new WebGlManager(gl, vertexShaderSource, fragmentShaderSource);
+	const webGlManager = new WebGlManager(gl);
 	webGlManager.initialize();
+	await setupGlShaders(webGlManager, gl);
 	await setupGlObjects(webGlManager, gl);
 
 	// create the setting of the game

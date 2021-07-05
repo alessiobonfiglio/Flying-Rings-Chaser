@@ -1,9 +1,11 @@
 import {default as GameObject} from "./gameObject.js"
+import {default as DefaultShaderClass} from "../../shaders/shaderClasses.js";
 
 class Cube extends GameObject {
-    static sourceFile = 'resources/cube/cube.obj';
-    static textureFile = 'resources/cube/crate.png';
-    _materialColor = [0.5, 0.5, 0.5];
+	static objFilename = "resources/cube/cube.obj";
+	static textureFilename = "resources/cube/crate.png";
+	static shaderClass = new DefaultShaderClass();
+	_materialColor = [0.5, 0.5, 0.5];
 }
 
 export default Cube;
