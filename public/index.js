@@ -3,13 +3,6 @@ import {default as GameEngine} from "./source/engine.js"
 import {default as Spaceship} from "./source/gameObjects/spaceship.js"
 import {default as utils} from "./source/utils.js"
 
-// utils
-function delay(time) {
-	return new Promise((resolve) => {
-		setTimeout(() => resolve(), time);
-	});
-}
-
 
 async function setupGlObjects(glManager, gl) {
 	const info =
