@@ -65,16 +65,6 @@ function delay(time) {
   });
 }
 
-function sum(a, b)
-{
-    return [a[0] + b[0], a[1] + b[1]];
-}
-
-function minus(a)
-{
-  return [-a[0], -a[1]];
-}
-
 async function init() {
   
     var path = window.location.pathname;
@@ -95,10 +85,9 @@ async function init() {
     var vertexShaderSource;
     var fragmentShaderSource;
     
-    await utils.loadFiles([shaderDir + 'vs.glsl', shaderDir + 'fs.glsl'], function (shaderText) {
-      vertexShaderSource = shaderText[0];
-      fragmentShaderSource = shaderText[1];
-    });
+    var shaderText = await utils.loadFilesAsync([shaderDir + 'vs.glsl', shaderDir + 'fs.glsl']);
+    vertexShaderSource = shaderText[0];
+    fragmentShaderSource = shaderText[1];    
     
     main(gl, vertexShaderSource, fragmentShaderSource);
 }
