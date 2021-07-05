@@ -165,6 +165,7 @@ class WebGlManager
             // Drawing the gameObject
             this.#gl.drawElements(this.#gl.TRIANGLES, glObject.totIndices, this.#gl.UNSIGNED_SHORT, 0);
         }
+        throw new Error();
     }
 
     #computeMatrix(gameObject, viewMatrix)

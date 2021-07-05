@@ -4,7 +4,6 @@ import {default as Spaceship} from "./source/gameObjects/spaceship.js"
 import {default as Camera} from "./source/gameObjects/camera.js"
 import {default as utils} from "./source/utils.js"
 
-
 async function main(gl, vertexShaderSource, fragmentShaderSource) 
 {
   var webGlManager = new WebGlManager(gl, vertexShaderSource, fragmentShaderSource);
@@ -65,9 +64,13 @@ async function setupGlObjects(glManager)
   }
 }
 
+function logGLCall(functionName, args) {
+    console.log("gl." + functionName + "(" +
+        WebGLDebugUtils.glFunctionArgsToString(functionName, args) + ")");
+}
 
 async function init() {
-  
+
     var path = window.location.pathname;
     var page = path.split("/").pop();
     var baseDir = window.location.href.replace(page, '');
@@ -80,7 +83,11 @@ async function init() {
         document.write("GL context not opened");
         return;
     }
-    
+
+    // de-comment to enable webgl debug (just print errors)
+    //gl = WebGLDebugUtils.makeDebugContext(gl);
+    // de-comment to enable webgl debug (with verbose logging of every function call)
+    gl = WebGLDebugUtils.makeDebugContext(gl, undefined, logGLCall);
     
     // load the shader files
     var vertexShaderSource;
@@ -92,5 +99,4 @@ async function init() {
     
     main(gl, vertexShaderSource, fragmentShaderSource);
 }
-
 window.onload = init;
