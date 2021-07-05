@@ -97,6 +97,6 @@ async function init() {
     vertexShaderSource = shaderText[0];
     fragmentShaderSource = shaderText[1];    
     
-    main(gl, vertexShaderSource, fragmentShaderSource);
+    await main(gl, vertexShaderSource, fragmentShaderSource);
 }
 window.onload = init;
