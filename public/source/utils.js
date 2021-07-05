@@ -192,7 +192,35 @@ createProgram:function(gl, vertexShader, fragmentShader) {
 	return image;
 	},
 
+	loadImage: async function(imageUrl) {
+		let img;
+		const imageLoadPromise = new Promise(resolve => {
+			img = new Image();
+			img.onload = resolve;
+			img.src = imageUrl;
+		});
 
+		await imageLoadPromise;
+		return img;
+	},
+
+
+	getTextureFromImage: function(context, image){
+		const texture=context.createTexture();
+
+		context.bindTexture(context.TEXTURE_2D, texture);
+
+		context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, image);
+		context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_S, context.CLAMP_TO_EDGE);
+		context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_T, context.CLAMP_TO_EDGE);
+		context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.LINEAR);
+		context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MIN_FILTER, context.NEAREST_MIPMAP_LINEAR);
+		context.generateMipmap(context.TEXTURE_2D);
+
+		context.bindTexture(context.TEXTURE_2D, null);
+
+		return texture;
+	},
 
 	isPowerOfTwo: function(x) {
 		return (x & (x - 1)) == 0;
