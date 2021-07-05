@@ -1,6 +1,7 @@
 import {default as Cube} from "./gameObjects/cube.js";
 import {default as Spaceship} from "./gameObjects/spaceship.js";
 import {default as Camera} from "./gameObjects/camera.js";
+import {default as Asteroid} from "./gameObjects/asteroid.js";
 
 class GameEngine {
 	#webGlManager;
@@ -20,6 +21,7 @@ class GameEngine {
 	// game objects
 	#spaceship;
 	#cubes = [];
+	#asteroids = [];
 
 	constructor(webGlManager, window, gameConfig) {
 		this.#webGlManager = webGlManager;
@@ -31,18 +33,20 @@ class GameEngine {
 	}
 
 	setup() {
-		this.#webGlManager.camera = new Camera([3.0, 3.0, 5], -45.0, -40.0);
+		this.#webGlManager.camera = new Camera([0, 0, 0], 0, -180);
 
 		// initialize the spaceship object
 		this.#spaceship = new Spaceship();
-		this.#spaceship.position = [-2, 0, 5];
+		this.#spaceship.position = [-9, 0, 5];
 		this.#webGlManager.instantiate(this.#spaceship);
 
+		this.#createAsteroids();
+
 		this.#cubes[0] = new Cube();
-		this.#cubes[0].position = [5, 0, 0];
+		this.#cubes[0].position = [0, -7, 10];
 		this.#webGlManager.instantiate(this.#cubes[0]);
-		this.#cubes[1] = new Cube();
-		this.#webGlManager.instantiate(this.#cubes[1]);
+		//this.#cubes[1] = new Cube();
+		//this.#webGlManager.instantiate(this.#cubes[1]);
 
 		// must be done like this to keep a reference of 'this'
 		this.#wrapperCallback = function () {
@@ -57,6 +61,11 @@ class GameEngine {
 	#gameLoop() {
 
 		// do things here
+
+		this.#moveAsteroids();
+
+		//this.#webGlManager.camera.verticalAngle++;
+		//console.log(this.#webGlManager.camera.verticalAngle%360);
 
 
 		this.#webGlManager.draw();
@@ -86,6 +95,23 @@ class GameEngine {
 
 			this.#frameCount++;
 			this.#gameLoop();
+		}
+	}
+
+	#createAsteroids() {
+		for (let i = 0; i < this.#gameConfig.numberOfAsteroids; i++) {
+			const ast = new Asteroid();
+
+			ast.initialize(this.#gameConfig);
+
+			this.#webGlManager.instantiate(ast);
+			this.#asteroids.push(ast);
+		}
+	}
+
+	#moveAsteroids() {
+		for (const i of this.#asteroids) {
+			i.moveForward(this.#gameConfig);
 		}
 	}
 

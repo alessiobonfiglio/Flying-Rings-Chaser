@@ -2,6 +2,7 @@ import {default as utils} from "./utils.js"
 
 class WebGlManager {
 	#gl;
+	#gameSetting;
 
 	#directionalLightColor;
 
@@ -11,8 +12,9 @@ class WebGlManager {
 	#classToGLShaderProgramMap = new Map(); // maps shaderClass class -> GLShaderProgram
 
 	// Initialization
-	constructor(context) {
+	constructor(context, gameSetting) {
 		this.#gl = context;
+		this.#gameSetting = gameSetting;
 	}
 
 	initialize() {
@@ -141,7 +143,7 @@ class WebGlManager {
 	#computeMatrix(gameObject, viewMatrix) {
 		var canvas = this.#gl.canvas;
 		var worldMatrix = gameObject.worldMatrix();
-		var perspectiveMatrix = utils.MakePerspective(90, canvas.width / canvas.height, 0.1, 100.0);
+		var perspectiveMatrix = utils.MakePerspective(90, canvas.width / canvas.height, 0.1, this.#gameSetting.maxZ);
 		return utils.multiplyAllMatrices(perspectiveMatrix, viewMatrix, worldMatrix)
 	}
 

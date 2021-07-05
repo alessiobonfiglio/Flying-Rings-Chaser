@@ -3,14 +3,16 @@ import {default as GameEngine} from "./source/engine.js"
 import {default as Cube} from "./source/gameObjects/cube.js"
 import {default as Spaceship} from "./source/gameObjects/spaceship.js"
 import {default as utils} from "./source/utils.js"
-import DefaultShaderClass from "./shaders/shaderClasses.js";
+import {default as DefaultShaderClass} from "./shaders/shaderClasses.js";
+import {default as Asteroid} from "./source/gameObjects/asteroid.js";
 
 
 async function setupGlObjects(glManager, gl) {
 	const info =
 		[
 			[Cube, "Cube"],
-			[Spaceship, "Spaceship"]
+			[Spaceship, "Spaceship"],
+			[Asteroid, "Asteroid"]
 		];
 
 	for (const [objClass, className] of info) {
@@ -63,12 +65,6 @@ async function init() {
 	// de-comment to enable webgl debug (with verbose logging of every function call)
 	//gl = WebGLDebugUtils.makeDebugContext(gl, undefined, logGLCall);
 
-	// create and initialize the WebGL manager
-	const webGlManager = new WebGlManager(gl);
-	webGlManager.initialize();
-	await setupGlShaders(webGlManager, gl);
-	await setupGlObjects(webGlManager, gl);
-
 	// create the setting of the game
 	const gameSetting = {
 		maxHalfX: 100,
@@ -77,10 +73,16 @@ async function init() {
 		fpsLimit: 60,
 		gameSpeed: 1,
 		numberOfAsteroids: 20,
-		asteroidScaleRange: [1, 10],
-		asteroidSpeedRange: [1, 2],
-		asteroidRotationSpeedRange: [1, 2],
+		asteroidScaleRange: [0.1, 0.1],
+		asteroidSpeedRange: [20, 40],
+		asteroidRotationSpeedRange: [0, 30],
 	} //maybe load this from a json in the future?
+
+	// create and initialize the WebGL manager
+	const webGlManager = new WebGlManager(gl, gameSetting);
+	webGlManager.initialize();
+	await setupGlShaders(webGlManager, gl);
+	await setupGlObjects(webGlManager, gl);
 
 	// create and start the game engine
 	const gameEngine = new GameEngine(webGlManager, window, gameSetting);
