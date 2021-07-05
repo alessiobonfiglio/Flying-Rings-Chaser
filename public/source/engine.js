@@ -29,7 +29,7 @@ class GameEngine {
 	}
 
 	setup() {
-		this.#webGlManager.camera = this.#buildCamera();
+		this.#webGlManager.camera = new Camera([3.0, 3.0, 5], -45.0, -40.0);
 
 		// initialize the spaceship object
 		this.#spaceship = new Spaceship();
@@ -80,15 +80,6 @@ class GameEngine {
 			this.#frameCount++;
 			this.#gameLoop();
 		}
-	}
-
-	#buildCamera() {
-		const camera = new Camera();
-		camera.position = [3.0, 3.0, 5];
-		camera.horizontalAngle = -45.0;
-		camera.verticalAngle = -40.0;
-
-		return camera;
 	}
 
 }
