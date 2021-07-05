@@ -1,5 +1,6 @@
 import {default as WebGlManager} from "./source/webgl-manager.js"
 import {default as GameEngine} from "./source/engine.js"
+import {default as Cube} from "./source/gameObjects/cube.js"
 import {default as Spaceship} from "./source/gameObjects/spaceship.js"
 import {default as utils} from "./source/utils.js"
 
@@ -7,6 +8,7 @@ import {default as utils} from "./source/utils.js"
 async function setupGlObjects(glManager, gl) {
 	const info =
 		[
+			[Cube, "Cube"],
 			[Spaceship, "Spaceship"]
 		];
 

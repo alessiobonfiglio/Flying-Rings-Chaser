@@ -1,3 +1,4 @@
+import {default as Cube} from "./gameObjects/cube.js";
 import {default as Spaceship} from "./gameObjects/spaceship.js";
 import {default as Camera} from "./gameObjects/camera.js";
 
@@ -18,6 +19,7 @@ class GameEngine {
 
 	// game objects
 	#spaceship;
+	#cubes = [];
 
 	constructor(webGlManager, window, gameConfig) {
 		this.#webGlManager = webGlManager;
@@ -36,6 +38,11 @@ class GameEngine {
 		this.#spaceship.position = [-2, 0, 5];
 		this.#webGlManager.instantiate(this.#spaceship);
 
+		this.#cubes[0] = new Cube();
+		this.#cubes[0].position = [5,0,0];
+		this.#webGlManager.instantiate(this.#cubes[0]);
+		this.#cubes[1] = new Cube();
+		this.#webGlManager.instantiate(this.#cubes[1]);
 
 		// must be done like this to keep a reference of 'this'
 		this.#wrapperCallback = function () {

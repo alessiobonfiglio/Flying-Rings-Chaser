@@ -1,4 +1,4 @@
-import GameObject from "./gameObject.js";
+import {default as GameObject} from "./gameObject.js";
 
 class Spaceship extends GameObject {
 	static sourceFile = 'resources/spaceship/X-WING.obj';

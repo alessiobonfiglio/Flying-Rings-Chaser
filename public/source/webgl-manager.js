@@ -132,12 +132,7 @@ class WebGlManager
         this.#gl.enableVertexAttribArray(this.#textureAttributeLocation);
         this.#gl.vertexAttribPointer(this.#textureAttributeLocation, 2, this.#gl.FLOAT, false, 0, 0);
 
-        // setup Texture
-        this.#gl.activeTexture(this.#gl.TEXTURE0);
-        this.#gl.bindTexture(this.#gl.TEXTURE_2D, texture);
-        this.#gl.uniform1i(this.#textureUniformLocation, 0);
-
-        return new WebGlObject(vao, objModel);
+        return new WebGlObject(vao, texture, objModel);
     }
 
     #drawGameObjects()
@@ -155,6 +150,11 @@ class WebGlManager
             // Passing the matrix as a uniform to the vertex shader
             this.#gl.uniformMatrix4fv(this.#positionUniformLocation, this.#gl.FALSE, utils.transposeMatrix(matrix));
             this.#gl.uniformMatrix4fv(this.#normalUniformLocation, this.#gl.FALSE, utils.transposeMatrix(gameObject.worldMatrix()));
+
+			// GameObject Texture
+			this.#gl.activeTexture(this.#gl.TEXTURE0);
+			this.#gl.bindTexture(this.#gl.TEXTURE_2D, glObject.texture);
+			this.#gl.uniform1i(this.#textureUniformLocation, 0);
 
             // GameObject Color
             this.#gl.uniform3fv(this.#materialDiffColorHandle, gameObject.materialColor);
@@ -201,15 +201,16 @@ class WebGlManager
 
 class WebGlObject
 {
-    vao;
-    texture;
-    totIndices;
-    
-    constructor(vao, objModel)
-    {
-        this.vao = vao;
-        this.totIndices = objModel.indices.length;
-    }
+	vao;
+	texture;
+	totIndices;
+
+	constructor(vao, texture, objModel)
+	{
+		this.vao = vao;
+		this.texture = texture;
+		this.totIndices = objModel.indices.length;
+	}
 }
 
 export default WebGlManager;

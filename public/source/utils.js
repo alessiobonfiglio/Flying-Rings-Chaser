@@ -14,37 +14,33 @@ createAndCompileShaders:function(gl, shaderText) {
 },
 
 createShader:function(gl, type, source) {
-  var shader = gl.createShader(type);
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
-  var success = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
-  if (success) {    
-    return shader;
-  }else{
-    console.log(gl.getShaderInfoLog(shader));  // eslint-disable-line
-    if (type == gl.VERTEX_SHADER)
-    	alert("ERROR IN VERTEX SHADER : " + gl.getShaderInfoLog(vertexShader));
-    else if (type == gl.FRAGMENT_SHADER)
-    	alert("ERROR IN FRAGMENT SHADER : " + gl.getShaderInfoLog(fragmentShader));
-    gl.deleteShader(shader);
-    throw Error("could not compile shader:" + gl.getShaderInfoLog(shader));
-  }
-
+	var shader = gl.createShader(type);
+	gl.shaderSource(shader, source);
+	gl.compileShader(shader);
+	var success = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
+	if (!success) {
+		console.log(gl.getShaderInfoLog(shader));
+		if (type == gl.VERTEX_SHADER)
+			alert("Error in Vertex Shader: " + gl.getShaderInfoLog(vertexShader));
+		else if (type == gl.FRAGMENT_SHADER)
+			alert("Error in Fragment Shader: " + gl.getShaderInfoLog(fragmentShader));
+		gl.deleteShader(shader);
+		throw Error("Could not compile shader:" + gl.getShaderInfoLog(shader));
+	}
+	return shader;
 },
 
 createProgram:function(gl, vertexShader, fragmentShader) {
-  var program = gl.createProgram();
-  gl.attachShader(program, vertexShader);
-  gl.attachShader(program, fragmentShader);
-  gl.linkProgram(program);
-  var success = gl.getProgramParameter(program, gl.LINK_STATUS);
-  if (success) {
-    return program;
-  }else{
-    console.log(gl.getProgramInfoLog(program));  // eslint-disable-line
-    gl.deleteProgram(program);
-		throw Error("program filed to link:" + gl.getProgramInfoLog (program));
-  }
+	var program = gl.createProgram();
+	gl.attachShader(program, vertexShader);
+	gl.attachShader(program, fragmentShader);
+	gl.linkProgram(program);
+	var success = gl.getProgramParameter(program, gl.LINK_STATUS);
+	if (!success) {
+		gl.deleteProgram(program);
+		throw Error("Program filed to link:" + gl.getProgramInfoLog (program));
+	}
+	return program;
 },
 
  resizeCanvasToDisplaySize:function(canvas) {
@@ -176,6 +172,8 @@ createProgram:function(gl, vertexShader, fragmentShader) {
 			context.bindTexture(context.TEXTURE_2D, texture);
 			
 			context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, image);
+			context.pixelStorei(context.UNPACK_FLIP_Y_WEBGL, true);
+			context.pixelStorei(context.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
 			context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_S, context.CLAMP_TO_EDGE); 
 			context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_T, context.CLAMP_TO_EDGE);
 			context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.LINEAR);
@@ -211,6 +209,8 @@ createProgram:function(gl, vertexShader, fragmentShader) {
 		context.bindTexture(context.TEXTURE_2D, texture);
 
 		context.texImage2D(context.TEXTURE_2D, 0, context.RGBA, context.RGBA, context.UNSIGNED_BYTE, image);
+		context.pixelStorei(context.UNPACK_FLIP_Y_WEBGL, true);
+		context.pixelStorei(context.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
 		context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_S, context.CLAMP_TO_EDGE);
 		context.texParameteri(context.TEXTURE_2D, context.TEXTURE_WRAP_T, context.CLAMP_TO_EDGE);
 		context.texParameteri(context.TEXTURE_2D, context.TEXTURE_MAG_FILTER, context.LINEAR);
