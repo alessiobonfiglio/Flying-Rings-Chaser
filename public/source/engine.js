@@ -1,8 +1,8 @@
-import {default as Cube} from "./gameObjects/cube.js";
-import {default as Spaceship} from "./gameObjects/spaceship.js";
-import {default as Camera} from "./gameObjects/camera.js";
-import {default as Asteroid} from "./gameObjects/asteroid.js";
-import {default as Ring} from "./gameObjects/ring.js";
+import { default as Cube } from "./gameObjects/cube.js";
+import { default as Spaceship } from "./gameObjects/spaceship.js";
+import { default as Camera } from "./gameObjects/camera.js";
+import { default as Asteroid } from "./gameObjects/asteroid.js";
+import { default as Ring } from "./gameObjects/ring.js";
 
 class GameEngine {
 	#webGlManager;
@@ -46,7 +46,7 @@ class GameEngine {
 
 		this.#rings.push(new Ring());
 		this.#rings[0].position = [0, 1, 4];
-		this.#rings[0].orientation = [90,0,0];
+		this.#rings[0].orientation = [90, 0, 0];
 		this.#webGlManager.instantiate(this.#rings[0]);
 
 		this.#cubes[0] = new Cube();
@@ -69,10 +69,7 @@ class GameEngine {
 
 		// do things here
 
-		this.#moveAsteroids();
-		this.#spaceship.orientation[0] += 0.5;
-		this.#spaceship.orientation[1] += 1.0;
-		this.#spaceship.orientation[2] += 1.5;
+		this.#updateGameObjets();
 
 		//this.#webGlManager.camera.verticalAngle++;
 		//console.log(this.#webGlManager.camera.verticalAngle%360);
@@ -123,6 +120,14 @@ class GameEngine {
 		for (const i of this.#asteroids) {
 			i.moveForward(this.#gameConfig);
 		}
+	}
+
+	#updateGameObjets() {
+		let gameObjectLists = [this.#asteroids, this.#rings, this.#cubes, [this.#spaceship]];
+		for (let gameObjectList of gameObjectLists)
+			for (let gameObject of gameObjectList)
+				if (gameObject.update)
+					gameObject.update();
 	}
 
 }

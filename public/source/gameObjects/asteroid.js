@@ -1,17 +1,19 @@
-import {default as GameObject} from "./gameObject.js"
-import {DefaultShaderClass} from "../../shaders/shaderClasses.js";
-import {default as MathUtils} from "../math_utils.js";
+import { default as GameObject } from "./gameObject.js"
+import { DefaultShaderClass } from "../../shaders/shaderClasses.js";
+import { default as MathUtils } from "../math_utils.js";
 
 class Asteroid extends GameObject {
 	static objFilename = "resources/asteroids/brown_asteroid.obj";
 	static textureFilename = "resources/asteroids/brown.png";
 	static shaderClass = new DefaultShaderClass();
+	#gameConfig;
 	_materialColor = [0.5, 0.5, 0.5];
 
 	speed = 1;
 	rotationSpeed = [1, 1, 1];
 
 	initialize(gameConfig) {
+		this.#gameConfig = gameConfig;
 		const x = MathUtils.getRandomInRange(-gameConfig.maxHalfX, gameConfig.maxHalfX);
 		const y = MathUtils.getRandomInRange(-gameConfig.maxHalfY, gameConfig.maxHalfY);
 		const z = MathUtils.getRandomInRange(gameConfig.maxZ * 2 / 3, gameConfig.maxZ);
@@ -33,6 +35,13 @@ class Asteroid extends GameObject {
 		const rsz = MathUtils.getRandomInRange(gameConfig.asteroidRotationSpeedRange[0], gameConfig.asteroidRotationSpeedRange[1]);
 		this.rotationSpeed = [rsx, rsy, rsz];
 	}
+
+
+	// game events handlers
+	update() {
+		this.moveForward(this.#gameConfig);
+	}
+
 
 	moveForward(gameConfig) {
 		this.position[2] -= this.speed * (gameConfig.gameSpeed / gameConfig.fpsLimit);
