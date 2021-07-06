@@ -27,6 +27,7 @@ class Ring extends GameObject {
 	update() {
 		super.update();		
 	}
+	_materialColor = [255 / 255, 215 / 255, 0 / 255];
 }
 
 export default Ring;
