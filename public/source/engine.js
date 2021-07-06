@@ -2,6 +2,7 @@ import {default as Cube} from "./gameObjects/cube.js";
 import {default as Spaceship} from "./gameObjects/spaceship.js";
 import {default as Camera} from "./gameObjects/camera.js";
 import {default as Asteroid} from "./gameObjects/asteroid.js";
+import {default as Ring} from "./gameObjects/ring.js";
 
 class GameEngine {
 	#webGlManager;
@@ -22,6 +23,7 @@ class GameEngine {
 	#spaceship;
 	#cubes = [];
 	#asteroids = [];
+	#rings = [];
 
 	constructor(webGlManager, window, gameConfig) {
 		this.#webGlManager = webGlManager;
@@ -41,6 +43,11 @@ class GameEngine {
 		this.#webGlManager.instantiate(this.#spaceship);
 
 		this.#createAsteroids();
+
+		this.#rings.push(new Ring());
+		this.#rings[0].position = [0, 1, 4];
+		this.#rings[0].orientation = [90,0,0];
+		this.#webGlManager.instantiate(this.#rings[0]);
 
 		this.#cubes[0] = new Cube();
 		this.#cubes[0].position = [0, -7, 10];

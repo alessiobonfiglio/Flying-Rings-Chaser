@@ -1,5 +1,5 @@
 import {default as GameObject} from "./gameObject.js";
-import {default as DefaultShaderClass} from "../../shaders/shaderClasses.js"
+import {DefaultShaderClass} from "../../shaders/shaderClasses.js"
 
 class Spaceship extends GameObject {
 	static objFilename = "resources/spaceship/X-WING.obj";

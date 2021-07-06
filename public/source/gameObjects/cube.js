@@ -1,5 +1,5 @@
 import {default as GameObject} from "./gameObject.js"
-import {default as DefaultShaderClass} from "../../shaders/shaderClasses.js";
+import {DefaultShaderClass} from "../../shaders/shaderClasses.js";
 
 class Cube extends GameObject {
 	static objFilename = "resources/cube/cube.obj";

@@ -1,5 +1,5 @@
 import {default as GameObject} from "./gameObject.js"
-import {default as DefaultShaderClass} from "../../shaders/shaderClasses.js";
+import {DefaultShaderClass} from "../../shaders/shaderClasses.js";
 import {default as MathUtils} from "../math_utils.js";
 
 class Asteroid extends GameObject {

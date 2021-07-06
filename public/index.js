@@ -3,8 +3,9 @@ import {default as GameEngine} from "./source/engine.js"
 import {default as Cube} from "./source/gameObjects/cube.js"
 import {default as Spaceship} from "./source/gameObjects/spaceship.js"
 import {default as utils} from "./source/utils.js"
-import {default as DefaultShaderClass} from "./shaders/shaderClasses.js";
+import {DefaultShaderClass, RingShaderClass} from "./shaders/shaderClasses.js";
 import {default as Asteroid} from "./source/gameObjects/asteroid.js";
+import {default as Ring} from "./source/gameObjects/ring.js";
 
 
 async function setupGlObjects(glManager, gl) {
@@ -12,14 +13,20 @@ async function setupGlObjects(glManager, gl) {
 		[
 			[Cube, "Cube"],
 			[Spaceship, "Spaceship"],
-			[Asteroid, "Asteroid"]
+			[Asteroid, "Asteroid"],
+			[Ring, "Ring"]
 		];
 
 	for (const [objClass, className] of info) {
 		// load the obj file
 		const objModel = new OBJ.Mesh(await utils.get_objstr(objClass.objFilename));
 		// load the texture
-		const texture = utils.getTextureFromImage(gl, await utils.loadImage(objClass.textureFilename));
+		let texture;
+		if(objClass.textureFilename == null){
+			texture = null;
+		} else {
+			texture = utils.getTextureFromImage(gl, await utils.loadImage(objClass.textureFilename));
+		}
 
 		glManager.bindGlModel(objModel, texture, objClass.shaderClass, className);
 	}
@@ -28,7 +35,8 @@ async function setupGlObjects(glManager, gl) {
 async function setupGlShaders(glManager, gl) {
 	const info =
 		[
-			DefaultShaderClass
+			DefaultShaderClass,
+			RingShaderClass
 		];
 
 	for (const shaderClass of info) {

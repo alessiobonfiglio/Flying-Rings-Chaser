@@ -53,7 +53,7 @@ class WebGlManager {
 	}
 
 	bindGLShader(shaderClass, vertexShaderSource, fragmentShaderSource) {
-		const shaderProgram = new GLShaderProgram(this.#gl, vertexShaderSource, fragmentShaderSource);
+		const shaderProgram = new GLShaderProgram(this.#gl, vertexShaderSource, fragmentShaderSource, shaderClass.useTexture);
 		this.#classToGLShaderProgramMap.set(shaderClass.name, shaderProgram);
 	}
 
@@ -93,11 +93,13 @@ class WebGlManager {
 		this.#gl.vertexAttribPointer(shaderProgram.locations.normalAttributeLocation, 3, this.#gl.FLOAT, false, 0, 0);
 
 		// Setup texture coordinates
-		var textureCoordinateBuffer = this.#gl.createBuffer();
-		this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, textureCoordinateBuffer);
-		this.#gl.bufferData(this.#gl.ARRAY_BUFFER, new Float32Array(objModel.textures), this.#gl.STATIC_DRAW);
-		this.#gl.enableVertexAttribArray(shaderProgram.locations.textureAttributeLocation);
-		this.#gl.vertexAttribPointer(shaderProgram.locations.textureAttributeLocation, 2, this.#gl.FLOAT, false, 0, 0);
+		if(texture != null) {
+			var textureCoordinateBuffer = this.#gl.createBuffer();
+			this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, textureCoordinateBuffer);
+			this.#gl.bufferData(this.#gl.ARRAY_BUFFER, new Float32Array(objModel.textures), this.#gl.STATIC_DRAW);
+			this.#gl.enableVertexAttribArray(shaderProgram.locations.textureAttributeLocation);
+			this.#gl.vertexAttribPointer(shaderProgram.locations.textureAttributeLocation, 2, this.#gl.FLOAT, false, 0, 0);
+		}
 
 		const ret = new WebGlObject(vao, texture, objModel);
 		ret.shaderProgram = shaderProgram;
@@ -105,10 +107,10 @@ class WebGlManager {
 	}
 
 	#drawGameObjects() {
-		var viewMatrix = this.camera?.viewMatrix() ?? utils.MakeView(3.0, 3.0, 2.5, -45.0, -40.0); // default viewMatrix
+		const viewMatrix = this.camera?.viewMatrix() ?? utils.MakeView(3.0, 3.0, 2.5, -45.0, -40.0); // default viewMatrix
 		// setup transformation matrix from local coordinates to Clip coordinates
-		for (var instance of this.#instantiatedObjects) {
-			var [gameObject, glObject] = [instance.gameObject, instance.glObject];
+		for (const instance of this.#instantiatedObjects) {
+			const [gameObject, glObject] = [instance.gameObject, instance.glObject];
 
 			// Use the program of the glObject
 			this.#gl.useProgram(glObject.shaderProgram.program);
@@ -117,16 +119,18 @@ class WebGlManager {
 			this.#gl.bindVertexArray(glObject.vao);
 
 			// Computing transformation matrix
-			var matrix = this.#computeMatrix(gameObject, viewMatrix);
+			const matrix = this.#computeMatrix(gameObject, viewMatrix);
 
 			// Passing the matrix as a uniform to the vertex shader
 			this.#gl.uniformMatrix4fv(glObject.shaderProgram.locations.positionUniformLocation, this.#gl.FALSE, utils.transposeMatrix(matrix));
 			this.#gl.uniformMatrix4fv(glObject.shaderProgram.locations.normalUniformLocation, this.#gl.FALSE, utils.transposeMatrix(gameObject.worldMatrix()));
 
 			// GameObject Texture
-			this.#gl.activeTexture(this.#gl.TEXTURE0);
-			this.#gl.bindTexture(this.#gl.TEXTURE_2D, glObject.texture);
-			this.#gl.uniform1i(glObject.shaderProgram.locations.textureUniformLocation, 0);
+			if(glObject.shaderProgram.useTexture) {
+				this.#gl.activeTexture(this.#gl.TEXTURE0);
+				this.#gl.bindTexture(this.#gl.TEXTURE_2D, glObject.texture);
+				this.#gl.uniform1i(glObject.shaderProgram.locations.textureUniformLocation, 0);
+			}
 
 			// GameObject Color
 			this.#gl.uniform3fv(glObject.shaderProgram.locations.materialDiffColorHandle, gameObject.materialColor);
@@ -141,9 +145,9 @@ class WebGlManager {
 	}
 
 	#computeMatrix(gameObject, viewMatrix) {
-		var canvas = this.#gl.canvas;
-		var worldMatrix = gameObject.worldMatrix();
-		var perspectiveMatrix = utils.MakePerspective(90, canvas.width / canvas.height, 0.1, this.#gameSetting.maxZ);
+		const canvas = this.#gl.canvas;
+		const worldMatrix = gameObject.worldMatrix();
+		const perspectiveMatrix = utils.MakePerspective(90, canvas.width / canvas.height, 0.1, this.#gameSetting.maxZ);
 		return utils.multiplyAllMatrices(perspectiveMatrix, viewMatrix, worldMatrix)
 	}
 
@@ -160,8 +164,8 @@ class WebGlManager {
 	}
 
 	#directionalLight() {
-		var dirLightAlpha = -utils.degToRad(60);
-		var dirLightBeta = -utils.degToRad(120);
+		const dirLightAlpha = -utils.degToRad(60);
+		const dirLightBeta = -utils.degToRad(120);
 
 		return [
 			Math.cos(dirLightAlpha) * Math.cos(dirLightBeta),
@@ -187,14 +191,17 @@ class WebGlObject {
 class GLShaderProgram {
 	program;
 	locations = {};
+	useTexture;
 
-	constructor(gl, vertexShaderSource, fragmentShaderSource) {
+	constructor(gl, vertexShaderSource, fragmentShaderSource, useTexture) {
 		// Create GLSL shaders, upload the GLSL source, compile the shaders
 		const vertexShader = utils.createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
 		const fragmentShader = utils.createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
 
 		// Link the two shaders into a program and store into the glModel of the class
 		this.program = utils.createProgram(gl, vertexShader, fragmentShader);
+
+		this.useTexture = useTexture;
 
 		this.initializeAttributeLocations(gl);
 	}
@@ -203,11 +210,14 @@ class GLShaderProgram {
 		// Look up where the vertex data needs to go.
 		this.locations.positionAttributeLocation = gl.getAttribLocation(this.program, "inPosition");
 		this.locations.normalAttributeLocation = gl.getAttribLocation(this.program, "inNormal");
-		this.locations.textureAttributeLocation = gl.getAttribLocation(this.program, "inTexCoords");
+
+		if(this.useTexture) {
+			this.locations.textureAttributeLocation = gl.getAttribLocation(this.program, "inTexCoords");
+			this.locations.textureUniformLocation = gl.getUniformLocation(this.program, "objectTexture");
+		}
 
 		this.locations.positionUniformLocation = gl.getUniformLocation(this.program, "matrix");
 		this.locations.normalUniformLocation = gl.getUniformLocation(this.program, "nMatrix");
-		this.locations.textureUniformLocation = gl.getUniformLocation(this.program, "objectTexture");
 
 		this.locations.materialDiffColorHandle = gl.getUniformLocation(this.program, "mDiffColor");
 		this.locations.lightDirectionHandle = gl.getUniformLocation(this.program, "lightDirection");
