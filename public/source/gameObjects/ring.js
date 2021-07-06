@@ -1,6 +1,6 @@
-import { default as GameObject } from "./gameObject.js"
-import { RingShaderClass } from "../../shaders/shaderClasses.js";
-import { default as CircleCollider } from "../colliders/circleCollider.js"
+import {default as GameObject} from "./gameObject.js"
+import {RingShaderClass} from "../../shaders/shaderClasses.js";
+import {default as CircleCollider} from "../colliders/circleCollider.js"
 
 class Ring extends GameObject {
 	static objFilename = "resources/ring/ring.obj";
@@ -9,6 +9,7 @@ class Ring extends GameObject {
 	static #colliderRadius;
 	static #centerOfGravity;
 	_materialColor = [0.5, 0.5, 0.5];
+	_materialColor = [255 / 255, 215 / 255, 0 / 255];
 
 	// Initialization
 	constructor() {
@@ -25,9 +26,8 @@ class Ring extends GameObject {
 
 	// events
 	update() {
-		super.update();		
+		super.update();
 	}
-	_materialColor = [255 / 255, 215 / 255, 0 / 255];
 }
 
 export default Ring;

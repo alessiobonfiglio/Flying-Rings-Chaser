@@ -13,4 +13,10 @@ class RingShaderClass extends ShaderClass {
 	static useTexture = false;
 }
 
-export {DefaultShaderClass, RingShaderClass};
+class TerrainShaderClass extends ShaderClass {
+	static vertexShaderFilename = "shaders/terrainVertexShader.glsl";
+	static fragmentShaderFilename = "shaders/terrainFragmentShader.glsl";
+	static useTexture = true;
+}
+
+export {DefaultShaderClass, RingShaderClass, TerrainShaderClass};

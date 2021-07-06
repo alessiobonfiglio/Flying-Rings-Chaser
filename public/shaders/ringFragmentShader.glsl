@@ -1,21 +1,21 @@
 #version 300 es
 
-precision mediump float;
-
 #define PI radians(180.0)
 
-in vec3 fsNormal;// normal to the surface
-in vec3 wr;// eye direction
+precision mediump float;
 
-out vec4 outColor;
+in vec3 fsNormal;					// normal to the surface (world space)
+in vec3 wr;							// eye direction (world space)
 
-uniform vec3 mDiffColor;// diffuse color
+out vec4 outColor;					// computed color
 
-in vec3 lxs[5];// lights direction
-uniform bool lxsEnabled[5];// if lights are enabled or not
+uniform vec3 mDiffColor;			// diffuse color
 
-const float u = 1.0;// metalness
-const float alpha = 0.5;// roughness
+in vec3 lxs[5];						// lights direction (world space)
+uniform bool lxsEnabled[5];			// if lights are enabled or not
+
+const float u = 1.0;				// metalness of the ring
+const float alpha = 0.5;			// roughness of the ring
 
 vec3 nNormal;
 
@@ -60,14 +60,17 @@ vec3 fr(vec3 lx) {
 }
 
 void main() {
+	// normalize the normal to the surface
 	nNormal = normalize(fsNormal);
 
+	// computer the PBR color wrt each light source
 	vec3 sum = fr(lxs[0]) * float(lxsEnabled[0]);
 	sum += fr(lxs[1]) * float(lxsEnabled[1]);
 	sum += fr(lxs[2]) * float(lxsEnabled[2]);
 	sum += fr(lxs[3]) * float(lxsEnabled[3]);
 	sum += fr(lxs[4]) * float(lxsEnabled[4]);
 
+	// sum all the colors and clamp them
 	outColor = vec4(clamp(sum, 0.0, 1.0), 1.0);
 }
 

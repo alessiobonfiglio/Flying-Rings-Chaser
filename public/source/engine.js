@@ -4,12 +4,15 @@ import {default as Camera} from "./gameObjects/camera.js";
 import {default as Asteroid} from "./gameObjects/asteroid.js";
 import {default as Ring} from "./gameObjects/ring.js";
 import {default as Light} from "./light.js";
+import {default as Terrain} from "./gameObjects/terrain.js";
+
+var X = 0, Z = 0, A = 180;
 
 class GameEngine {
 	#webGlManager;
 	#window;
 
-	#gameConfig;
+	#gameSettings;
 
 	#frameCount;
 
@@ -22,16 +25,17 @@ class GameEngine {
 
 	// game objects
 	#spaceship;
+	#terrains = [];
 	#cubes = [];
 	#asteroids = [];
 	#rings = [];
 
-	constructor(webGlManager, window, gameConfig) {
+	constructor(webGlManager, window, gameSettings) {
 		this.#webGlManager = webGlManager;
 		this.#window = window;
-		this.#gameConfig = gameConfig;
+		this.#gameSettings = gameSettings;
 
-		this.#frameInterval = 1000.0 / gameConfig.fpsLimit;
+		this.#frameInterval = 1000.0 / gameSettings.fpsLimit;
 		this.#frameCount = 0;
 	}
 
@@ -42,6 +46,9 @@ class GameEngine {
 		this.#spaceship = new Spaceship();
 		this.#spaceship.position = [-9, 0, 5];
 		this.#webGlManager.instantiate(this.#spaceship);
+
+
+		this.#createTerrainChunks();
 
 		this.#createAsteroids();
 
@@ -76,6 +83,8 @@ class GameEngine {
 		this.#rings[0].orientation[0] += 1;
 
 		//this.#webGlManager.camera.verticalAngle++;
+		this.#webGlManager.camera.verticalAngle = A;
+		this.#webGlManager.camera.position = [X, 0, Z];
 		//console.log(this.#webGlManager.camera.verticalAngle%360);
 
 
@@ -110,18 +119,29 @@ class GameEngine {
 	}
 
 	#createAsteroids() {
-		for (let i = 0; i < this.#gameConfig.numberOfAsteroids; i++) {
+		for (let i = 0; i < this.#gameSettings.numberOfAsteroids; i++) {
 			const ast = new Asteroid();
 
-			ast.initialize(this.#gameConfig);
+			ast.initialize(this.#gameSettings);
 
 			this.#webGlManager.instantiate(ast);
 			this.#asteroids.push(ast);
 		}
 	}
 
+	#createTerrainChunks() {
+		for (let i = -this.#gameSettings.halfNumberTerrainChunks; i < this.#gameSettings.halfNumberTerrainChunks; i++) {
+			const terr = new Terrain();
+
+			terr.position = [i * this.#gameSettings.terrainChunkSize, 0, 0];
+
+			this.#webGlManager.instantiate(terr);
+			this.#terrains.push(terr);
+		}
+	}
+
 	#updateGameObjets() {
-		let gameObjectList = [this.#asteroids, this.#rings, this.#cubes, [this.#spaceship]].flat();
+		let gameObjectList = [this.#asteroids, this.#rings, this.#cubes, [this.#spaceship], this.#terrains].flat();
 		for (let gameObject of gameObjectList) {
 			if (gameObject.update) {
 				gameObject.update();
@@ -129,6 +149,30 @@ class GameEngine {
 		}
 	}
 
+}
+
+window.addEventListener("keyup", keyFunction, false);
+
+function keyFunction(e) {
+
+	if (e.keyCode == 37) {  // 6
+		X -= 5.0;
+	}
+	if (e.keyCode == 39) {  // 7
+		X += 5.0;
+	}
+	if (e.keyCode == 40) {  // 1
+		Z -= 5.0;
+	}
+	if (e.keyCode == 38) {  // 2
+		Z += 5.0;
+	}
+	if (e.keyCode == 69) {  // 2
+		A += 3.0;
+	}
+	if (e.keyCode == 81) {  // 2
+		A -= 3.0;
+	}
 }
 
 export default GameEngine;

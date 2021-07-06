@@ -106,11 +106,13 @@ class WebGlManager {
 		this.#gl.bufferData(this.#gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(objModel.indices), this.#gl.STATIC_DRAW);
 
 		// Setup normals
-		var normalBuffer = this.#gl.createBuffer();
-		this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, normalBuffer);
-		this.#gl.bufferData(this.#gl.ARRAY_BUFFER, new Float32Array(objModel.vertexNormals), this.#gl.STATIC_DRAW);
-		this.#gl.enableVertexAttribArray(shaderProgram.locations.normalAttributeLocation);
-		this.#gl.vertexAttribPointer(shaderProgram.locations.normalAttributeLocation, 3, this.#gl.FLOAT, false, 0, 0);
+		if (objModel.vertexNormals) {
+			var normalBuffer = this.#gl.createBuffer();
+			this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, normalBuffer);
+			this.#gl.bufferData(this.#gl.ARRAY_BUFFER, new Float32Array(objModel.vertexNormals), this.#gl.STATIC_DRAW);
+			this.#gl.enableVertexAttribArray(shaderProgram.locations.normalAttributeLocation);
+			this.#gl.vertexAttribPointer(shaderProgram.locations.normalAttributeLocation, 3, this.#gl.FLOAT, false, 0, 0);
+		}
 
 		// Setup texture coordinates
 		if (texture != null) {

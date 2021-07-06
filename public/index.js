@@ -3,28 +3,35 @@ import {default as GameEngine} from "./source/engine.js"
 import {default as Cube} from "./source/gameObjects/cube.js"
 import {default as Spaceship} from "./source/gameObjects/spaceship.js"
 import {default as utils} from "./source/utils.js"
-import {DefaultShaderClass, RingShaderClass} from "./shaders/shaderClasses.js";
+import {DefaultShaderClass, RingShaderClass, TerrainShaderClass} from "./shaders/shaderClasses.js";
 import {default as Asteroid} from "./source/gameObjects/asteroid.js";
 import {default as Ring} from "./source/gameObjects/ring.js";
+import {default as Terrain} from "./source/gameObjects/terrain.js";
 
 
-async function setupGlObjects(glManager, gl) {
+async function setupGlObjects(glManager, gl, gameSettings) {
 	const info =
 		[
 			[Cube, "Cube"],
 			[Spaceship, "Spaceship", objModel => Spaceship.loadInfoFromObjModel(objModel)],
 			[Asteroid, "Asteroid", objModel => Ring.loadInfoFromObjModel(objModel)],
+			[Terrain, "Terrain"],
 			[Ring, "Ring"]
 		];
 
 	for (const [objClass, className, objModelInit] of info) {
 		// load the obj file
-		const objModel = new OBJ.Mesh(await utils.get_objstr(objClass.objFilename));
+		let objModel;
+		if (objClass.meshGenerator) {
+			objModel = objClass.meshGenerator(gameSettings);
+		} else {
+			objModel = new OBJ.Mesh(await utils.get_objstr(objClass.objFilename));
+		}
 		// load the texture
 		const texture = objClass.textureFilename != null
 			? utils.getTextureFromImage(gl, await utils.loadImage(objClass.textureFilename))
 			: null;
-		if(objModelInit)
+		if (objModelInit)
 			objModelInit(objModel);
 
 		glManager.bindGlModel(objModel, texture, objClass.shaderClass, className);
@@ -35,7 +42,8 @@ async function setupGlShaders(glManager, gl) {
 	const info =
 		[
 			DefaultShaderClass,
-			RingShaderClass
+			RingShaderClass,
+			TerrainShaderClass
 		];
 
 	for (const shaderClass of info) {
@@ -83,13 +91,16 @@ async function init() {
 		asteroidScaleRange: [0.1, 0.1],
 		asteroidSpeedRange: [20, 40],
 		asteroidRotationSpeedRange: [0, 30],
+		terrainChunkSize: 500,
+		terrainChunkResolution: 40,
+		halfNumberTerrainChunks: 2,
 	} //maybe load this from a json in the future?
 
 	// create and initialize the WebGL manager
 	const webGlManager = new WebGlManager(gl, gameSetting);
 	webGlManager.initialize();
 	await setupGlShaders(webGlManager, gl);
-	await setupGlObjects(webGlManager, gl);
+	await setupGlObjects(webGlManager, gl, gameSetting);
 
 	// create and start the game engine
 	const gameEngine = new GameEngine(webGlManager, window, gameSetting);
