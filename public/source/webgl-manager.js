@@ -1,28 +1,33 @@
 import {default as utils} from "./utils.js"
+import {default as Light} from "./light.js";
 
 class WebGlManager {
 	#gl;
 	#gameSetting;
 
-	#directionalLightColor;
+	camera;
 
 	#instantiatedObjects = []; // contains a list of {gameObject, vao}
 	#classToGlObjectMap = new Map(); // maps gameObject class -> GlObject
 
 	#classToGLShaderProgramMap = new Map(); // maps shaderClass class -> GLShaderProgram
 
+	#maxNumOfLights = 5;
+	#lights;
+	#lightsEnabled;
+
 	// Initialization
 	constructor(context, gameSetting) {
 		this.#gl = context;
 		this.#gameSetting = gameSetting;
+
+		this.#lights = Array(this.#maxNumOfLights).fill(new Light([0, 0, 0]));
+		this.#lightsEnabled = Array(this.#maxNumOfLights).fill(false);
 	}
 
 	initialize() {
 		// Deep test
 		this.#gl.enable(this.#gl.DEPTH_TEST);
-
-		// Lights
-		this.#directionalLightColor = [0.1, 1.0, 1.0];
 	}
 
 	// Public Methods
@@ -34,6 +39,21 @@ class WebGlManager {
 	destroy(gameObject) {
 		var index = this.#instantiatedObjects.indexOf(gameObject);
 		this.#instantiatedObjects.splice(index, 1);
+	}
+
+	setAndEnableLight(index, light) {
+		if (index >= this.#maxNumOfLights) {
+			throw new Error();
+		}
+		this.#lights[index] = light;
+		this.#lightsEnabled[index] = true;
+	}
+
+	disableLight(index) {
+		if (index >= this.#maxNumOfLights) {
+			throw new Error();
+		}
+		this.#lightsEnabled[index] = false;
 	}
 
 	draw() {
@@ -93,7 +113,7 @@ class WebGlManager {
 		this.#gl.vertexAttribPointer(shaderProgram.locations.normalAttributeLocation, 3, this.#gl.FLOAT, false, 0, 0);
 
 		// Setup texture coordinates
-		if(texture != null) {
+		if (texture != null) {
 			var textureCoordinateBuffer = this.#gl.createBuffer();
 			this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, textureCoordinateBuffer);
 			this.#gl.bufferData(this.#gl.ARRAY_BUFFER, new Float32Array(objModel.textures), this.#gl.STATIC_DRAW);
@@ -108,6 +128,9 @@ class WebGlManager {
 
 	#drawGameObjects() {
 		const viewMatrix = this.camera?.viewMatrix() ?? utils.MakeView(3.0, 3.0, 2.5, -45.0, -40.0); // default viewMatrix
+
+		const lightsArray = this.#lights.map((x) => x.position).flat();
+
 		// setup transformation matrix from local coordinates to Clip coordinates
 		for (const instance of this.#instantiatedObjects) {
 			const [gameObject, glObject] = [instance.gameObject, instance.glObject];
@@ -119,14 +142,15 @@ class WebGlManager {
 			this.#gl.bindVertexArray(glObject.vao);
 
 			// Computing transformation matrix
-			const matrix = this.#computeMatrix(gameObject, viewMatrix);
+			const worldMatrix = gameObject.worldMatrix();
+			const WVPMatrix = this.#computeMatrix(worldMatrix, viewMatrix);
 
 			// Passing the matrix as a uniform to the vertex shader
-			this.#gl.uniformMatrix4fv(glObject.shaderProgram.locations.positionUniformLocation, this.#gl.FALSE, utils.transposeMatrix(matrix));
+			this.#gl.uniformMatrix4fv(glObject.shaderProgram.locations.positionUniformLocation, this.#gl.FALSE, utils.transposeMatrix(WVPMatrix));
 			this.#gl.uniformMatrix4fv(glObject.shaderProgram.locations.normalUniformLocation, this.#gl.FALSE, utils.transposeMatrix(gameObject.worldMatrix()));
 
 			// GameObject Texture
-			if(glObject.shaderProgram.useTexture) {
+			if (glObject.shaderProgram.useTexture) {
 				this.#gl.activeTexture(this.#gl.TEXTURE0);
 				this.#gl.bindTexture(this.#gl.TEXTURE_2D, glObject.texture);
 				this.#gl.uniform1i(glObject.shaderProgram.locations.textureUniformLocation, 0);
@@ -135,18 +159,20 @@ class WebGlManager {
 			// GameObject Color
 			this.#gl.uniform3fv(glObject.shaderProgram.locations.materialDiffColorHandle, gameObject.materialColor);
 
+			// camera position
+			this.#gl.uniform3fv(glObject.shaderProgram.locations.cameraPositionLocation, this.camera.position);
+
 			// directional lights
-			this.#gl.uniform3fv(glObject.shaderProgram.locations.lightDirectionHandle, this.#directionalLight());
-			this.#gl.uniform3fv(glObject.shaderProgram.locations.lightColorHandle, this.#directionalLightColor);
+			this.#gl.uniform3fv(glObject.shaderProgram.locations.lightsPositionHandle, lightsArray);
+			this.#gl.uniform1uiv(glObject.shaderProgram.locations.lightsEnabledHandle, this.#lightsEnabled);
 
 			// Drawing the gameObject
 			this.#gl.drawElements(this.#gl.TRIANGLES, glObject.totIndices, this.#gl.UNSIGNED_SHORT, 0);
 		}
 	}
 
-	#computeMatrix(gameObject, viewMatrix) {
+	#computeMatrix(worldMatrix, viewMatrix) {
 		const canvas = this.#gl.canvas;
-		const worldMatrix = gameObject.worldMatrix();
 		const perspectiveMatrix = utils.MakePerspective(90, canvas.width / canvas.height, 0.1, this.#gameSetting.maxZ);
 		return utils.multiplyAllMatrices(perspectiveMatrix, viewMatrix, worldMatrix)
 	}
@@ -163,16 +189,6 @@ class WebGlManager {
 		return false;
 	}
 
-	#directionalLight() {
-		const dirLightAlpha = -utils.degToRad(60);
-		const dirLightBeta = -utils.degToRad(120);
-
-		return [
-			Math.cos(dirLightAlpha) * Math.cos(dirLightBeta),
-			Math.sin(dirLightAlpha),
-			Math.cos(dirLightAlpha) * Math.sin(dirLightBeta)
-		];
-	}
 }
 
 
@@ -211,7 +227,9 @@ class GLShaderProgram {
 		this.locations.positionAttributeLocation = gl.getAttribLocation(this.program, "inPosition");
 		this.locations.normalAttributeLocation = gl.getAttribLocation(this.program, "inNormal");
 
-		if(this.useTexture) {
+		this.locations.cameraPositionLocation = gl.getUniformLocation(this.program, "cameraPosition");
+
+		if (this.useTexture) {
 			this.locations.textureAttributeLocation = gl.getAttribLocation(this.program, "inTexCoords");
 			this.locations.textureUniformLocation = gl.getUniformLocation(this.program, "objectTexture");
 		}
@@ -220,8 +238,9 @@ class GLShaderProgram {
 		this.locations.normalUniformLocation = gl.getUniformLocation(this.program, "nMatrix");
 
 		this.locations.materialDiffColorHandle = gl.getUniformLocation(this.program, "mDiffColor");
-		this.locations.lightDirectionHandle = gl.getUniformLocation(this.program, "lightDirection");
-		this.locations.lightColorHandle = gl.getUniformLocation(this.program, "lightColor");
+
+		this.locations.lightsPositionHandle = gl.getUniformLocation(this.program, "lightsPositions");
+		this.locations.lightsEnabledHandle = gl.getUniformLocation(this.program, "lxsEnabled");
 	}
 }
 

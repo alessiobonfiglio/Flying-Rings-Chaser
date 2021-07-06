@@ -5,7 +5,7 @@ class Ring extends GameObject {
 	static objFilename = "resources/ring/ring.obj";
 	static textureFilename = null;
 	static shaderClass = new RingShaderClass();
-	_materialColor = [0.5, 0.5, 0.5];
+	_materialColor = [255 / 255, 215 / 255, 0 / 255];
 }
 
 export default Ring;
