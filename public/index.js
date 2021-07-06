@@ -1,38 +1,36 @@
-import {default as WebGlManager} from "./source/webgl-manager.js"
-import {default as GameEngine} from "./source/engine.js"
-import {default as Cube} from "./source/gameObjects/cube.js"
-import {default as Spaceship} from "./source/gameObjects/spaceship.js"
-import {default as utils} from "./source/utils.js"
-import {DefaultShaderClass, RingShaderClass, TerrainShaderClass} from "./shaders/shaderClasses.js";
-import {default as Asteroid} from "./source/gameObjects/asteroid.js";
-import {default as Ring} from "./source/gameObjects/ring.js";
-import {default as Terrain} from "./source/gameObjects/terrain.js";
+import { default as WebGlManager } from "./source/webgl-manager.js"
+import { default as GameEngine } from "./source/engine.js"
+import { default as Cube } from "./source/gameObjects/cube.js"
+import { default as Spaceship } from "./source/gameObjects/spaceship.js"
+import { default as utils } from "./source/utils.js"
+import { DefaultShaderClass, RingShaderClass, TerrainShaderClass } from "./shaders/shaderClasses.js";
+import { default as Asteroid } from "./source/gameObjects/asteroid.js";
+import { default as Ring } from "./source/gameObjects/ring.js";
+import { default as Terrain } from "./source/gameObjects/terrain.js";
 
 
 async function setupGlObjects(glManager, gl, gameSettings) {
 	const info =
 		[
 			[Cube, "Cube"],
-			[Spaceship, "Spaceship", objModel => Spaceship.loadInfoFromObjModel(objModel)],
-			[Asteroid, "Asteroid", objModel => Ring.loadInfoFromObjModel(objModel)],
+			[Spaceship, "Spaceship"],
+			[Asteroid, "Asteroid"],
 			[Terrain, "Terrain"],
 			[Ring, "Ring"]
 		];
 
-	for (const [objClass, className, objModelInit] of info) {
+	for (const [objClass, className] of info) {
 		// load the obj file
-		let objModel;
-		if (objClass.meshGenerator) {
-			objModel = objClass.meshGenerator(gameSettings);
-		} else {
-			objModel = new OBJ.Mesh(await utils.get_objstr(objClass.objFilename));
-		}
+		const objModel = objClass.meshGenerator
+			? objClass.meshGenerator(gameSettings)
+			: new OBJ.Mesh(await utils.get_objstr(objClass.objFilename));
+
 		// load the texture
 		const texture = objClass.textureFilename != null
 			? utils.getTextureFromImage(gl, await utils.loadImage(objClass.textureFilename))
 			: null;
-		if (objModelInit)
-			objModelInit(objModel);
+		if (objClass.loadInfoFromObjModel)
+			objClass.loadInfoFromObjModel(objModel);
 
 		glManager.bindGlModel(objModel, texture, objClass.shaderClass, className);
 	}

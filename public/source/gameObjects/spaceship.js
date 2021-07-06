@@ -1,7 +1,7 @@
-import {default as GameObject} from "./gameObject.js";
-import {DefaultShaderClass} from "../../shaders/shaderClasses.js"
-import {default as SphericalCollider} from "../colliders/sphericalCollider.js"
-import {default as MathUtils} from "../math_utils.js"
+import { default as GameObject } from "./gameObject.js";
+import { DefaultShaderClass } from "../../shaders/shaderClasses.js"
+import { default as SphericalCollider } from "../colliders/sphericalCollider.js"
+import { default as MathUtils } from "../math_utils.js"
 
 class Spaceship extends GameObject {
 	static objFilename = "resources/spaceship/X-WING.obj";
@@ -30,15 +30,21 @@ class Spaceship extends GameObject {
 	}
 
 	// engine events
+	tot = 0;
+	sign = 1;
 	update() {
 		super.update();
-		this.position = MathUtils.sum(this.position, [0.01, 0.01, 0.01]);
+		var deltaPos = 0.01;
+		if (this.tot > 5) {
+			this.sign *= -1;
+			this.tot = 0;
+		}
+		this.position = MathUtils.sum(this.position, MathUtils.mul(this.sign * deltaPos, [1, 1, 1]));
+		this.tot += deltaPos;		
 		this.orientation[0] += 0.5;
 		this.orientation[1] += 1.0;
 		this.orientation[2] += 1.5;
 	}
-
-
 }
 
 export default Spaceship;

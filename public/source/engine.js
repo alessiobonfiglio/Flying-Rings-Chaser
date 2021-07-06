@@ -44,7 +44,7 @@ class GameEngine {
 
 		// initialize the spaceship object
 		this.#spaceship = new Spaceship();
-		this.#spaceship.position = [-9, 0, 5];
+		this.#spaceship.center = [0, 1, 4];
 		this.#webGlManager.instantiate(this.#spaceship);
 
 
@@ -55,7 +55,7 @@ class GameEngine {
 		this.#webGlManager.setAndEnableLight(0, new Light([0, 0, 0]));
 
 		this.#rings.push(new Ring());
-		this.#rings[0].position = [0, 1, 4];
+		this.#rings[0].center = [0, 1, 4];
 		this.#rings[0].orientation = [90, 0, 0];
 		this.#webGlManager.instantiate(this.#rings[0]);
 
@@ -86,9 +86,13 @@ class GameEngine {
 		this.#webGlManager.camera.verticalAngle = A;
 		this.#webGlManager.camera.position = [X, 0, Z];
 		//console.log(this.#webGlManager.camera.verticalAngle%360);
-
-
+		this.#testCollision();
 		this.#webGlManager.draw();
+	}
+
+	#testCollision() {		
+		var collides = this.#spaceship.collider.intersectWithCircle(this.#rings[0].collider);
+		console.log("spaceships collides with ring[0]? ", collides);
 	}
 
 	// this is done in order to limit the framerate to 'fpsLimit'

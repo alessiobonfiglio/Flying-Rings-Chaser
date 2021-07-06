@@ -60,6 +60,7 @@ class GameObject // should be an abstract class if js allows that
 		if (this.collider) {
 			this.collider.center = this.center;
 			this.collider.scale = this.scale;
+			this.collider.orientation = this.orientation;
 		}
 	}
 

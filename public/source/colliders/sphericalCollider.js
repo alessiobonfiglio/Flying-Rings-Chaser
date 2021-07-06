@@ -16,7 +16,7 @@ class SphericalCollider extends Collider {
     intersectWithCircle(circleCollider) {        
         let Cc = circleCollider.center;
         let Cs = this.center;
-        let n = circleCollider.normal;
+        let n = circleCollider.currentNormal;
         // <Cc - x, n> = 0 
         // x = Cs + tn
         // <Cc - Cs - tn, n> = <Cc - Cs,n> - t<n, n> = 0 -> t = <Cc - Cs, n> / |n|^2 = <Cc - Cs, n>
