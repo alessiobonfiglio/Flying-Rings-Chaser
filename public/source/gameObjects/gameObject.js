@@ -4,12 +4,20 @@ import { default as MathUtils } from "../math_utils.js"
 class GameObject // should be an abstract class if js allows that
 {
 	position = [0, 0, 0]; //pivot in world coordinates
-	scale = 1;
+	scale = 0.8;
 	orientation = [0, 0, 0]; // [rx, ry, rz]
 	collider;
 
-	get centerOfGravity() {
+	get localCenterOfGravity() {
 		return [0, 0, 0];
+	}
+
+	set center (value) {
+		this.position = MathUtils.sub(value, MathUtils.mul(-this.scale, this.localCenterOfGravity)); // Isometry + scaling, scales distances
+	}
+
+	get center() {
+		return MathUtils.sum(this.position, MathUtils.mul(this.scale, this.localCenterOfGravity)); // Isometry + scaling, scales distances
 	}
 
 	// Color
@@ -21,8 +29,8 @@ class GameObject // should be an abstract class if js allows that
 	// events
 	update() {
 		if (this.collider) {
-			this.collider.center = this.localToWorld(this.centerOfGravity);
-			this.collider.scale = this.scale;
+			this.collider.center = this.center;
+			this.collider.scale = this.scale;					
 		}
 	}
 

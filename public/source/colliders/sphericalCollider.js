@@ -21,10 +21,26 @@ class SphericalCollider extends Collider {
         // x = Cs + tn
         // <Cc - Cs - tn, n> = <Cc - Cs,n> - t<n, n> = 0 -> t = <Cc - Cs, n> / |n|^2 = <Cc - Cs, n>
 
+
         let t = MathUtils.dot(MathUtils.sub(Cc, Cs), n)
         let x = MathUtils.sum(Cs, MathUtils.mul(t, n));
+        
+        // let v = Cc - x;
+        // if they intersect, then one of the following point is an intersection:
+        // {x, Cc + rv, Cc - rv}     
 
-        return this.isInside(x) && circleCollider.isInside(x);
+        const checkInside = x => this.isInside(x) && circleCollider.isInside(x);
+        if(checkInside(x))
+            return true;
+        var v = MathUtils.normalize(MathUtils.sub(Cc, x));
+        x = MathUtils.sum(Cc, MathUtils.mul(circleCollider.scaledRadius, v));
+        if(checkInside(x))
+            return true;
+
+        x = MathUtils.sum(Cc, MathUtils.mul(-circleCollider.scaledRadius, v));
+        if(checkInside(x))
+            return true;
+        return false;
     }
 
 
@@ -43,8 +59,6 @@ class SphericalCollider extends Collider {
 
         return MathUtils.distance([x,y,z], this.center) < this.scaledRadius;
     }
-
-
 }
 
 export default SphericalCollider;

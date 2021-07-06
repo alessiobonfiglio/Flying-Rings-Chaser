@@ -25,7 +25,7 @@ class Spaceship extends GameObject {
 	}
 
 	// properties
-	get centerOfGravity() {
+	get localCenterOfGravity() {
 		return Spaceship.#centerOfGravity;
 	}
 
