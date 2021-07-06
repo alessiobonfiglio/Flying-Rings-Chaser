@@ -63,6 +63,9 @@ class GameEngine {
 		// do things here
 
 		this.#moveAsteroids();
+		this.#spaceship.orientation[0] += 0.5;
+		this.#spaceship.orientation[1] += 1.0;
+		this.#spaceship.orientation[2] += 1.5;
 
 		//this.#webGlManager.camera.verticalAngle++;
 		//console.log(this.#webGlManager.camera.verticalAngle%360);
