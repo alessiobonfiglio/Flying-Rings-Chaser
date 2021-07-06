@@ -116,12 +116,6 @@ class GameEngine {
 		}
 	}
 
-	#moveAsteroids() {
-		for (const i of this.#asteroids) {
-			i.moveForward(this.#gameConfig);
-		}
-	}
-
 	#updateGameObjets() {
 		let gameObjectLists = [this.#asteroids, this.#rings, this.#cubes, [this.#spaceship]];
 		for (let gameObjectList of gameObjectLists)

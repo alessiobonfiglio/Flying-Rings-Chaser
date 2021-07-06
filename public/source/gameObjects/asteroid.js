@@ -39,6 +39,7 @@ class Asteroid extends GameObject {
 
 	// game events handlers
 	update() {
+		super.update();
 		this.moveForward(this.#gameConfig);
 	}
 

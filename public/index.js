@@ -12,21 +12,20 @@ async function setupGlObjects(glManager, gl) {
 	const info =
 		[
 			[Cube, "Cube"],
-			[Spaceship, "Spaceship"],
-			[Asteroid, "Asteroid"],
+			[Spaceship, "Spaceship", objModel => Spaceship.loadInfoFromObjModel(objModel)],
+			[Asteroid, "Asteroid", objModel => Ring.loadInfoFromObjModel(objModel)],
 			[Ring, "Ring"]
 		];
 
-	for (const [objClass, className] of info) {
+	for (const [objClass, className, objModelInit] of info) {
 		// load the obj file
 		const objModel = new OBJ.Mesh(await utils.get_objstr(objClass.objFilename));
 		// load the texture
-		let texture;
-		if(objClass.textureFilename == null){
-			texture = null;
-		} else {
-			texture = utils.getTextureFromImage(gl, await utils.loadImage(objClass.textureFilename));
-		}
+		const texture = objClass.textureFilename != null
+			? utils.getTextureFromImage(gl, await utils.loadImage(objClass.textureFilename))
+			: null;
+		if(objModelInit)
+			objModelInit(objModel);
 
 		glManager.bindGlModel(objModel, texture, objClass.shaderClass, className);
 	}

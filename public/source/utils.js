@@ -483,7 +483,7 @@ createProgram:function(gl, vertexShader, fragmentShader) {
 
 	multiplyMatrixVector: function(m, v){
        /* Mutiplies a matrix [m] by a vector [v] */
-       
+       	   
 		var out = [];  
 		
 		var row, row_offset;
