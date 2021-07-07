@@ -16,6 +16,7 @@ void main() {
 
 	// compute the normal to the surface using the derivatves offered by WebGL
 	vec3 nNormal = normalize(cross(dFdx(fsPosition), dFdy(fsPosition)));
+
 	vec3 texColor = texture(objectTexture, fsTexCoords).xyz;
 
 	// compute the lambert diffuse of each light source

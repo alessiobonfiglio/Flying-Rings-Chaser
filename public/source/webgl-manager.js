@@ -152,7 +152,6 @@ class WebGlManager {
 			// passing the increment if present
 			if (typeof gameObject.rowNumber !== 'undefined') {
 				const zOffset = gameObject.rowNumber * this.#gameSetting.terrainChunkSize;
-				console.log(zOffset);
 				this.#gl.uniform1f(glObject.shaderProgram.locations.incrementLocation, zOffset);
 			}
 

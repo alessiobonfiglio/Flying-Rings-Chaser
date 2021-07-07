@@ -4,7 +4,7 @@ import { default as CircleCollider } from "../colliders/circleCollider.js"
 import { default as MathUtils } from "../math_utils.js"
 
 class Ring extends GameObject {
-	static objFilename = "resources/ring/ring.obj";
+	static objFilename = "resources/ring/ring_smooth.obj";
 	static textureFilename = null;
 	static shaderClass = new RingShaderClass();
 	static #colliderRadius;
