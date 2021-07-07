@@ -13,7 +13,13 @@ class SphericalCollider extends Collider {
     }
 
 
-    intersectWithCircle(circleCollider) {        
+    intersectWithCircle(circleCollider) {      
+        // Fast check (sufficent condition). far colliders
+        if(MathUtils.distance(this.center, circleCollider.center) > this.scaledRadius + circleCollider.scaledRadius)
+            return false;
+        
+
+        // close colliders
         let Cc = circleCollider.center;
         let Cs = this.center;
         let n = circleCollider.currentNormal;

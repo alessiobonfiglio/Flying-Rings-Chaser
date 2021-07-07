@@ -37,7 +37,7 @@ class WebGlManager {
 	}
 
 	destroy(gameObject) {		
-		this.#instantiatedObjects.delete(gameObject);
+		this.#instantiatedObjects.delete(gameObject);		
 	}
 
 	setAndEnableLight(index, light) {

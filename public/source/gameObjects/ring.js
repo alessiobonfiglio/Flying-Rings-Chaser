@@ -20,6 +20,7 @@ class Ring extends GameObject {
 		this.collider.thickness = 0.5;
 		this.collider.normal = [0, 0, 1];
 		this.orientation = [90,0,0];
+		this.scale = 3;
 	}
 
 	static loadInfoFromObjModel(objModel) {

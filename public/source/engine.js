@@ -43,11 +43,14 @@ class GameEngine {
 	setup() {
 		this.#webGlManager.camera = new Camera([0, 0, 0], 0, -180);
 
+
 		// initialize the spaceship object
 		this.#spaceship = new Spaceship();
-		this.#spaceship.center = [-7, -3, -3];
-		this.#instantiate(this.#spaceship);
+		this.#spaceship.center = [0, 1, 4];
 		
+		this.#webGlManager.camera.initialize(this.#spaceship);
+
+		this.#instantiate(this.#spaceship);
 
 
 		this.#createTerrainChunks();
@@ -56,7 +59,7 @@ class GameEngine {
 
 		this.#webGlManager.setAndEnableLight(0, new Light([0, 0, 0]));
 
-		for(const ring of this.getSomeRings([0, 1, 4], 20)){
+		for(const ring of this.getSomeRings([0, 1, 4], 100)){
 			this.#rings.push(ring);
 			this.#instantiateRing(ring);
 		}								
@@ -84,18 +87,26 @@ class GameEngine {
 		this.#updateGameObjets();
 
 		//this.#webGlManager.camera.verticalAngle++;
-		this.#webGlManager.camera.verticalAngle = A;
-		this.#webGlManager.camera.position = [X, 0, Z];
+		// this.#webGlManager.camera.verticalAngle = A;
+		// this.#webGlManager.camera.position = [X, 0, Z];
 		//console.log(this.#webGlManager.camera.verticalAngle%360);
 		this.#checkCollisions();
 		this.#webGlManager.draw();
 	}
 
 	#checkCollisions() {
+		// rings
 		for (const ring of this.#rings)
 			if (this.#spaceship.collider.intersectWithCircle(ring.collider)) {
 				this.#spaceship.onRingCollided(ring);
 				ring.onSpaceshipCollided(this.#spaceship);
+			}
+		
+		// asteroid
+		for(const asteroid of this.#asteroids)
+			if (this.#spaceship.collider.intersectWithSphere(asteroid.collider)) {
+				this.#spaceship.onAsteroidCollided(asteroid);
+				asteroid.onSpaceshipCollided(this.#spaceship);
 			}
 	}
 
@@ -132,7 +143,7 @@ class GameEngine {
 
 			ast.initialize(this.#gameSettings);
 
-			this.#webGlManager.instantiate(ast);
+			this.#instantiateAsteroid(ast);
 			this.#asteroids.push(ast);
 		}
 	}
@@ -155,6 +166,7 @@ class GameEngine {
 				gameObject.update();
 			}
 		}
+		this.#webGlManager.camera.update();
 	}
 
 	#instantiate(gameObject) {
@@ -169,9 +181,16 @@ class GameEngine {
 		return ring;
 	}
 
+	#instantiateAsteroid(asteroid){
+		this.#instantiate(asteroid);
+		asteroid.destroyed.subscribe(ast =>this.#removeItem(this.#asteroids, ast));
+		return asteroid;
+	}
+
+
 	* getSomeRings(center, tot) {
-		var v = [1,1,1];
-		var spacing = 2;
+		var v = [0,0,1];
+		var spacing = 10;
 		for(var i=0; i < tot; i++){
 			let ring = new Ring();
 			ring.center = MathUtils.sum(center, MathUtils.mul((i - tot/2) * spacing, v));

@@ -1,17 +1,21 @@
 import {default as GameObject} from "./gameObject.js"
 import {DefaultShaderClass} from "../../shaders/shaderClasses.js";
 import {default as MathUtils} from "../math_utils.js";
+import { default as SphericalCollider } from "../colliders/sphericalCollider.js"
 
 class Asteroid extends GameObject {
 	static objFilename = "resources/asteroids/brown_asteroid.obj";
 	static textureFilename = "resources/asteroids/brown.png";
 	static shaderClass = new DefaultShaderClass();
+	static #colliderRadius;
+	static #centerOfGravity;
 	#gameSettings;
 	_materialColor = [0.5, 0.5, 0.5];
 
 	speed = 1;
 	rotationSpeed = [1, 1, 1];
 
+	// Initialization
 	initialize(gameSettings) {
 		this.#gameSettings = gameSettings;
 		const x = MathUtils.getRandomInRange(-gameSettings.maxHalfX, gameSettings.maxHalfX);
@@ -34,6 +38,17 @@ class Asteroid extends GameObject {
 		const rsy = MathUtils.getRandomInRange(gameSettings.asteroidRotationSpeedRange[0], gameSettings.asteroidRotationSpeedRange[1]);
 		const rsz = MathUtils.getRandomInRange(gameSettings.asteroidRotationSpeedRange[0], gameSettings.asteroidRotationSpeedRange[1]);
 		this.rotationSpeed = [rsx, rsy, rsz];
+		this.#setupCollider();
+	}
+
+	#setupCollider() {
+		this.collider = new SphericalCollider();
+		this.collider.radius = Asteroid.#colliderRadius;	
+	}
+	
+	static loadInfoFromObjModel(objModel) {
+		Asteroid.#centerOfGravity = GameObject._computeCenterOfGravity(objModel);
+		Asteroid.#colliderRadius = GameObject._computeRadius(objModel, Asteroid.#centerOfGravity);
 	}
 
 
@@ -44,7 +59,10 @@ class Asteroid extends GameObject {
 	}
 
 
+	hit = false;
 	moveForward(gameSettings) {
+		if(this.hit)
+			return;
 		this.position[2] -= this.speed * (gameSettings.gameSpeed / gameSettings.fpsLimit);
 		if (this.position[2] < 0) {
 			this.initialize(gameSettings);
@@ -53,6 +71,14 @@ class Asteroid extends GameObject {
 		this.orientation[0] += (this.rotationSpeed[0] * (gameSettings.gameSpeed / gameSettings.fpsLimit)) % 360;
 		this.orientation[1] += (this.rotationSpeed[1] * (gameSettings.gameSpeed / gameSettings.fpsLimit)) % 360;
 		this.orientation[2] += (this.rotationSpeed[2] * (gameSettings.gameSpeed / gameSettings.fpsLimit)) % 360;
+	}
+
+	onSpaceshipCollided(spaceship) {
+	}
+
+	// override
+	bindCollider() {
+		super.bindCollider();		
 	}
 }
 

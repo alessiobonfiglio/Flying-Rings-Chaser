@@ -1,9 +1,11 @@
 import {default as utils} from "/source/utils.js"
+import { default as MathUtils } from "../math_utils.js"
 
 class Camera {
 	position = [0, 0, 0];
 	horizontalAngle;
 	verticalAngle;
+	#spaceship;
 
 	constructor(position, horizontalAngle, verticalAngle) {
 		this.position = position;
@@ -11,8 +13,16 @@ class Camera {
 		this.verticalAngle = verticalAngle;
 	}
 
+	initialize(spaceship) {
+		this.#spaceship = spaceship;
+	}
+
 	viewMatrix() {
 		return utils.MakeView(this.position[0], this.position[1], this.position[2], this.horizontalAngle, this.verticalAngle);
+	}
+
+	update() {
+		this.position = MathUtils.sum(this.#spaceship.center, [0,2,-3]);		
 	}
 }
 
