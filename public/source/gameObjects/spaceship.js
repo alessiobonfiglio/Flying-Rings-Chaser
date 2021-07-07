@@ -17,6 +17,7 @@ class Spaceship extends GameObject {
 		super();
 		this.collider = new SphericalCollider();
 		this.collider.radius = Spaceship.#colliderRadius;
+		
 	}
 
 	// properties
@@ -35,7 +36,7 @@ class Spaceship extends GameObject {
 	update() {
 		super.update();
 		var deltaPos = 0.01;
-		if (this.tot > 5) {
+		if (this.tot > 25) {
 			this.sign *= -1;
 			this.tot = 0;
 		}
@@ -44,6 +45,16 @@ class Spaceship extends GameObject {
 		this.orientation[0] += 0.5;
 		this.orientation[1] += 1.0;
 		this.orientation[2] += 1.5;
+	}
+
+	// override
+	bindCollider() {
+		super.bindCollider();
+		this.collider.scale = this.scale; 
+	}
+
+	onRingCollided(ring) {
+
 	}
 }
 

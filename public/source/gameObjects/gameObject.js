@@ -1,8 +1,13 @@
-import {default as utils} from "../utils.js"
-import {default as MathUtils} from "../math_utils.js"
+import { default as utils } from "../utils.js"
+import { default as MathUtils } from "../math_utils.js"
+import { default as Event } from "../utils/event.js"
 
 class GameObject // should be an abstract class if js allows that
 {
+	// events
+	destroyed = new Event();
+
+	// variables
 	position = [0, 0, 0]; //pivot in world coordinates
 	scale = 1;
 	orientation = [0, 0, 0]; // [rx, ry, rz]
@@ -50,18 +55,21 @@ class GameObject // should be an abstract class if js allows that
 		return radius;
 	}
 
-	static* #verticesFromObj(vertices) {
+	static * #verticesFromObj(vertices) {
 		for (let i = 0; i < vertices.length; i += 3)
 			yield [vertices[i], vertices[i + 1], vertices[i + 2]];
 	}
 
-	// events
+	// engine events handlers
 	update() {
-		if (this.collider) {
-			this.collider.center = this.center;
-			this.collider.scale = this.scale;
-			this.collider.orientation = this.orientation;
-		}
+		if (this.collider)
+			this.bindCollider();
+	}
+
+	bindCollider() {
+		this.collider.center = this.center;
+		this.collider.scale = this.scale;
+		this.collider.orientation = this.orientation;
 	}
 
 	// public methods
@@ -71,6 +79,10 @@ class GameObject // should be an abstract class if js allows that
 
 	localToWorld(local) {
 		return MathUtils.multiplyMatrixVector(this.worldMatrix(), local);
+	}
+
+	destroy() {
+		this.destroyed.invoke(this);
 	}
 }
 

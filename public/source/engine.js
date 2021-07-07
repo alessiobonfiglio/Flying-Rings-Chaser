@@ -1,10 +1,11 @@
-import {default as Cube} from "./gameObjects/cube.js";
-import {default as Spaceship} from "./gameObjects/spaceship.js";
-import {default as Camera} from "./gameObjects/camera.js";
-import {default as Asteroid} from "./gameObjects/asteroid.js";
-import {default as Ring} from "./gameObjects/ring.js";
-import {default as Light} from "./light.js";
-import {default as Terrain} from "./gameObjects/terrain.js";
+import { default as Cube } from "./gameObjects/cube.js";
+import { default as Spaceship } from "./gameObjects/spaceship.js";
+import { default as Camera } from "./gameObjects/camera.js";
+import { default as Asteroid } from "./gameObjects/asteroid.js";
+import { default as Ring } from "./gameObjects/ring.js";
+import { default as Light } from "./light.js";
+import { default as Terrain } from "./gameObjects/terrain.js";
+import { default as MathUtils } from "./math_utils.js"
 
 var X = 0, Z = 0, A = 180;
 
@@ -44,8 +45,9 @@ class GameEngine {
 
 		// initialize the spaceship object
 		this.#spaceship = new Spaceship();
-		this.#spaceship.center = [0, 1, 4];
-		this.#webGlManager.instantiate(this.#spaceship);
+		this.#spaceship.center = [-7, -3, -3];
+		this.#instantiate(this.#spaceship);
+		
 
 
 		this.#createTerrainChunks();
@@ -54,14 +56,14 @@ class GameEngine {
 
 		this.#webGlManager.setAndEnableLight(0, new Light([0, 0, 0]));
 
-		this.#rings.push(new Ring());
-		this.#rings[0].center = [0, 1, 4];
-		this.#rings[0].orientation = [90, 0, 0];
-		this.#webGlManager.instantiate(this.#rings[0]);
+		for(const ring of this.getSomeRings([0, 1, 4], 20)){
+			this.#rings.push(ring);
+			this.#instantiateRing(ring);
+		}								
 
 		this.#cubes[0] = new Cube();
 		this.#cubes[0].position = [0, -7, 10];
-		this.#webGlManager.instantiate(this.#cubes[0]);
+		this.#instantiate(this.#cubes[0]);
 		//this.#cubes[1] = new Cube();
 		//this.#webGlManager.instantiate(this.#cubes[1]);
 
@@ -80,19 +82,21 @@ class GameEngine {
 		// do things here
 
 		this.#updateGameObjets();
-		this.#rings[0].orientation[0] += 1;
 
 		//this.#webGlManager.camera.verticalAngle++;
 		this.#webGlManager.camera.verticalAngle = A;
 		this.#webGlManager.camera.position = [X, 0, Z];
 		//console.log(this.#webGlManager.camera.verticalAngle%360);
-		this.#testCollision();
+		this.#checkCollisions();
 		this.#webGlManager.draw();
 	}
 
-	#testCollision() {		
-		var collides = this.#spaceship.collider.intersectWithCircle(this.#rings[0].collider);
-		console.log("spaceships collides with ring[0]? ", collides);
+	#checkCollisions() {
+		for (const ring of this.#rings)
+			if (this.#spaceship.collider.intersectWithCircle(ring.collider)) {
+				this.#spaceship.onRingCollided(ring);
+				ring.onSpaceshipCollided(this.#spaceship);
+			}
 	}
 
 	// this is done in order to limit the framerate to 'fpsLimit'
@@ -153,6 +157,35 @@ class GameEngine {
 		}
 	}
 
+	#instantiate(gameObject) {
+		gameObject.destroyed.subscribe(gameObject => this.#webGlManager.destroy(gameObject));
+		this.#webGlManager.instantiate(gameObject);
+		return gameObject;
+	}
+
+	#instantiateRing(ring){
+		this.#instantiate(ring);
+		ring.destroyed.subscribe(r => this.#removeItem(this.#rings, r));
+		return ring;
+	}
+
+	* getSomeRings(center, tot) {
+		var v = [1,1,1];
+		var spacing = 2;
+		for(var i=0; i < tot; i++){
+			let ring = new Ring();
+			ring.center = MathUtils.sum(center, MathUtils.mul((i - tot/2) * spacing, v));
+			yield ring;
+		}
+	}
+
+	#removeItem(arr, value) {
+		var index = arr.indexOf(value);
+		if (index > -1) {
+		  arr.splice(index, 1);
+		}
+		return arr;
+	  }
 }
 
 window.addEventListener("keyup", keyFunction, false);
@@ -177,6 +210,10 @@ function keyFunction(e) {
 	if (e.keyCode == 81) {  // 2
 		A -= 3.0;
 	}
+
 }
+
+// utils
+
 
 export default GameEngine;

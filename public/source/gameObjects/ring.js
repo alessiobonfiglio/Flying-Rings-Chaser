@@ -1,7 +1,7 @@
-import {default as GameObject} from "./gameObject.js"
-import {RingShaderClass} from "../../shaders/shaderClasses.js";
-import {default as CircleCollider} from "../colliders/circleCollider.js"
-import {default as MathUtils} from "../math_utils.js"
+import { default as GameObject } from "./gameObject.js"
+import { RingShaderClass } from "../../shaders/shaderClasses.js";
+import { default as CircleCollider } from "../colliders/circleCollider.js"
+import { default as MathUtils } from "../math_utils.js"
 
 class Ring extends GameObject {
 	static objFilename = "resources/ring/ring.obj";
@@ -17,8 +17,9 @@ class Ring extends GameObject {
 		super();
 		this.collider = new CircleCollider();
 		this.collider.radius = Ring.#colliderRadius;
-		this.collider.thickness = 2;	
-		this.collider.normal = [0,0,1];
+		this.collider.thickness = 0.5;
+		this.collider.normal = [0, 0, 1];
+		this.orientation = [90,0,0];
 	}
 
 	static loadInfoFromObjModel(objModel) {
@@ -28,7 +29,13 @@ class Ring extends GameObject {
 
 	// events
 	update() {
-		super.update();		
+		super.update();
+		this.orientation[0] += 1;
+	}
+
+	onSpaceshipCollided(spaceship) {
+
+		this.destroy();
 	}
 }
 

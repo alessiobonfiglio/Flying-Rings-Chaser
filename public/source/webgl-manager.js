@@ -7,7 +7,7 @@ class WebGlManager {
 
 	camera;
 
-	#instantiatedObjects = []; // contains a list of {gameObject, vao}
+	#instantiatedObjects = new Map(); // contains a map of gameObject -> GlObject
 	#classToGlObjectMap = new Map(); // maps gameObject class -> GlObject
 
 	#classToGLShaderProgramMap = new Map(); // maps shaderClass class -> GLShaderProgram
@@ -33,12 +33,12 @@ class WebGlManager {
 	// Public Methods
 	instantiate(gameObject) {
 		var glObject = this.#classToGlObjectMap.get(gameObject.constructor.name);
-		this.#instantiatedObjects.push({gameObject: gameObject, glObject: glObject});
+		this.#instantiatedObjects.set(gameObject, glObject);
 	}
 
 	destroy(gameObject) {
-		var index = this.#instantiatedObjects.indexOf(gameObject);
-		this.#instantiatedObjects.splice(index, 1);
+		console.log(gameObject)
+		this.#instantiatedObjects.delete(gameObject);
 	}
 
 	setAndEnableLight(index, light) {
@@ -134,9 +134,7 @@ class WebGlManager {
 		const lightsArray = this.#lights.map((x) => x.position).flat();
 
 		// setup transformation matrix from local coordinates to Clip coordinates
-		for (const instance of this.#instantiatedObjects) {
-			const [gameObject, glObject] = [instance.gameObject, instance.glObject];
-
+		for (const [gameObject, glObject] of this.#instantiatedObjects.entries()) {
 			// Use the program of the glObject
 			this.#gl.useProgram(glObject.shaderProgram.program);
 

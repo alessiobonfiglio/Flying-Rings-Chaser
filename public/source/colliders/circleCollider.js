@@ -24,6 +24,10 @@ class CircleCollider extends Collider{
         return ret;
     }
 
+    get currentthickness() {
+        return this.thickness * this.scale;
+    }
+
 
 
     isInside(point) {
@@ -31,7 +35,7 @@ class CircleCollider extends Collider{
         let deltaPos = MathUtils.sub(point, this.center);
         let dot = MathUtils.dot(deltaPos, this.currentNormal);        
 
-        if(dot > this.thickness || dot < -this.thickness)
+        if(dot > this.thickness || dot < -this.currentthickness)
             return false;
 
         // check if is inside the circle
