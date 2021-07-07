@@ -19,9 +19,7 @@ class CircleCollider extends Collider{
     }
 
     get currentNormal() {
-        let R = utils.MakeRotateXYZMatrix(this.orientation[0], this.orientation[1], this.orientation[2]);
-        var ret = MathUtils.multiplyMatrixVector(R, this.#normal);
-        return ret;
+        return this._currentOrientation(this.normal);
     }
 
     get currentthickness() {
