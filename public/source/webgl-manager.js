@@ -36,8 +36,8 @@ class WebGlManager {
 		this.#instantiatedObjects.set(gameObject, glObject);
 	}
 
-	destroy(gameObject) {		
-		this.#instantiatedObjects.delete(gameObject);		
+	destroy(gameObject) {
+		this.#instantiatedObjects.delete(gameObject);
 	}
 
 	setAndEnableLight(index, light) {
@@ -149,8 +149,10 @@ class WebGlManager {
 			this.#gl.uniformMatrix4fv(glObject.shaderProgram.locations.normalUniformLocation, this.#gl.FALSE, utils.transposeMatrix(gameObject.worldMatrix()));
 
 			// passing the increment if present
-			if(gameObject.increment){
-				this.#gl.uniform1f(glObject.shaderProgram.locations.incrementLocation, gameObject.increment);
+			if (typeof gameObject.rowNumber !== 'undefined') {
+				const zOffset = gameObject.rowNumber * this.#gameSetting.terrainChunkSize;
+				console.log(zOffset);
+				this.#gl.uniform1f(glObject.shaderProgram.locations.incrementLocation, zOffset);
 			}
 
 			// GameObject Texture
@@ -233,7 +235,7 @@ class GLShaderProgram {
 
 		this.locations.cameraPositionLocation = gl.getUniformLocation(this.program, "cameraPosition");
 
-		this.locations.incrementLocation = gl.getUniformLocation(this.program, "increment");
+		this.locations.incrementLocation = gl.getUniformLocation(this.program, "zOffset");
 
 		if (this.useTexture) {
 			this.locations.textureAttributeLocation = gl.getAttribLocation(this.program, "inTexCoords");

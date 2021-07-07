@@ -1,12 +1,12 @@
-import { default as Cube } from "./gameObjects/cube.js";
-import { default as Spaceship } from "./gameObjects/spaceship.js";
-import { default as Camera } from "./gameObjects/camera.js";
-import { default as Asteroid } from "./gameObjects/asteroid.js";
-import { default as Ring } from "./gameObjects/ring.js";
-import { default as Light } from "./light.js";
-import { default as Terrain } from "./gameObjects/terrain.js";
-import { default as Cockpit } from "./gameObjects/cockpit.js";
-import { default as MathUtils } from "./math_utils.js"
+import {default as Cube} from "./gameObjects/cube.js";
+import {default as Spaceship} from "./gameObjects/spaceship.js";
+import {default as Camera} from "./gameObjects/camera.js";
+import {default as Asteroid} from "./gameObjects/asteroid.js";
+import {default as Ring} from "./gameObjects/ring.js";
+import {default as Light} from "./light.js";
+import {default as Terrain} from "./gameObjects/terrain.js";
+import {default as Cockpit} from "./gameObjects/cockpit.js";
+import {default as MathUtils} from "./math_utils.js"
 
 var X = 0, Y = 0, Z = 0, A = 180;
 
@@ -62,10 +62,10 @@ class GameEngine {
 
 		this.#webGlManager.setAndEnableLight(0, new Light([0, 0, 0]));
 
-		for(const ring of this.getSomeRings([0, 1, 4], 100)){
+		for (const ring of this.getSomeRings([0, 1, 4], 100)) {
 			this.#rings.push(ring);
 			this.#instantiateRing(ring);
-		}								
+		}
 
 		this.#cubes[0] = new Cube();
 		this.#cubes[0].position = [0, -7, 10];
@@ -109,9 +109,9 @@ class GameEngine {
 				ring.onSpaceshipCollided(this.#cockpit);
 			}
 		}
-		
+
 		// asteroid
-		for(const asteroid of this.#asteroids) {
+		for (const asteroid of this.#asteroids) {
 			if (this.#spaceship.collider.intersectWithSphere(asteroid.collider)) {
 				this.#spaceship.onAsteroidCollided(asteroid);
 				asteroid.onSpaceshipCollided(this.#spaceship);
@@ -162,13 +162,16 @@ class GameEngine {
 	}
 
 	#createTerrainChunks() {
-		for (let i = -this.#gameSettings.halfNumberTerrainChunks; i < this.#gameSettings.halfNumberTerrainChunks; i++) {
-			const terr = new Terrain(this.#gameSettings);
+		for (let i = -this.#gameSettings.halfNumberTerrainChunksColumns; i < this.#gameSettings.halfNumberTerrainChunksColumns; i++) {
+			for (let j = 0; j < this.#gameSettings.numberTerrainChunksRows; j++) {
+				const terr = new Terrain(this.#gameSettings);
 
-			terr.position = [i * this.#gameSettings.terrainChunkSize, 0, 0];
+				terr.position = [i * this.#gameSettings.terrainChunkSize, 0, j * this.#gameSettings.terrainChunkSize];
+				terr.rowNumber = j;
 
-			this.#webGlManager.instantiate(terr);
-			this.#terrains.push(terr);
+				this.#webGlManager.instantiate(terr);
+				this.#terrains.push(terr);
+			}
 		}
 	}
 
@@ -188,25 +191,25 @@ class GameEngine {
 		return gameObject;
 	}
 
-	#instantiateRing(ring){
+	#instantiateRing(ring) {
 		this.#instantiate(ring);
 		ring.destroyed.subscribe(r => this.#removeItem(this.#rings, r));
 		return ring;
 	}
 
-	#instantiateAsteroid(asteroid){
+	#instantiateAsteroid(asteroid) {
 		this.#instantiate(asteroid);
-		asteroid.destroyed.subscribe(ast =>this.#removeItem(this.#asteroids, ast));
+		asteroid.destroyed.subscribe(ast => this.#removeItem(this.#asteroids, ast));
 		return asteroid;
 	}
 
 
 	* getSomeRings(center, tot) {
-		var v = [0,0,1];
+		var v = [0, 0, 1];
 		var spacing = 40;
-		for(var i=0; i < tot; i++){
+		for (var i = 0; i < tot; i++) {
 			let ring = new Ring();
-			ring.center = MathUtils.sum(center, MathUtils.mul((i - tot/2) * spacing, v));
+			ring.center = MathUtils.sum(center, MathUtils.mul((i - tot / 2) * spacing, v));
 			yield ring;
 		}
 	}
@@ -214,7 +217,7 @@ class GameEngine {
 	#removeItem(arr, value) {
 		var index = arr.indexOf(value);
 		if (index > -1) {
-		  arr.splice(index, 1);
+			arr.splice(index, 1);
 		}
 		return arr;
 	}

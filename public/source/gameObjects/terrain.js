@@ -8,7 +8,7 @@ class Terrain extends GameObject {
 	_materialColor = [0.5, 0.5, 0.5];
 
 	#gameSettings;
-	increment = 0;
+	rowNumber;
 
 	static createMesh(gameSettings) {
 		const res = gameSettings.terrainChunkResolution;
@@ -55,7 +55,12 @@ class Terrain extends GameObject {
 	// events
 	update() {
 		super.update();
-		this.increment += this.#gameSettings.terrainSpeed * (this.#gameSettings.gameSpeed / this.#gameSettings.fpsLimit);
+		this.position[2] -= this.#gameSettings.terrainSpeed * (this.#gameSettings.gameSpeed / this.#gameSettings.fpsLimit);
+		const newZ = ((this.position[2] - this.#gameSettings.terrainChunkSize) % (this.#gameSettings.terrainChunkSize * this.#gameSettings.numberTerrainChunksRows)) + this.#gameSettings.terrainChunkSize;
+		if(newZ > this.position[2]){
+			this.rowNumber += this.#gameSettings.numberTerrainChunksRows;
+		}
+		this.position[2] = newZ;
 	}
 }
 

@@ -88,9 +88,10 @@ async function init() {
 		asteroidSpeedRange: [20, 40],
 		asteroidRotationSpeedRange: [0, 30],
 		terrainChunkSize: 500,
-		terrainChunkResolution: 40,
-		halfNumberTerrainChunks: 2,
-		terrainSpeed: 1,
+		terrainChunkResolution: 32,
+		halfNumberTerrainChunksColumns: 2,
+		numberTerrainChunksRows:3,
+		terrainSpeed: 60,
 	} //maybe load this from a json in the future?
 
 	// create and initialize the WebGL manager
