@@ -163,7 +163,7 @@ class GameEngine {
 
 	#createTerrainChunks() {
 		for (let i = -this.#gameSettings.halfNumberTerrainChunks; i < this.#gameSettings.halfNumberTerrainChunks; i++) {
-			const terr = new Terrain();
+			const terr = new Terrain(this.#gameSettings);
 
 			terr.position = [i * this.#gameSettings.terrainChunkSize, 0, 0];
 

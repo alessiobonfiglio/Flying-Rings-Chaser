@@ -9,7 +9,6 @@ class Ring extends GameObject {
 	static shaderClass = new RingShaderClass();
 	static #colliderRadius;
 	static #centerOfGravity;
-	_materialColor = [0.5, 0.5, 0.5];
 	_materialColor = [255 / 255, 215 / 255, 0 / 255];
 
 	// Initialization

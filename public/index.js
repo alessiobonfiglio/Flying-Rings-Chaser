@@ -90,6 +90,7 @@ async function init() {
 		terrainChunkSize: 500,
 		terrainChunkResolution: 40,
 		halfNumberTerrainChunks: 2,
+		terrainSpeed: 1,
 	} //maybe load this from a json in the future?
 
 	// create and initialize the WebGL manager

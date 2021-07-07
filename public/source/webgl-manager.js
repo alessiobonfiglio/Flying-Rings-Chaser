@@ -148,6 +148,11 @@ class WebGlManager {
 			this.#gl.uniformMatrix4fv(glObject.shaderProgram.locations.positionUniformLocation, this.#gl.FALSE, utils.transposeMatrix(WVPMatrix));
 			this.#gl.uniformMatrix4fv(glObject.shaderProgram.locations.normalUniformLocation, this.#gl.FALSE, utils.transposeMatrix(gameObject.worldMatrix()));
 
+			// passing the increment if present
+			if(gameObject.increment){
+				this.#gl.uniform1f(glObject.shaderProgram.locations.incrementLocation, gameObject.increment);
+			}
+
 			// GameObject Texture
 			if (glObject.shaderProgram.useTexture) {
 				this.#gl.activeTexture(this.#gl.TEXTURE0);
@@ -227,6 +232,8 @@ class GLShaderProgram {
 		this.locations.normalAttributeLocation = gl.getAttribLocation(this.program, "inNormal");
 
 		this.locations.cameraPositionLocation = gl.getUniformLocation(this.program, "cameraPosition");
+
+		this.locations.incrementLocation = gl.getUniformLocation(this.program, "increment");
 
 		if (this.useTexture) {
 			this.locations.textureAttributeLocation = gl.getAttribLocation(this.program, "inTexCoords");

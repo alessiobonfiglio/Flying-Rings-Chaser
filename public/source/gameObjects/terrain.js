@@ -7,6 +7,9 @@ class Terrain extends GameObject {
 	static shaderClass = new TerrainShaderClass();
 	_materialColor = [0.5, 0.5, 0.5];
 
+	#gameSettings;
+	increment = 0;
+
 	static createMesh(gameSettings) {
 		const res = gameSettings.terrainChunkResolution;
 		const maxXZ = gameSettings.terrainChunkSize;
@@ -42,6 +45,17 @@ class Terrain extends GameObject {
 		}
 
 		return {indices: ind, vertices: vert, textures: uv}
+	}
+
+	constructor(gameSettings) {
+		super();
+		this.#gameSettings = gameSettings;
+	}
+
+	// events
+	update() {
+		super.update();
+		this.increment += this.#gameSettings.terrainSpeed * (this.#gameSettings.gameSpeed / this.#gameSettings.fpsLimit);
 	}
 }
 
