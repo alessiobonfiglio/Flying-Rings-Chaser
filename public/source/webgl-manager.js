@@ -1,5 +1,5 @@
-import {default as utils} from "./utils.js"
-import {default as Light} from "./light.js";
+import { default as utils } from "./utils.js"
+import { default as Light } from "./light.js";
 
 class WebGlManager {
 	#gl;
@@ -133,20 +133,21 @@ class WebGlManager {
 		const lightsArray = this.#lights.map((x) => x.position).flat();
 
 		// setup transformation matrix from local coordinates to Clip coordinates
-		for (const [gameObject, glObject] of this.#instantiatedObjects.entries()) {
-			// Use the program of the glObject
-			this.#gl.useProgram(glObject.shaderProgram.program);
+		for (const [gameObject, glObject] of this.#instantiatedObjects.entries())
+			if (gameObject.isVisible) {
+				// Use the program of the glObject
+				this.#gl.useProgram(glObject.shaderProgram.program);
 
-			// Use the vao of the glObject
-			this.#gl.bindVertexArray(glObject.vao);
+				// Use the vao of the glObject
+				this.#gl.bindVertexArray(glObject.vao);
 
-			// Computing transformation matrix
-			const worldMatrix = gameObject.worldMatrix();
-			const WVPMatrix = this.#computeMatrix(worldMatrix, viewMatrix);
+				// Computing transformation matrix
+				const worldMatrix = gameObject.worldMatrix();
+				const WVPMatrix = this.#computeMatrix(worldMatrix, viewMatrix);
 
-			// Passing the matrix as a uniform to the vertex shader
-			this.#gl.uniformMatrix4fv(glObject.shaderProgram.locations.positionUniformLocation, this.#gl.FALSE, utils.transposeMatrix(WVPMatrix));
-			this.#gl.uniformMatrix4fv(glObject.shaderProgram.locations.normalUniformLocation, this.#gl.FALSE, utils.transposeMatrix(gameObject.worldMatrix()));
+				// Passing the matrix as a uniform to the vertex shader
+				this.#gl.uniformMatrix4fv(glObject.shaderProgram.locations.positionUniformLocation, this.#gl.FALSE, utils.transposeMatrix(WVPMatrix));
+				this.#gl.uniformMatrix4fv(glObject.shaderProgram.locations.normalUniformLocation, this.#gl.FALSE, utils.transposeMatrix(gameObject.worldMatrix()));
 
 			// passing the increment if present
 			if (typeof gameObject.rowNumber !== 'undefined') {
@@ -155,26 +156,26 @@ class WebGlManager {
 				this.#gl.uniform1f(glObject.shaderProgram.locations.incrementLocation, zOffset);
 			}
 
-			// GameObject Texture
-			if (glObject.shaderProgram.useTexture) {
-				this.#gl.activeTexture(this.#gl.TEXTURE0);
-				this.#gl.bindTexture(this.#gl.TEXTURE_2D, glObject.texture);
-				this.#gl.uniform1i(glObject.shaderProgram.locations.textureUniformLocation, 0);
+				// GameObject Texture
+				if (glObject.shaderProgram.useTexture) {
+					this.#gl.activeTexture(this.#gl.TEXTURE0);
+					this.#gl.bindTexture(this.#gl.TEXTURE_2D, glObject.texture);
+					this.#gl.uniform1i(glObject.shaderProgram.locations.textureUniformLocation, 0);
+				}
+
+				// GameObject Color
+				this.#gl.uniform3fv(glObject.shaderProgram.locations.materialDiffColorHandle, gameObject.materialColor);
+
+				// camera position
+				this.#gl.uniform3fv(glObject.shaderProgram.locations.cameraPositionLocation, this.camera.position);
+
+				// directional lights
+				this.#gl.uniform3fv(glObject.shaderProgram.locations.lightsPositionHandle, lightsArray);
+				this.#gl.uniform1uiv(glObject.shaderProgram.locations.lightsEnabledHandle, this.#lightsEnabled);
+
+				// Drawing the gameObject
+				this.#gl.drawElements(this.#gl.TRIANGLES, glObject.totIndices, this.#gl.UNSIGNED_SHORT, 0);
 			}
-
-			// GameObject Color
-			this.#gl.uniform3fv(glObject.shaderProgram.locations.materialDiffColorHandle, gameObject.materialColor);
-
-			// camera position
-			this.#gl.uniform3fv(glObject.shaderProgram.locations.cameraPositionLocation, this.camera.position);
-
-			// directional lights
-			this.#gl.uniform3fv(glObject.shaderProgram.locations.lightsPositionHandle, lightsArray);
-			this.#gl.uniform1uiv(glObject.shaderProgram.locations.lightsEnabledHandle, this.#lightsEnabled);
-
-			// Drawing the gameObject
-			this.#gl.drawElements(this.#gl.TRIANGLES, glObject.totIndices, this.#gl.UNSIGNED_SHORT, 0);
-		}
 	}
 
 	#computeMatrix(worldMatrix, viewMatrix) {

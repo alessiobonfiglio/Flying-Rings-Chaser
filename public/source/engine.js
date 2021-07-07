@@ -1,12 +1,15 @@
-import {default as Cube} from "./gameObjects/cube.js";
-import {default as Spaceship} from "./gameObjects/spaceship.js";
-import {default as Camera} from "./gameObjects/camera.js";
-import {default as Asteroid} from "./gameObjects/asteroid.js";
-import {default as Ring} from "./gameObjects/ring.js";
-import {default as Light} from "./light.js";
-import {default as Terrain} from "./gameObjects/terrain.js";
-import {default as Cockpit} from "./gameObjects/cockpit.js";
-import {default as MathUtils} from "./math_utils.js"
+import { default as Cube } from "./gameObjects/cube.js";
+import { default as Spaceship } from "./gameObjects/spaceship.js";
+import { default as Camera } from "./gameObjects/camera.js";
+import { default as Asteroid } from "./gameObjects/asteroid.js";
+import { default as Ring } from "./gameObjects/ring.js";
+import { default as Light } from "./light.js";
+import { default as Terrain } from "./gameObjects/terrain.js";
+import { default as Cockpit } from "./gameObjects/cockpit.js";
+import { default as TerrainCollider } from "./gameObjects/terrainCollider.js";
+import { default as MathUtils } from "./math_utils.js"
+import GameObject from "./gameObjects/gameObject.js";
+import { default as SemispaceCollider } from "./colliders/semispaceCollider.js"
 
 var X = 0, Y = 0, Z = 0, A = 180;
 
@@ -32,6 +35,7 @@ class GameEngine {
 	#cubes = [];
 	#asteroids = [];
 	#rings = [];
+	#terrainCollider;
 
 	constructor(webGlManager, window, gameSettings) {
 		this.#webGlManager = webGlManager;
@@ -50,11 +54,11 @@ class GameEngine {
 		this.#spaceship.center = [0, 1, 4];
 
 		this.#instantiate(this.#spaceship);
-
 		this.#createTerrainChunks();
-
+		
 		this.#cockpit = new Cockpit(this.#window, this.#gameSettings);
-		this.#webGlManager.instantiate(this.#cockpit);
+		this.#terrainCollider = this.#instantiateTerrainCollider();
+		this.#instantiate(this.#cockpit);
 
 		this.#webGlManager.camera.initialize(this.#cockpit);
 
@@ -121,6 +125,11 @@ class GameEngine {
 				asteroid.onSpaceshipCollided(this.#cockpit);
 			}
 		}
+
+		// ground
+		if(this.#terrainCollider.collider.intersectWithSphere(this.#cockpit.collider)){
+			this.#cockpit.onGroundCollided();			
+		}			
 	}
 
 	// this is done in order to limit the framerate to 'fpsLimit'
@@ -183,6 +192,7 @@ class GameEngine {
 			}
 		}
 		this.#webGlManager.camera.update();
+		this.#terrainCollider.update();
 	}
 
 	#instantiate(gameObject) {
@@ -220,6 +230,13 @@ class GameEngine {
 			arr.splice(index, 1);
 		}
 		return arr;
+	}
+
+	#instantiateTerrainCollider() {
+		var terrain = new TerrainCollider();
+		terrain.initialize(this.#cockpit, this.#gameSettings);
+		this.#instantiate(terrain);
+		return terrain;
 	}
 }
 

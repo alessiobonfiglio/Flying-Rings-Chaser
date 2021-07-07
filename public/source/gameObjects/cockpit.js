@@ -64,6 +64,10 @@ class Cockpit extends GameObject {
 		console.log("Cockpit: asteroid hit");
 	}
 
+	onGroundCollided() {
+		console.log("Cockpit: gound hit");
+	}
+
     #keyFunctionDown(cockpit) {
 		return function(e) {
 			if (e.keyCode == 87) {	// W

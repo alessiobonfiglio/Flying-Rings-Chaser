@@ -12,6 +12,7 @@ class GameObject // should be an abstract class if js allows that
 	scale = 1;
 	orientation = [0, 0, 0]; // [rx, ry, rz]
 	collider;
+	isVisible = true;
 
 	get localCenterOfGravity() {
 		return [0, 0, 0];

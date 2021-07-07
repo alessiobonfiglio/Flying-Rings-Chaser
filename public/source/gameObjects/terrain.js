@@ -1,6 +1,7 @@
 import {default as GameObject} from "./gameObject.js"
 import {TerrainShaderClass} from "../../shaders/shaderClasses.js";
 
+
 class Terrain extends GameObject {
 	static meshGenerator = Terrain.createMesh;
 	static textureFilename = "resources/terrain/terrain.png";
