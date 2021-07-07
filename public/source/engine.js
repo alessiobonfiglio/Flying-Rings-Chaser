@@ -5,9 +5,10 @@ import { default as Asteroid } from "./gameObjects/asteroid.js";
 import { default as Ring } from "./gameObjects/ring.js";
 import { default as Light } from "./light.js";
 import { default as Terrain } from "./gameObjects/terrain.js";
+import { default as Cockpit } from "./gameObjects/cockpit.js";
 import { default as MathUtils } from "./math_utils.js"
 
-var X = 0, Z = 0, A = 180;
+var X = 0, Y = 0, Z = 0, A = 180;
 
 class GameEngine {
 	#webGlManager;
@@ -26,6 +27,7 @@ class GameEngine {
 
 	// game objects
 	#spaceship;
+	#cockpit;
 	#terrains = [];
 	#cubes = [];
 	#asteroids = [];
@@ -43,17 +45,18 @@ class GameEngine {
 	setup() {
 		this.#webGlManager.camera = new Camera([0, 0, 0], 0, -180);
 
-
 		// initialize the spaceship object
 		this.#spaceship = new Spaceship();
 		this.#spaceship.center = [0, 1, 4];
-		
-		this.#webGlManager.camera.initialize(this.#spaceship);
 
 		this.#instantiate(this.#spaceship);
 
-
 		this.#createTerrainChunks();
+
+		this.#cockpit = new Cockpit(this.#window, this.#gameSettings);
+		this.#webGlManager.instantiate(this.#cockpit);
+
+		this.#webGlManager.camera.initialize(this.#cockpit);
 
 		this.#createAsteroids();
 
@@ -84,7 +87,7 @@ class GameEngine {
 
 		// do things here
 
-		this.#updateGameObjets();
+		this.#updateGameObjects();
 
 		//this.#webGlManager.camera.verticalAngle++;
 		// this.#webGlManager.camera.verticalAngle = A;
@@ -96,18 +99,28 @@ class GameEngine {
 
 	#checkCollisions() {
 		// rings
-		for (const ring of this.#rings)
+		for (const ring of this.#rings) {
 			if (this.#spaceship.collider.intersectWithCircle(ring.collider)) {
 				this.#spaceship.onRingCollided(ring);
 				ring.onSpaceshipCollided(this.#spaceship);
 			}
+			if (this.#cockpit.collider.intersectWithCircle(ring.collider)) {
+				this.#cockpit.onRingCollided(ring);
+				ring.onSpaceshipCollided(this.#cockpit);
+			}
+		}
 		
 		// asteroid
-		for(const asteroid of this.#asteroids)
+		for(const asteroid of this.#asteroids) {
 			if (this.#spaceship.collider.intersectWithSphere(asteroid.collider)) {
 				this.#spaceship.onAsteroidCollided(asteroid);
 				asteroid.onSpaceshipCollided(this.#spaceship);
 			}
+			if (this.#cockpit.collider.intersectWithSphere(asteroid.collider)) {
+				this.#cockpit.onAsteroidCollided(asteroid);
+				asteroid.onSpaceshipCollided(this.#cockpit);
+			}
+		}
 	}
 
 	// this is done in order to limit the framerate to 'fpsLimit'
@@ -159,8 +172,8 @@ class GameEngine {
 		}
 	}
 
-	#updateGameObjets() {
-		let gameObjectList = [this.#asteroids, this.#rings, this.#cubes, [this.#spaceship], this.#terrains].flat();
+	#updateGameObjects() {
+		let gameObjectList = [this.#asteroids, this.#rings, this.#cubes, [this.#spaceship], [this.#cockpit], this.#terrains].flat();
 		for (let gameObject of gameObjectList) {
 			if (gameObject.update) {
 				gameObject.update();
@@ -170,7 +183,7 @@ class GameEngine {
 	}
 
 	#instantiate(gameObject) {
-		gameObject.destroyed.subscribe(gameObject => this.#webGlManager.destroy(gameObject));
+		gameObject.destroyed.subscribe(gameObj => this.#webGlManager.destroy(gameObj));
 		this.#webGlManager.instantiate(gameObject);
 		return gameObject;
 	}
@@ -204,35 +217,7 @@ class GameEngine {
 		  arr.splice(index, 1);
 		}
 		return arr;
-	  }
+	}
 }
-
-window.addEventListener("keyup", keyFunction, false);
-
-function keyFunction(e) {
-
-	if (e.keyCode == 37) {  // 6
-		X -= 5.0;
-	}
-	if (e.keyCode == 39) {  // 7
-		X += 5.0;
-	}
-	if (e.keyCode == 40) {  // 1
-		Z -= 5.0;
-	}
-	if (e.keyCode == 38) {  // 2
-		Z += 5.0;
-	}
-	if (e.keyCode == 69) {  // 2
-		A += 3.0;
-	}
-	if (e.keyCode == 81) {  // 2
-		A -= 3.0;
-	}
-
-}
-
-// utils
-
 
 export default GameEngine;

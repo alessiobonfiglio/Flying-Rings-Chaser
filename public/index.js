@@ -3,10 +3,11 @@ import { default as GameEngine } from "./source/engine.js"
 import { default as Cube } from "./source/gameObjects/cube.js"
 import { default as Spaceship } from "./source/gameObjects/spaceship.js"
 import { default as utils } from "./source/utils.js"
-import { DefaultShaderClass, RingShaderClass, TerrainShaderClass } from "./shaders/shaderClasses.js";
+import { DefaultShaderClass, RingShaderClass, TerrainShaderClass, CockpitShaderClass } from "./shaders/shaderClasses.js";
 import { default as Asteroid } from "./source/gameObjects/asteroid.js";
 import { default as Ring } from "./source/gameObjects/ring.js";
 import { default as Terrain } from "./source/gameObjects/terrain.js";
+import { default as Cockpit } from "./source/gameObjects/cockpit.js";
 
 
 async function setupGlObjects(glManager, gl, gameSettings) {
@@ -14,6 +15,7 @@ async function setupGlObjects(glManager, gl, gameSettings) {
 		[
 			[Cube, "Cube"],
 			[Spaceship, "Spaceship"],
+			[Cockpit, "Cockpit"],
 			[Asteroid, "Asteroid"],
 			[Terrain, "Terrain"],
 			[Ring, "Ring"]
@@ -41,7 +43,8 @@ async function setupGlShaders(glManager, gl) {
 		[
 			DefaultShaderClass,
 			RingShaderClass,
-			TerrainShaderClass
+			TerrainShaderClass,
+			CockpitShaderClass
 		];
 
 	for (const shaderClass of info) {
@@ -60,11 +63,6 @@ function logGLCall(functionName, args) {
 }
 
 async function init() {
-
-	const path = window.location.pathname;
-	const page = path.split("/").pop();
-	const baseDir = window.location.href.replace(page, '');
-
 	// Get A WebGL context
 	const canvas = document.getElementById("c");
 	const gl = canvas.getContext("webgl2");

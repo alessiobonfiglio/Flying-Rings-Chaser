@@ -32,15 +32,15 @@ class GameObject // should be an abstract class if js allows that
 
 	// protected
 	static _computeCenterOfGravity(objModel) {
-		let totVerices = 0;
+		let totVertices = 0;
 		let ret = [0, 0, 0];
 		for (const v of this.#verticesFromObj(objModel.vertices))
 			if (v[0] && v[1] && v[2]) {
 				ret = MathUtils.sum(ret, v);
-				totVerices++;
+				totVertices++;
 			}
 
-		ret = MathUtils.mul(1 / totVerices, ret);
+		ret = MathUtils.mul(1 / totVertices, ret);
 		return ret;
 	}
 

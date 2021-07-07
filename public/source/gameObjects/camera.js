@@ -5,7 +5,7 @@ class Camera {
 	position = [0, 0, 0];
 	horizontalAngle;
 	verticalAngle;
-	#spaceship;
+	#cockpit;
 
 	constructor(position, horizontalAngle, verticalAngle) {
 		this.position = position;
@@ -13,8 +13,8 @@ class Camera {
 		this.verticalAngle = verticalAngle;
 	}
 
-	initialize(spaceship) {
-		this.#spaceship = spaceship;
+	initialize(cockpit) {
+		this.#cockpit = cockpit;
 	}
 
 	viewMatrix() {
@@ -22,7 +22,8 @@ class Camera {
 	}
 
 	update() {
-		this.position = MathUtils.sum(this.#spaceship.center, [0,2,-3]);		
+		//this.position = MathUtils.sum(this.#spaceship.center, [0,2,-3]);
+		this.position = MathUtils.sum(this.#cockpit.position, [0, 1, -0.5]);
 	}
 }
 
