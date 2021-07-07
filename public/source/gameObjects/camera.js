@@ -23,7 +23,7 @@ class Camera {
 
 	update() {
 		//this.position = MathUtils.sum(this.#spaceship.center, [0,2,-3]);
-		this.position = MathUtils.sum(this.#cockpit.position, [0, 1, -0.5]);
+		this.position = MathUtils.sum(this.#cockpit.position, [0, -0.125, -0.75]);
 	}
 }
 

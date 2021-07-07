@@ -5,6 +5,7 @@ import { default as MathUtils } from "../math_utils.js"
 
 class Cockpit extends GameObject {
 	static objFilename = "resources/cockpit/Cockpit.obj";
+	static textureFilename = "resources/cockpit/Cockpit_Texture.png";
 	static shaderClass = new CockpitShaderClass();
     static #colliderRadius;
 	static #centerOfGravity;
@@ -12,9 +13,9 @@ class Cockpit extends GameObject {
     #gameSettings;
 
 	_materialColor = [0.2, 0.2, 0.2];
-    position = [0, -0.85, 0.45];
+    position = [0, 0, 0];
     scale = 2;
-    orientation = [180, -65, 180];
+    orientation = [0, 180, 0];
     deltaSpeed = 2;
     up = 0;
     down = 0;
@@ -65,7 +66,7 @@ class Cockpit extends GameObject {
 	}
 
 	onGroundCollided() {
-		console.log("Cockpit: gound hit");
+		console.log("Cockpit: ground hit");
 	}
 
     #keyFunctionDown(cockpit) {

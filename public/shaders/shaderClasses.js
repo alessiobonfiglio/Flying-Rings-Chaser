@@ -22,7 +22,7 @@ class TerrainShaderClass extends ShaderClass {
 class CockpitShaderClass extends ShaderClass {
 	static vertexShaderFilename = "shaders/cockpitVertexShader.glsl";
 	static fragmentShaderFilename = "shaders/cockpitFragmentShader.glsl";
-	static useTexture = false;
+	static useTexture = true;
 }
 
 export {DefaultShaderClass, RingShaderClass, TerrainShaderClass, CockpitShaderClass};
