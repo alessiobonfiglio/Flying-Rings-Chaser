@@ -36,8 +36,7 @@ class WebGlManager {
 		this.#instantiatedObjects.set(gameObject, glObject);
 	}
 
-	destroy(gameObject) {
-		console.log(gameObject)
+	destroy(gameObject) {		
 		this.#instantiatedObjects.delete(gameObject);
 	}
 
