@@ -25,6 +25,5 @@ void main() {
 	diffuseIntensity += dot(lxs[4], nNormal) * float(lxsEnabled[4]);
 
 	// compute the lambert diffuse color
-	//outColor = vec4(texColor * clamp(diffuseIntensity, 0.0, 1.0), 1.0);
-	outColor = texture(objectTexture, fsTexCoords);
+	outColor = vec4(texColor * clamp(diffuseIntensity, 0.0, 1.0), 1.0);
 }

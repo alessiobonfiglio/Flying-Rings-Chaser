@@ -4,7 +4,7 @@ import {default as MathUtils} from "../math_utils.js";
 import { default as SphericalCollider } from "../colliders/sphericalCollider.js"
 
 class Asteroid extends GameObject {
-	static objFilename = "resources/asteroids/brown_asteroid.obj";
+	static objFilename = "resources/asteroids/brown_asteroid_n.obj";
 	static textureFilename = "resources/asteroids/brown.png";
 	static shaderClass = new DefaultShaderClass();
 	static #colliderRadius;
