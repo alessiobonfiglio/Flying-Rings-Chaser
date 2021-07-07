@@ -35,8 +35,8 @@ class Spaceship extends GameObject {
 	sign = 1;
 	update() {
 		super.update();
-		var deltaPos = 0.5;
-		if (this.tot > 200) {
+		var deltaPos = 1;
+		if (this.tot > 600) {
 			this.sign *= -1;
 			this.tot = 0;
 		}

@@ -190,7 +190,7 @@ class GameEngine {
 
 	* getSomeRings(center, tot) {
 		var v = [0,0,1];
-		var spacing = 10;
+		var spacing = 40;
 		for(var i=0; i < tot; i++){
 			let ring = new Ring();
 			ring.center = MathUtils.sum(center, MathUtils.mul((i - tot/2) * spacing, v));
