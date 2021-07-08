@@ -96,7 +96,7 @@ function logGLCall(functionName, args) {
 
 async function init() {
 	// Get A WebGL context
-	const canvas = document.getElementById("c");
+	const canvas = document.getElementById("webglCanvas");
 	const gl = canvas.getContext("webgl2");
 	if (!gl) {
 		document.write("GL context not opened");
@@ -128,6 +128,18 @@ async function init() {
 		skyboxOscillatingSpeed: 0.6,
 		skyboxTwoTimesMaxOscillation: 10,
 		skyboxParallaxFactor: 0.5, // between 1 and 0 (1->disabled)
+		cockpitSpeed: 2,
+		maxLasers: 10,
+		laserSpeed: 5,
+		laserReloadPerSecond: 1,
+		laserCooldown: 2,
+		ringPoints: 1000,
+		ringRestoreHealth: 10,
+		asteroidPoints: 100,
+		asteroidDamage: 10,
+		asteroidHealth: 2,
+		pointsPerSecond: 50,
+		damagePerSecond: 1,
 	} //maybe load this from a json in the future?
 
 	// create and initialize the WebGL manager

@@ -1,14 +1,30 @@
 <!DOCTYPE html>
 <html lang="en" xml:lang="en">
-    <head>
-        <meta charset = "utf-8">
-        <title>Flying Rings Chaser</title>
-        <script src="libs/webgl-debug.js"></script>
-        <script src="libs/webgl-obj-loader.min.js"></script>
-    </head>
-    <body>
-        <canvas id="c"></canvas>
-        <script type="module" src="index.js"></script>
-        <link rel="stylesheet" href="index.css">
-    </body>
+	<head>
+		<meta charset="utf-8" />
+		<title>Flying Rings Chaser</title>
+		<script src="libs/webgl-debug.js"></script>
+		<script src="libs/webgl-obj-loader.min.js"></script>
+		<script type="module" src="index.js"></script>
+		<link rel="stylesheet" href="index.css" />
+	</head>
+	<body>
+		<canvas id="webglCanvas"></canvas>
+		<div id="points">00000000</div>
+		<div id="health-bar">
+			<div id="health"></div>
+		</div>
+		<div id="laser-bar">
+			<div id="laser0" class="laser"></div>
+			<div id="laser1" class="laser"></div>
+			<div id="laser2" class="laser"></div>
+			<div id="laser3" class="laser"></div>
+			<div id="laser4" class="laser"></div>
+			<div id="laser5" class="laser"></div>
+			<div id="laser6" class="laser"></div>
+			<div id="laser7" class="laser"></div>
+			<div id="laser8" class="laser"></div>
+			<div id="laser9" class="laser"></div>
+		</div>
+	</body>
 </html>

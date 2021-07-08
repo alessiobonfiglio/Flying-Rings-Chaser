@@ -1,8 +1,66 @@
 body {
-  margin: 0;
+	margin: 0;
+	justify-content: center;
+	align-items: center;
+	background: black;
+	display: flex;
+	padding: 0;
+	margin: 0;
 }
+
 canvas {
-  width: 100vw;
-  height: 100vh;
-  display: block;
+	width: 100vw;
+	height: 100vh;
+	display: block;
+}
+
+@font-face {
+    font-family: '8BitOperator';
+    src: url('resources/gui/8bitoperator_jve.ttf');
+}
+
+#points {
+	position: absolute;
+	right: 2vw;
+	top: 1vh;
+	font-size: 3.5vw;
+	font-family: '8BitOperator';
+	color: green;
+}
+
+#health-bar {
+	position: absolute;
+	display: flex;
+	left: 2vw;
+	top: 2vh;
+	width: 30vw;
+	height: 5vh;
+	padding: 0 0.25vw;
+	align-items: center;
+	outline: 0.2vw solid white;
+}
+
+#health {
+	width: 100%;
+	height: 4vh;
+	background-color: red;
+}
+
+#laser-bar {
+	position: absolute;
+	display: flex;
+	right: 2vw;
+	bottom: 2vh;
+	width: 22.5vw;
+	height: 5vh;
+	padding: 0 0.25vw;
+	align-items: center;
+	justify-content: space-between;
+	outline: 0.2vw solid white;
+}
+
+.laser {
+	width: 2vw;
+	height: 4vh;
+	background-color: blue;
 }

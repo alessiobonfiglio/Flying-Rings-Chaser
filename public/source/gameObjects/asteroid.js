@@ -51,16 +51,14 @@ class Asteroid extends GameObject {
 		Asteroid.#colliderRadius = GameObject._computeRadius(objModel, Asteroid.#centerOfGravity);
 	}
 
-
 	// game events handlers
 	update() {
 		super.update();
-		this.moveForward(this.#gameSettings);
+		this.#moveForward(this.#gameSettings);
 	}
 
-
 	hit = false;
-	moveForward(gameSettings) {
+	#moveForward(gameSettings) {
 		if(this.hit)
 			return;
 		this.position[2] -= this.speed * (gameSettings.gameSpeed / gameSettings.fpsLimit);
@@ -74,6 +72,7 @@ class Asteroid extends GameObject {
 	}
 
 	onSpaceshipCollided(spaceship) {
+		this.initialize(this.#gameSettings);
 	}
 
 	// override
