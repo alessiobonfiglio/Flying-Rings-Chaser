@@ -36,7 +36,7 @@ class WebGlManager {
 
 	// Public Methods
 	instantiate(gameObject) {
-		var glObject = this.#classToGlObjectMap.get(gameObject.constructor.name);
+		const glObject = this.#classToGlObjectMap.get(gameObject.constructor.name);
 		this.#instantiatedObjects.set(gameObject, glObject);
 	}
 
@@ -44,11 +44,11 @@ class WebGlManager {
 		this.#instantiatedObjects.delete(gameObject);
 	}
 
-	setAndEnableLight(index, light) {
+	setAndEnableLightPosition(index, position) {
 		if (index >= this.#maxNumOfLights) {
 			throw new Error();
 		}
-		this.#lights[index] = light;
+		this.#lights[index].position = position.slice();
 		this.#lightsEnabled[index] = true;
 	}
 
@@ -60,7 +60,7 @@ class WebGlManager {
 	}
 
 	draw() {
-		var canvas = this.#gl.canvas;
+		const canvas = this.#gl.canvas;
 
 		// canvas full screen
 		this.#resizeCanvasToDisplaySize(canvas);

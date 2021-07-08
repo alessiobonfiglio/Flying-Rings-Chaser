@@ -63,8 +63,6 @@ class GameEngine {
 
 		this.#createAsteroids();
 
-		this.#webGlManager.setAndEnableLight(0, new Light([0, 0, 0]));
-
 		for (const ring of this.getSomeRings([0, 1, 4], 100)) {
 			this.#rings.push(ring);
 			this.#instantiateRing(ring);
@@ -95,6 +93,7 @@ class GameEngine {
 		//this.#webGlManager.camera.verticalAngle++;
 		//console.log(this.#webGlManager.camera.verticalAngle%360);
 		this.#checkCollisions();
+		this.#updateLights();
 		this.#webGlManager.draw();
 	}
 
@@ -208,6 +207,12 @@ class GameEngine {
 		this.#instantiate(asteroid);
 		asteroid.destroyed.subscribe(ast => this.#removeItem(this.#asteroids, ast));
 		return asteroid;
+	}
+
+	#updateLights(){
+		this.#webGlManager.setAndEnableLightPosition(0, this.#cockpit.position);
+
+		//todo: lasers
 	}
 
 
