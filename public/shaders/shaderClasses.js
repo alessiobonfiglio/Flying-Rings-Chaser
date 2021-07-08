@@ -25,4 +25,10 @@ class CockpitShaderClass extends ShaderClass {
 	static useTexture = true;
 }
 
-export {DefaultShaderClass, RingShaderClass, TerrainShaderClass, CockpitShaderClass};
+class SkyboxShaderClass extends ShaderClass {
+	static vertexShaderFilename = "shaders/skyboxVertexShader.glsl";
+	static fragmentShaderFilename = "shaders/skyboxFragmentShader.glsl";
+	static useTexture = true;
+}
+
+export {DefaultShaderClass, RingShaderClass, TerrainShaderClass, CockpitShaderClass, SkyboxShaderClass};

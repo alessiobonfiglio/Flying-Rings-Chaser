@@ -1,13 +1,20 @@
-import { default as WebGlManager } from "./source/webgl-manager.js"
-import { default as GameEngine } from "./source/engine.js"
-import { default as Cube } from "./source/gameObjects/cube.js"
-import { default as Spaceship } from "./source/gameObjects/spaceship.js"
-import { default as utils } from "./source/utils.js"
-import { DefaultShaderClass, RingShaderClass, TerrainShaderClass, CockpitShaderClass } from "./shaders/shaderClasses.js";
-import { default as Asteroid } from "./source/gameObjects/asteroid.js";
-import { default as Ring } from "./source/gameObjects/ring.js";
-import { default as Terrain } from "./source/gameObjects/terrain.js";
-import { default as Cockpit } from "./source/gameObjects/cockpit.js";
+import {default as WebGlManager} from "./source/webgl-manager.js"
+import {default as GameEngine} from "./source/engine.js"
+import {default as Cube} from "./source/gameObjects/cube.js"
+import {default as Spaceship} from "./source/gameObjects/spaceship.js"
+import {default as utils} from "./source/utils.js"
+import {
+	CockpitShaderClass,
+	DefaultShaderClass,
+	RingShaderClass,
+	SkyboxShaderClass,
+	TerrainShaderClass
+} from "./shaders/shaderClasses.js";
+import {default as Asteroid} from "./source/gameObjects/asteroid.js";
+import {default as Ring} from "./source/gameObjects/ring.js";
+import {default as Terrain} from "./source/gameObjects/terrain.js";
+import {default as Cockpit} from "./source/gameObjects/cockpit.js";
+import {default as Skybox} from "./source/skybox.js";
 
 
 async function setupGlObjects(glManager, gl, gameSettings) {
@@ -38,7 +45,7 @@ async function setupGlObjects(glManager, gl, gameSettings) {
 	}
 }
 
-async function setupGlShaders(glManager, gl) {
+async function setupGlShaders(glManager) {
 	const info =
 		[
 			DefaultShaderClass,
@@ -55,6 +62,31 @@ async function setupGlShaders(glManager, gl) {
 
 		glManager.bindGLShader(shaderClass, vertexShaderSource, fragmentShaderSource);
 	}
+}
+
+async function setupGlSkybox(glManager, gl) {
+	const shaderText = await utils.loadFilesAsync([SkyboxShaderClass.vertexShaderFilename, SkyboxShaderClass.fragmentShaderFilename]);
+	const vertexShaderSource = shaderText[0];
+	const fragmentShaderSource = shaderText[1];
+	glManager.bindGLShader(SkyboxShaderClass, vertexShaderSource, fragmentShaderSource);
+
+	const skyboxVertices = new Float32Array(
+		[
+			-1, -1, 1.0,
+			1, -1, 1.0,
+			-1, 1, 1.0,
+			-1, 1, 1.0,
+			1, -1, 1.0,
+			1, 1, 1.0,
+		]);
+	const skyboxTexture = gl.createTexture();
+	const faceInfos = Skybox.getFaceInfos(gl);
+	for (const faceInfo of faceInfos) {
+		faceInfo.image = await utils.loadImage(faceInfo.url)
+	}
+	utils.fillSkyboxTextureFromImage(gl, skyboxTexture, faceInfos);
+
+	glManager.createSkybox(skyboxVertices, skyboxTexture);
 }
 
 function logGLCall(functionName, args) {
@@ -90,15 +122,20 @@ async function init() {
 		terrainChunkSize: 500,
 		terrainChunkResolution: 32,
 		halfNumberTerrainChunksColumns: 2,
-		numberTerrainChunksRows:3,
+		numberTerrainChunksRows: 3,
 		terrainSpeed: 60,
+		skyboxDefaultPosition: [0, -200, 0],
+		skyboxOscillatingSpeed: 0.6,
+		skyboxTwoTimesMaxOscillation: 10,
+		skyboxParallaxFactor: 0.5, // between 1 and 0 (1->disabled)
 	} //maybe load this from a json in the future?
 
 	// create and initialize the WebGL manager
 	const webGlManager = new WebGlManager(gl, gameSetting);
 	webGlManager.initialize();
-	await setupGlShaders(webGlManager, gl);
+	await setupGlShaders(webGlManager);
 	await setupGlObjects(webGlManager, gl, gameSetting);
+	await setupGlSkybox(webGlManager, gl);
 
 	// create and start the game engine
 	const gameEngine = new GameEngine(webGlManager, window, gameSetting);

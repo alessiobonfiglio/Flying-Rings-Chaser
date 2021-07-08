@@ -1,17 +1,14 @@
-import { default as Cube } from "./gameObjects/cube.js";
-import { default as Spaceship } from "./gameObjects/spaceship.js";
-import { default as Camera } from "./gameObjects/camera.js";
-import { default as Asteroid } from "./gameObjects/asteroid.js";
-import { default as Ring } from "./gameObjects/ring.js";
-import { default as Light } from "./light.js";
-import { default as Terrain } from "./gameObjects/terrain.js";
-import { default as Cockpit } from "./gameObjects/cockpit.js";
-import { default as TerrainCollider } from "./gameObjects/terrainCollider.js";
-import { default as MathUtils } from "./math_utils.js"
-import GameObject from "./gameObjects/gameObject.js";
-import { default as SemispaceCollider } from "./colliders/semispaceCollider.js"
-
-var X = 0, Y = 0, Z = 0, A = 180;
+import {default as Cube} from "./gameObjects/cube.js";
+import {default as Spaceship} from "./gameObjects/spaceship.js";
+import {default as Camera} from "./gameObjects/camera.js";
+import {default as Asteroid} from "./gameObjects/asteroid.js";
+import {default as Ring} from "./gameObjects/ring.js";
+import {default as Light} from "./light.js";
+import {default as Terrain} from "./gameObjects/terrain.js";
+import {default as Cockpit} from "./gameObjects/cockpit.js";
+import {default as TerrainCollider} from "./gameObjects/terrainCollider.js";
+import {default as MathUtils} from "./math_utils.js"
+import Skybox from "./skybox.js";
 
 class GameEngine {
 	#webGlManager;
@@ -49,13 +46,15 @@ class GameEngine {
 	setup() {
 		this.#webGlManager.camera = new Camera([0, 0, 0], 0, -180);
 
+		this.#webGlManager.skyboxGameObject = new Skybox(this.#gameSettings);
+
 		// initialize the spaceship object
 		this.#spaceship = new Spaceship();
 		this.#spaceship.center = [0, 1, 4];
 
 		this.#instantiate(this.#spaceship);
 		this.#createTerrainChunks();
-		
+
 		this.#cockpit = new Cockpit(this.#window, this.#gameSettings);
 		this.#terrainCollider = this.#instantiateTerrainCollider();
 		this.#instantiate(this.#cockpit);
@@ -94,8 +93,6 @@ class GameEngine {
 		this.#updateGameObjects();
 
 		//this.#webGlManager.camera.verticalAngle++;
-		// this.#webGlManager.camera.verticalAngle = A;
-		// this.#webGlManager.camera.position = [X, 0, Z];
 		//console.log(this.#webGlManager.camera.verticalAngle%360);
 		this.#checkCollisions();
 		this.#webGlManager.draw();
@@ -127,9 +124,9 @@ class GameEngine {
 		}
 
 		// ground
-		if(this.#terrainCollider.collider.intersectWithSphere(this.#cockpit.collider)){
-			this.#cockpit.onGroundCollided();			
-		}			
+		if (this.#terrainCollider.collider.intersectWithSphere(this.#cockpit.collider)) {
+			this.#cockpit.onGroundCollided();
+		}
 	}
 
 	// this is done in order to limit the framerate to 'fpsLimit'
@@ -185,10 +182,10 @@ class GameEngine {
 	}
 
 	#updateGameObjects() {
-		let gameObjectList = [this.#asteroids, this.#rings, this.#cubes, [this.#spaceship], [this.#cockpit], this.#terrains].flat();
+		let gameObjectList = [this.#asteroids, this.#rings, this.#cubes, [this.#spaceship], [this.#cockpit], this.#terrains, [this.#webGlManager.skyboxGameObject]].flat();
 		for (let gameObject of gameObjectList) {
 			if (gameObject.update) {
-				gameObject.update();
+				gameObject.update(this.#frameCount);
 			}
 		}
 		this.#webGlManager.camera.update();
@@ -215,9 +212,9 @@ class GameEngine {
 
 
 	* getSomeRings(center, tot) {
-		var v = [0, 0, 1];
-		var spacing = 40;
-		for (var i = 0; i < tot; i++) {
+		const v = [0, 0, 1];
+		const spacing = 40;
+		for (let i = 0; i < tot; i++) {
 			let ring = new Ring();
 			ring.center = MathUtils.sum(center, MathUtils.mul((i - tot / 2) * spacing, v));
 			yield ring;
@@ -225,7 +222,7 @@ class GameEngine {
 	}
 
 	#removeItem(arr, value) {
-		var index = arr.indexOf(value);
+		const index = arr.indexOf(value);
 		if (index > -1) {
 			arr.splice(index, 1);
 		}
@@ -233,11 +230,12 @@ class GameEngine {
 	}
 
 	#instantiateTerrainCollider() {
-		var terrain = new TerrainCollider();
+		const terrain = new TerrainCollider();
 		terrain.initialize(this.#cockpit, this.#gameSettings);
 		this.#instantiate(terrain);
 		return terrain;
 	}
 }
+
 
 export default GameEngine;

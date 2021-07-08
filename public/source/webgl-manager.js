@@ -1,5 +1,6 @@
-import { default as utils } from "./utils.js"
-import { default as Light } from "./light.js";
+import {default as utils} from "./utils.js"
+import {default as Light} from "./light.js";
+import {SkyboxShaderClass} from "../shaders/shaderClasses.js";
 
 class WebGlManager {
 	#gl;
@@ -15,6 +16,9 @@ class WebGlManager {
 	#maxNumOfLights = 5;
 	#lights;
 	#lightsEnabled;
+
+	#skyboxGL;
+	skyboxGameObject;
 
 	// Initialization
 	constructor(context, gameSetting) {
@@ -68,12 +72,34 @@ class WebGlManager {
 		this.#gl.clearColor(0, 0, 0, 0);
 		this.#gl.clear(this.#gl.COLOR_BUFFER_BIT | this.#gl.DEPTH_BUFFER_BIT);
 
-		this.#drawGameObjects();
+		const perspectiveMatrix = utils.MakePerspective(90, this.#gl.canvas.width / this.#gl.canvas.height, 0.1, this.#gameSetting.maxZ);
+		const viewMatrix = this.camera?.viewMatrix() ?? utils.MakeView(3.0, 3.0, 2.5, -45.0, -40.0); // default viewMatrix
+		const viewProjectionMatrix = utils.multiplyAllMatrices(perspectiveMatrix, viewMatrix)
+
+		this.#drawGameObjects(viewProjectionMatrix);
+		this.#drawSkybox(viewProjectionMatrix);
 	}
 
 	bindGLShader(shaderClass, vertexShaderSource, fragmentShaderSource) {
 		const shaderProgram = new GLShaderProgram(this.#gl, vertexShaderSource, fragmentShaderSource, shaderClass.useTexture);
 		this.#classToGLShaderProgramMap.set(shaderClass.name, shaderProgram);
+	}
+
+	createSkybox(skyboxVertices, skyboxTexture) {
+		const shaderProgram = this.#classToGLShaderProgramMap.get(SkyboxShaderClass.name);
+		const vao = this.#gl.createVertexArray();
+		this.#gl.bindVertexArray(vao);
+
+		// Setup position buffer
+		const positionBuffer = this.#gl.createBuffer();
+		this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, positionBuffer);
+		this.#gl.bufferData(this.#gl.ARRAY_BUFFER, skyboxVertices, this.#gl.STATIC_DRAW);
+		this.#gl.enableVertexAttribArray(shaderProgram.locations.positionAttributeLocation);
+		this.#gl.vertexAttribPointer(shaderProgram.locations.positionAttributeLocation, 3, this.#gl.FLOAT, false, 0, 0);
+
+		this.#skyboxGL = new WebGlObject(vao, skyboxTexture, null);
+		this.#skyboxGL.shaderProgram = shaderProgram;
+
 	}
 
 	bindGlModel(objModel, texture, shaderClass, className) {
@@ -89,24 +115,24 @@ class WebGlManager {
 
 	// Private Methods
 	#buildGlObject(objModel, texture, shaderProgram) {
-		var vao = this.#gl.createVertexArray();
+		const vao = this.#gl.createVertexArray();
 		this.#gl.bindVertexArray(vao);
 
 		// Setup position buffer
-		var positionBuffer = this.#gl.createBuffer();
+		const positionBuffer = this.#gl.createBuffer();
 		this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, positionBuffer);
 		this.#gl.bufferData(this.#gl.ARRAY_BUFFER, new Float32Array(objModel.vertices), this.#gl.STATIC_DRAW);
 		this.#gl.enableVertexAttribArray(shaderProgram.locations.positionAttributeLocation);
 		this.#gl.vertexAttribPointer(shaderProgram.locations.positionAttributeLocation, 3, this.#gl.FLOAT, false, 0, 0);
 
 		// Setup indices
-		var indexBuffer = this.#gl.createBuffer();
+		const indexBuffer = this.#gl.createBuffer();
 		this.#gl.bindBuffer(this.#gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
 		this.#gl.bufferData(this.#gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(objModel.indices), this.#gl.STATIC_DRAW);
 
 		// Setup normals
 		if (objModel.vertexNormals) {
-			var normalBuffer = this.#gl.createBuffer();
+			const normalBuffer = this.#gl.createBuffer();
 			this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, normalBuffer);
 			this.#gl.bufferData(this.#gl.ARRAY_BUFFER, new Float32Array(objModel.vertexNormals), this.#gl.STATIC_DRAW);
 			this.#gl.enableVertexAttribArray(shaderProgram.locations.normalAttributeLocation);
@@ -115,7 +141,7 @@ class WebGlManager {
 
 		// Setup texture coordinates
 		if (texture != null) {
-			var textureCoordinateBuffer = this.#gl.createBuffer();
+			const textureCoordinateBuffer = this.#gl.createBuffer();
 			this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, textureCoordinateBuffer);
 			this.#gl.bufferData(this.#gl.ARRAY_BUFFER, new Float32Array(objModel.textures), this.#gl.STATIC_DRAW);
 			this.#gl.enableVertexAttribArray(shaderProgram.locations.textureAttributeLocation);
@@ -127,9 +153,7 @@ class WebGlManager {
 		return ret;
 	}
 
-	#drawGameObjects() {
-		const viewMatrix = this.camera?.viewMatrix() ?? utils.MakeView(3.0, 3.0, 2.5, -45.0, -40.0); // default viewMatrix
-
+	#drawGameObjects(viewProjectionMatrix) {
 		const lightsArray = this.#lights.map((x) => x.position).flat();
 
 		// setup transformation matrix from local coordinates to Clip coordinates
@@ -143,17 +167,17 @@ class WebGlManager {
 
 				// Computing transformation matrix
 				const worldMatrix = gameObject.worldMatrix();
-				const WVPMatrix = this.#computeMatrix(worldMatrix, viewMatrix);
+				const WVPMatrix = utils.multiplyAllMatrices(viewProjectionMatrix, worldMatrix);
 
 				// Passing the matrix as a uniform to the vertex shader
 				this.#gl.uniformMatrix4fv(glObject.shaderProgram.locations.positionUniformLocation, this.#gl.FALSE, utils.transposeMatrix(WVPMatrix));
 				this.#gl.uniformMatrix4fv(glObject.shaderProgram.locations.normalUniformLocation, this.#gl.FALSE, utils.transposeMatrix(gameObject.worldMatrix()));
 
-			// passing the increment if present
-			if (typeof gameObject.rowNumber !== 'undefined') {
-				const zOffset = gameObject.rowNumber * this.#gameSetting.terrainChunkSize;
-				this.#gl.uniform1f(glObject.shaderProgram.locations.incrementLocation, zOffset);
-			}
+				// passing the increment if present
+				if (typeof gameObject.rowNumber !== 'undefined') {
+					const zOffset = gameObject.rowNumber * this.#gameSetting.terrainChunkSize;
+					this.#gl.uniform1f(glObject.shaderProgram.locations.incrementLocation, zOffset);
+				}
 
 				// GameObject Texture
 				if (glObject.shaderProgram.useTexture) {
@@ -173,14 +197,37 @@ class WebGlManager {
 				this.#gl.uniform1uiv(glObject.shaderProgram.locations.lightsEnabledHandle, this.#lightsEnabled);
 
 				// Drawing the gameObject
+				this.#gl.depthFunc(this.#gl.LESS);
 				this.#gl.drawElements(this.#gl.TRIANGLES, glObject.totIndices, this.#gl.UNSIGNED_SHORT, 0);
 			}
 	}
 
-	#computeMatrix(worldMatrix, viewMatrix) {
-		const canvas = this.#gl.canvas;
-		const perspectiveMatrix = utils.MakePerspective(90, canvas.width / canvas.height, 0.1, this.#gameSetting.maxZ);
-		return utils.multiplyAllMatrices(perspectiveMatrix, viewMatrix, worldMatrix)
+	#drawSkybox(viewProjectionMatrix) {
+		// use the skybox shader
+		this.#gl.useProgram(this.#skyboxGL.shaderProgram.program);
+
+		// use the cube map texture
+		this.#gl.activeTexture(this.#gl.TEXTURE1);
+		this.#gl.bindTexture(this.#gl.TEXTURE_CUBE_MAP, this.#skyboxGL.texture);
+		this.#gl.uniform1i(this.#skyboxGL.shaderProgram.locations.textureUniformLocation, 1);
+
+		// pass the inverse of the WPM
+		let inverseViewProjMatrix;
+		if (this.skyboxGameObject) {
+			// Computing transformation matrix
+			const worldMatrix = this.skyboxGameObject.worldMatrix(this.camera);
+			const WVPMatrix = utils.multiplyAllMatrices(viewProjectionMatrix, worldMatrix);
+			inverseViewProjMatrix = utils.invertMatrix(WVPMatrix);
+		} else {
+			inverseViewProjMatrix = utils.invertMatrix(viewProjectionMatrix);
+		}
+		this.#gl.uniformMatrix4fv(this.#skyboxGL.shaderProgram.locations.inverseViewProjMatrixUniformLocation, this.#gl.FALSE, utils.transposeMatrix(inverseViewProjMatrix));
+
+		// draw
+		this.#gl.bindVertexArray(this.#skyboxGL.vao);
+		this.#gl.depthFunc(this.#gl.LEQUAL);
+		this.#gl.drawArrays(this.#gl.TRIANGLES, 0, 6);
+
 	}
 
 	#resizeCanvasToDisplaySize(canvas, multiplier) {
@@ -206,7 +253,7 @@ class WebGlObject {
 	constructor(vao, texture, objModel) {
 		this.vao = vao;
 		this.texture = texture;
-		this.totIndices = objModel.indices.length;
+		this.totIndices = objModel != null ? objModel.indices.length : null;
 	}
 }
 
@@ -244,6 +291,7 @@ class GLShaderProgram {
 
 		this.locations.positionUniformLocation = gl.getUniformLocation(this.program, "matrix");
 		this.locations.normalUniformLocation = gl.getUniformLocation(this.program, "nMatrix");
+		this.locations.inverseViewProjMatrixUniformLocation = gl.getUniformLocation(this.program, "inverseMVPMatrix");
 
 		this.locations.materialDiffColorHandle = gl.getUniformLocation(this.program, "mDiffColor");
 
