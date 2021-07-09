@@ -16,8 +16,16 @@ class Asteroid extends GameObject {
 	rotationSpeed = [1, 1, 1];
 
 	// Initialization
+	constructor() {
+		super();
+		this.collider = new SphericalCollider();
+		this.collider.radius = Asteroid.#colliderRadius;
+	}
+
+	// Initialization
 	initialize(gameSettings) {
 		this.#gameSettings = gameSettings;
+
 		const x = MathUtils.getRandomInRange(-gameSettings.maxHalfX, gameSettings.maxHalfX);
 		const y = MathUtils.getRandomInRange(-gameSettings.maxHalfY, gameSettings.maxHalfY);
 		const z = MathUtils.getRandomInRange(gameSettings.maxZ * 2 / 3, gameSettings.maxZ);
@@ -28,22 +36,13 @@ class Asteroid extends GameObject {
 		const rz = MathUtils.getRandomInRange(0, 360);
 		this.orientation = [rx, ry, rz];
 
-		const s = MathUtils.getRandomInRange(gameSettings.asteroidScaleRange[0], gameSettings.asteroidScaleRange[1]);
-		this.scale = s;
-
-		const speed = MathUtils.getRandomInRange(gameSettings.asteroidSpeedRange[0], gameSettings.asteroidSpeedRange[1]);
-		this.speed = speed;
+		this.scale = MathUtils.getRandomInRange(gameSettings.asteroidScaleRange[0], gameSettings.asteroidScaleRange[1]);
+		this.speed = MathUtils.getRandomInRange(gameSettings.asteroidSpeedRange[0], gameSettings.asteroidSpeedRange[1]);
 
 		const rsx = MathUtils.getRandomInRange(gameSettings.asteroidRotationSpeedRange[0], gameSettings.asteroidRotationSpeedRange[1]);
 		const rsy = MathUtils.getRandomInRange(gameSettings.asteroidRotationSpeedRange[0], gameSettings.asteroidRotationSpeedRange[1]);
 		const rsz = MathUtils.getRandomInRange(gameSettings.asteroidRotationSpeedRange[0], gameSettings.asteroidRotationSpeedRange[1]);
 		this.rotationSpeed = [rsx, rsy, rsz];
-		this.#setupCollider();
-	}
-
-	#setupCollider() {
-		this.collider = new SphericalCollider();
-		this.collider.radius = Asteroid.#colliderRadius;	
 	}
 	
 	static loadInfoFromObjModel(objModel) {
@@ -73,11 +72,6 @@ class Asteroid extends GameObject {
 
 	onSpaceshipCollided(spaceship) {
 		this.initialize(this.#gameSettings);
-	}
-
-	// override
-	bindCollider() {
-		super.bindCollider();		
 	}
 }
 

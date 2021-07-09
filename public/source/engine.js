@@ -3,11 +3,9 @@ import {default as Spaceship} from "./gameObjects/spaceship.js";
 import {default as Camera} from "./gameObjects/camera.js";
 import {default as Asteroid} from "./gameObjects/asteroid.js";
 import {default as Ring} from "./gameObjects/ring.js";
-import {default as Light} from "./light.js";
 import {default as Terrain} from "./gameObjects/terrain.js";
 import {default as Cockpit} from "./gameObjects/cockpit.js";
 import {default as TerrainCollider} from "./gameObjects/terrainCollider.js";
-import {default as MathUtils} from "./math_utils.js"
 import Skybox from "./skybox.js";
 
 class GameEngine {
@@ -62,17 +60,11 @@ class GameEngine {
 		this.#webGlManager.camera.initialize(this.#cockpit);
 
 		this.#createAsteroids();
-
-		for (const ring of this.getSomeRings([0, 1, 4], 100)) {
-			this.#rings.push(ring);
-			this.#instantiateRing(ring);
-		}
+		this.#createRings();
 
 		this.#cubes[0] = new Cube();
 		this.#cubes[0].position = [0, -7, 10];
 		this.#instantiate(this.#cubes[0]);
-		//this.#cubes[1] = new Cube();
-		//this.#webGlManager.instantiate(this.#cubes[1]);
 
 		// must be done like this to keep a reference of 'this'
 		this.#wrapperCallback = function () {
@@ -85,9 +77,7 @@ class GameEngine {
 	}
 
 	#gameLoop() {
-
 		// do things here
-
 		this.#updateGameObjects();
 
 		//this.#webGlManager.camera.verticalAngle++;
@@ -96,14 +86,10 @@ class GameEngine {
 		this.#updateLights();
 		this.#webGlManager.draw();
 	}
-
+s
 	#checkCollisions() {
 		// rings
 		for (const ring of this.#rings) {
-			if (this.#spaceship.collider.intersectWithCircle(ring.collider)) {
-				this.#spaceship.onRingCollided(ring);
-				ring.onSpaceshipCollided(this.#spaceship);
-			}
 			if (this.#cockpit.collider.intersectWithCircle(ring.collider)) {
 				this.#cockpit.onRingCollided(ring);
 				ring.onSpaceshipCollided(this.#cockpit);
@@ -112,10 +98,6 @@ class GameEngine {
 
 		// asteroid
 		for (const asteroid of this.#asteroids) {
-			if (this.#spaceship.collider.intersectWithSphere(asteroid.collider)) {
-				this.#spaceship.onAsteroidCollided(asteroid);
-				asteroid.onSpaceshipCollided(this.#spaceship);
-			}
 			if (this.#cockpit.collider.intersectWithSphere(asteroid.collider)) {
 				this.#cockpit.onAsteroidCollided(asteroid);
 				asteroid.onSpaceshipCollided(this.#cockpit);
@@ -158,11 +140,33 @@ class GameEngine {
 	#createAsteroids() {
 		for (let i = 0; i < this.#gameSettings.numberOfAsteroids; i++) {
 			const ast = new Asteroid();
-
 			ast.initialize(this.#gameSettings);
 
 			this.#instantiateAsteroid(ast);
 			this.#asteroids.push(ast);
+		}
+	}
+
+	#createRings() {
+		// Manually set the first ring as the last instantiated ring, in order 
+		// to compute the minimum distance between rings
+		const r = new Ring();
+
+		Ring.lastRing = r;
+		r.position = [0, 0, this.#gameSettings.maxZ * 2 / 3];
+
+		r.initialize(this.#gameSettings);
+
+		this.#instantiateRing(r);
+		this.#rings.push(r);
+
+		// Instantiate the other rings
+		for (let i = 1; i < this.#gameSettings.numberOfRings; i++) {
+			const ring = new Ring();
+			ring.initialize(this.#gameSettings);
+
+			this.#instantiateRing(ring);
+			this.#rings.push(ring);
 		}
 	}
 
@@ -213,17 +217,6 @@ class GameEngine {
 		this.#webGlManager.setAndEnableLightPosition(0, this.#cockpit.position);
 
 		//todo: lasers
-	}
-
-
-	* getSomeRings(center, tot) {
-		const v = [0, 0, 1];
-		const spacing = 40;
-		for (let i = 0; i < tot; i++) {
-			let ring = new Ring();
-			ring.center = MathUtils.sum(center, MathUtils.mul((i - tot / 2) * spacing, v));
-			yield ring;
-		}
 	}
 
 	#removeItem(arr, value) {

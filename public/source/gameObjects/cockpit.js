@@ -15,7 +15,6 @@ class Cockpit extends GameObject {
 	#healthDisplay;
 	#points = 0;
 	#pointsDisplay;
-	#pointsStyle;
 	#lasers = [];
 	#lastLaser = 9;
 	#lastFrame;
@@ -82,13 +81,8 @@ class Cockpit extends GameObject {
 		this.#lastFrame = now;
 	}
 
-    // override
-	bindCollider() {
-		super.bindCollider();
-		this.collider.scale = this.scale * 0.9; 
-	}
-
 	onRingCollided(ring) {
+		console.log("Cockpit: ring hit");
 		// Add health
 		this.#health += this.#gameSettings.ringRestoreHealth;
 		this.#health = Math.min(100, this.#health);
@@ -100,6 +94,7 @@ class Cockpit extends GameObject {
 	}
 
 	onAsteroidCollided(asteroid) {
+		console.log("Cockpit: asteroid hit");
 		// Reduce health
 		this.#health -= this.#gameSettings.asteroidDamage;
 		this.#health = Math.max(0, this.#health);
@@ -113,6 +108,15 @@ class Cockpit extends GameObject {
 
 	onGroundCollided() {
 		console.log("Cockpit: ground hit");
+		// Reduce health
+		this.#health -= this.#gameSettings.terrainDamage;
+		this.#health = Math.max(0, this.#health);
+		this.#healthDisplay.style.width = this.#health.toString() + '%';
+
+		// Reduce points
+		this.#points -= this.#gameSettings.terrainPoints;
+		this.#points = Math.max(0, this.#points);
+		this.#pointsDisplay.textContent = parseInt(this.#points).toString().padStart(8, "0");
 	}
 
 	shoot() {

@@ -119,6 +119,10 @@ async function init() {
 		asteroidScaleRange: [0.1, 0.1],
 		asteroidSpeedRange: [20, 40],
 		asteroidRotationSpeedRange: [0, 30],
+		numberOfRings: 10,
+		minRingDistance: 25,
+		ringScaleRange: [12, 12],
+		ringSpeedRange: [20, 20],
 		terrainChunkSize: 500,
 		terrainChunkResolution: 32,
 		halfNumberTerrainChunksColumns: 2,
@@ -134,12 +138,14 @@ async function init() {
 		laserReloadPerSecond: 1,
 		laserCooldown: 2,
 		ringPoints: 1000,
-		ringRestoreHealth: 10,
+		ringRestoreHealth: 25,
 		asteroidPoints: 100,
 		asteroidDamage: 10,
 		asteroidHealth: 2,
 		pointsPerSecond: 50,
 		damagePerSecond: 1,
+		terrainDamage: 5,
+		terrainPoints: 100,
 	} //maybe load this from a json in the future?
 
 	// create and initialize the WebGL manager
