@@ -17,6 +17,7 @@ class Cockpit extends GameObject {
 	#pointsDisplay;
 	#lasers = [];
 	#lastLaser = 9;
+	#canShoot = true;
 
 	_materialColor = [0.5, 0.5, 0.5];
     position = [0, 0, 0];
@@ -58,6 +59,9 @@ class Cockpit extends GameObject {
 
     update() {
 		super.update();
+
+		// Adjust collider towards the front of the cockpit
+		this.collider.center[2] += 2; 
 
 		// Move cockpit
 		const horizontal = (this.left - this.right) * this.#gameSettings.gameSpeed / this.#gameSettings.fpsLimit;
@@ -117,21 +121,28 @@ class Cockpit extends GameObject {
 	}
 
 	shoot() {
-		if (this.#lastLaser >= 0) {
+		if (this.#canShoot && this.#lastLaser >= 0) {
 			this.#lasers[this.#lastLaser].style.opacity = 0;
 			if (this.#lastLaser == this.#lasers.length - 1)
-				this.#reload();
+				this.#delayedReload();
 			this.#lastLaser--;
+			this.#canShoot = false;
+			this.#delayedCooldown();
 		}
 	}
 
-	async #reload() {
+	async #delayedReload() {
 		await this.#sleep(this.#gameSettings.laserReloadPerSecond * 1000);
 		this.#lastLaser++;
 		this.#lasers[this.#lastLaser].style.opacity = 1;
 		if (this.#lastLaser < this.#lasers.length - 1) {
-			this.#reload();
+			this.#delayedReload();
 		}
+	}
+
+	async #delayedCooldown() {
+		await this.#sleep(this.#gameSettings.laserCooldown * 1000);
+		this.#canShoot = true;
 	}
 
 	#sleep(ms) {
