@@ -1,5 +1,3 @@
-import {default as Cube} from "./gameObjects/cube.js";
-import {default as Spaceship} from "./gameObjects/spaceship.js";
 import {default as Camera} from "./gameObjects/camera.js";
 import {default as Asteroid} from "./gameObjects/asteroid.js";
 import {default as Ring} from "./gameObjects/ring.js";
@@ -13,6 +11,7 @@ class GameEngine {
 	#window;
 
 	#gameSettings;
+	static isPlaying = false;
 
 	#frameCount;
 
@@ -24,10 +23,8 @@ class GameEngine {
 	#wrapperCallback;
 
 	// game objects
-	#spaceship;
 	#cockpit;
 	#terrains = [];
-	#cubes = [];
 	#asteroids = [];
 	#rings = [];
 	#terrainCollider;
@@ -42,29 +39,20 @@ class GameEngine {
 	}
 
 	setup() {
+		document.getElementById("start-button").onclick = this.#start_game(this);
+		document.getElementById("end-button").onclick = this.#end_game(this);
 		this.#webGlManager.camera = new Camera([0, 0, 0], 0, -180);
 
 		this.#webGlManager.skyboxGameObject = new Skybox(this.#gameSettings);
 
-		// initialize the spaceship object
-		this.#spaceship = new Spaceship();
-		this.#spaceship.center = [0, 1, 4];
-
-		this.#instantiate(this.#spaceship);
+		// Initialize the terrain and the cockpit
 		this.#createTerrainChunks();
-
 		this.#cockpit = new Cockpit(this.#window, this.#gameSettings);
+		this.#cockpit.initialize();
 		this.#terrainCollider = this.#instantiateTerrainCollider();
+
 		this.#instantiate(this.#cockpit);
-
 		this.#webGlManager.camera.initialize(this.#cockpit);
-
-		this.#createAsteroids();
-		this.#createRings();
-
-		this.#cubes[0] = new Cube();
-		this.#cubes[0].position = [0, -7, 10];
-		this.#instantiate(this.#cubes[0]);
 
 		// must be done like this to keep a reference of 'this'
 		this.#wrapperCallback = function () {
@@ -76,6 +64,35 @@ class GameEngine {
 		this.frameLoop();
 	}
 
+	#start_game(gameEngine) {
+		return function() {
+			GameEngine.isPlaying = true;
+			document.getElementById("start-game").style.zIndex = -1;
+			document.getElementById("start-button").disabled = true;
+			gameEngine.createAsteroids();
+			gameEngine.createRings();
+		}
+	}
+
+	#end_game(gameEngine) {
+		return function() {
+			GameEngine.isPlaying = true;
+			document.getElementById("end-game").style.zIndex = -1;
+			document.getElementById("end-button").disabled = true;
+			gameEngine.restartGame();
+		}
+	}
+	
+	restartGame() {
+		this.#cockpit.initialize();
+		for (const ast of this.#asteroids)
+			ast.initialize(this.#gameSettings);
+		Ring.lastRing = this.#rings[0];
+		Ring.lastRing.position = [0, 0, this.#gameSettings.maxZ / 3];
+		for (const ring of this.#rings)
+			ring.initialize(this.#gameSettings);
+	}
+
 	#gameLoop() {
 		// do things here
 		this.#updateGameObjects();
@@ -85,8 +102,18 @@ class GameEngine {
 		this.#checkCollisions();
 		this.#updateLights();
 		this.#webGlManager.draw();
+
+		// If the player is dead end the game
+		if (this.#cockpit.isDead()) {
+			GameEngine.isPlaying = false;
+			this.#cockpit.scale = 0;
+			document.getElementById("end-score").textContent = "You scored " + (this.#cockpit.getScore()) + " points";
+			document.getElementById("end-game").style.zIndex = 1;
+			document.getElementById("end-game").style.opacity = 1;
+			document.getElementById("end-button").disabled = false;
+		}
 	}
-s
+
 	#checkCollisions() {
 		// rings
 		for (const ring of this.#rings) {
@@ -137,7 +164,7 @@ s
 		}
 	}
 
-	#createAsteroids() {
+	createAsteroids() {
 		for (let i = 0; i < this.#gameSettings.numberOfAsteroids; i++) {
 			const ast = new Asteroid();
 			ast.initialize(this.#gameSettings);
@@ -147,13 +174,13 @@ s
 		}
 	}
 
-	#createRings() {
+	createRings() {
 		// Manually set the first ring as the last instantiated ring, in order 
 		// to compute the minimum distance between rings
 		const r = new Ring();
 
 		Ring.lastRing = r;
-		r.position = [0, 0, this.#gameSettings.maxZ * 2 / 3];
+		r.position = [0, 0, this.#gameSettings.maxZ / 3];
 
 		r.initialize(this.#gameSettings);
 
@@ -185,7 +212,7 @@ s
 	}
 
 	#updateGameObjects() {
-		let gameObjectList = [this.#asteroids, this.#rings, this.#cubes, [this.#spaceship], [this.#cockpit], this.#terrains, [this.#webGlManager.skyboxGameObject]].flat();
+		let gameObjectList = [this.#asteroids, this.#rings, [this.#cockpit], this.#terrains, [this.#webGlManager.skyboxGameObject]].flat();
 		for (let gameObject of gameObjectList) {
 			if (gameObject.update) {
 				gameObject.update(this.#frameCount);

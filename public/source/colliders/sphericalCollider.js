@@ -15,7 +15,7 @@ class SphericalCollider extends Collider {
 
     intersectWithCircle(circleCollider) {      
         // Fast check (sufficient condition). far colliders
-        if(MathUtils.distance(this.center, circleCollider.center) > this.scaledRadius + circleCollider.scaledRadius)
+        if (MathUtils.distance(this.center, circleCollider.center) > this.scaledRadius + circleCollider.scaledRadius)
             return false;
         
 
@@ -36,15 +36,15 @@ class SphericalCollider extends Collider {
         // {x, Cc + rv, Cc - rv}     
 
         const checkInside = x => this.isInside(x) && circleCollider.isInside(x);
-        if(checkInside(x))
+        if (checkInside(x))
             return true;
         var v = MathUtils.normalize(MathUtils.sub(Cc, x));
         x = MathUtils.sum(Cc, MathUtils.mul(circleCollider.scaledRadius, v));
-        if(checkInside(x))
+        if (checkInside(x))
             return true;
 
         x = MathUtils.sum(Cc, MathUtils.mul(-circleCollider.scaledRadius, v));
-        if(checkInside(x))
+        if (checkInside(x))
             return true;
         return false;
     }

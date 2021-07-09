@@ -1,7 +1,7 @@
-import {default as GameObject} from "./gameObject.js"
+import {default as GameObject} from "./gameObject.js";
 import {DefaultShaderClass} from "../../shaders/shaderClasses.js";
 import {default as MathUtils} from "../math_utils.js";
-import { default as SphericalCollider } from "../colliders/sphericalCollider.js"
+import { default as SphericalCollider } from "../colliders/sphericalCollider.js";
 
 class Asteroid extends GameObject {
 	static objFilename = "resources/asteroids/brown_asteroid_n.obj";
@@ -56,10 +56,7 @@ class Asteroid extends GameObject {
 		this.#moveForward(this.#gameSettings);
 	}
 
-	hit = false;
 	#moveForward(gameSettings) {
-		if(this.hit)
-			return;
 		this.position[2] -= this.speed * (gameSettings.gameSpeed / gameSettings.fpsLimit);
 		if (this.position[2] < 0) {
 			this.initialize(gameSettings);

@@ -1,5 +1,4 @@
 import { default as MathUtils } from "../math_utils.js"
-import {default as utils } from "../utils.js"
 import { default as Collider } from "./collider.js"
 
 class CircleCollider extends Collider{
@@ -22,7 +21,7 @@ class CircleCollider extends Collider{
         return this._currentOrientation(this.normal);
     }
 
-    get currentthickness() {
+    get currentThickness() {
         return this.thickness * this.scale;
     }
 
@@ -33,7 +32,7 @@ class CircleCollider extends Collider{
         let deltaPos = MathUtils.sub(point, this.center);
         let dot = MathUtils.dot(deltaPos, this.currentNormal);        
 
-        if(dot > this.thickness || dot < -this.currentthickness)
+        if (dot > this.thickness || dot < -this.currentThickness)
             return false;
 
         // check if is inside the circle
@@ -43,4 +42,4 @@ class CircleCollider extends Collider{
     }           
 }
 
-export default CircleCollider;  
+export default CircleCollider;

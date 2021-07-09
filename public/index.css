@@ -15,8 +15,8 @@ canvas {
 }
 
 @font-face {
-    font-family: '8BitOperator';
-    src: url('resources/gui/8bitoperator_jve.ttf');
+	font-family: "8BitOperator";
+	src: url("resources/gui/8bitoperator_jve.ttf");
 }
 
 #points {
@@ -24,7 +24,7 @@ canvas {
 	right: 2vw;
 	top: 1vh;
 	font-size: 3.5vw;
-	font-family: '8BitOperator';
+	font-family: "8BitOperator";
 	letter-spacing: 0.3vw;
 	color: green;
 }
@@ -64,4 +64,63 @@ canvas {
 	width: 2vw;
 	height: 4vh;
 	background-color: blue;
+}
+
+.gui-box {
+	position: absolute;
+	width: 40vw;
+	height: 40vh;
+	background-color: rgba(255, 255, 255, 0.5);
+	border-style: dashed;
+	border-width: 0.5vw;
+	border-color: black;
+	padding: 0.5vw;
+	text-align: center;
+	vertical-align: middle;
+	align-content: space-between;
+}
+
+.gui-text {
+	padding: 1vh;
+	font-family: "8BitOperator";
+	font-size: 1.5vw;
+	text-align: center;
+}
+
+.gui-title {
+	padding-bottom: 2vh;
+	font-family: "8BitOperator";
+	font-size: 3vw;
+	font-weight: bold;
+	text-align: center;
+}
+
+.gui-button {
+	position: absolute;
+	width: 20vw;
+	bottom: 2vh;
+	margin-left: -10vw;
+	padding: 2vh;
+	border: 0.2vw solid black;
+	background-color: rgb(100, 100, 100);
+	font-family: "8BitOperator";
+	font-size: 3vw;
+	text-align: center;
+}
+
+.gui-button:hover {
+	background-color: rgb(150, 150, 150);
+}
+
+.gui-button:active {
+	background-color: rgb(50, 50, 50);
+}
+
+#start-game {
+	z-index: 1;
+}
+
+#end-game {
+	z-index: -1;
+	opacity: 0;
 }

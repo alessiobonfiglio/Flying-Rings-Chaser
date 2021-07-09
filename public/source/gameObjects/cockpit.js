@@ -1,7 +1,8 @@
 import { default as GameObject } from "./gameObject.js";
 import { CockpitShaderClass } from "../../shaders/shaderClasses.js";
-import { default as SphericalCollider } from "../colliders/sphericalCollider.js"
-import { default as MathUtils } from "../math_utils.js"
+import { default as SphericalCollider } from "../colliders/sphericalCollider.js";
+import { default as MathUtils } from "../math_utils.js";
+import { default as GameEngine } from "../engine.js";
 
 class Cockpit extends GameObject {
 	static objFilename = "resources/cockpit/Cockpit.obj";
@@ -11,17 +12,17 @@ class Cockpit extends GameObject {
 	static #centerOfGravity;
 
     #gameSettings;
-	#health = 100;
+	#health;
 	#healthDisplay;
-	#points = 0;
+	#points;
 	#pointsDisplay;
 	#lasers = [];
 	#lastLaser = 9;
 	#canShoot = true;
 
 	_materialColor = [0.5, 0.5, 0.5];
-    position = [0, 0, 0];
-    scale = 2;
+    position;
+    scale;
     orientation = [0, 180, 0];
     deltaSpeed;
     up = 0;
@@ -47,6 +48,13 @@ class Cockpit extends GameObject {
         window.addEventListener("keyup", this.#keyFunctionUp(this), false);
 	}
 
+	initialize() {
+		this.position = [0, 0, 0];
+		this.scale = 2;
+		this.#health = 100;
+		this.#points = 0;
+	}
+
     // properties
 	get localCenterOfGravity() {
 		return Cockpit.#centerOfGravity;
@@ -60,8 +68,11 @@ class Cockpit extends GameObject {
     update() {
 		super.update();
 
+		if (!GameEngine.isPlaying)
+			return;
+
 		// Adjust collider towards the front of the cockpit
-		this.collider.center[2] += 2; 
+		this.collider.center[2] += 2;
 
 		// Move cockpit
 		const horizontal = (this.left - this.right) * this.#gameSettings.gameSpeed / this.#gameSettings.fpsLimit;
@@ -75,11 +86,19 @@ class Cockpit extends GameObject {
 		// Add points
 		this.#points += this.#gameSettings.pointsPerSecond * this.#gameSettings.gameSpeed / this.#gameSettings.fpsLimit;
 		this.#pointsDisplay.textContent = parseInt(this.#points).toString().padStart(8, "0");
-		
+
 		// Reduce health
 		this.#health -= this.#gameSettings.damagePerSecond * this.#gameSettings.gameSpeed / this.#gameSettings.fpsLimit;
 		this.#health = Math.max(0, this.#health);
 		this.#healthDisplay.style.width = this.#health.toString() + '%';
+	}
+
+	isDead() {
+		return this.#health <= 0;
+	}
+
+	getScore() {
+		return parseInt(this.#points).toString();
 	}
 
 	onRingCollided(ring) {
@@ -121,7 +140,8 @@ class Cockpit extends GameObject {
 	}
 
 	shoot() {
-		if (this.#canShoot && this.#lastLaser >= 0) {
+		// Shoot a laser and start the reload/cooldown async functions
+		if (GameEngine.isPlaying && this.#canShoot && this.#lastLaser >= 0) {
 			this.#lasers[this.#lastLaser].style.opacity = 0;
 			if (this.#lastLaser == this.#lasers.length - 1)
 				this.#delayedReload();

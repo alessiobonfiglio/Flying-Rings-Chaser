@@ -1,4 +1,4 @@
-import {default as GameObject} from "./gameObject.js"
+import {default as GameObject} from "./gameObject.js";
 import {TerrainShaderClass} from "../../shaders/shaderClasses.js";
 
 
@@ -58,7 +58,7 @@ class Terrain extends GameObject {
 		super.update();
 		this.position[2] -= this.#gameSettings.terrainSpeed * (this.#gameSettings.gameSpeed / this.#gameSettings.fpsLimit);
 		const newZ = ((this.position[2] - this.#gameSettings.terrainChunkSize) % (this.#gameSettings.terrainChunkSize * this.#gameSettings.numberTerrainChunksRows)) + this.#gameSettings.terrainChunkSize;
-		if(newZ > this.position[2]){
+		if (newZ > this.position[2]){
 			this.rowNumber += this.#gameSettings.numberTerrainChunksRows;
 		}
 		this.position[2] = newZ;

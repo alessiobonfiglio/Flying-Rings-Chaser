@@ -6,7 +6,7 @@ class Event {
     }
 
     invoke(sender) {
-        for(const handler of this.#eventHandlers)
+        for (const handler of this.#eventHandlers)
             handler(sender);
     }
 }
