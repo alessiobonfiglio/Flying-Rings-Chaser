@@ -25,6 +25,7 @@ canvas {
 	top: 1vh;
 	font-size: 3.5vw;
 	font-family: '8BitOperator';
+	letter-spacing: 0.3vw;
 	color: green;
 }
 

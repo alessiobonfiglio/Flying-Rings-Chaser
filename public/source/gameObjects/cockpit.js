@@ -17,7 +17,6 @@ class Cockpit extends GameObject {
 	#pointsDisplay;
 	#lasers = [];
 	#lastLaser = 9;
-	#lastFrame;
 
 	_materialColor = [0.5, 0.5, 0.5];
     position = [0, 0, 0];
@@ -35,7 +34,6 @@ class Cockpit extends GameObject {
 		this.collider = new SphericalCollider();
 		this.collider.radius = Cockpit.#colliderRadius;
         this.#gameSettings = gameSettings;
-		this.#lastFrame = Date.now();
 
 		this.deltaSpeed = gameSettings.cockpitSpeed;
 		this.#healthDisplay = document.getElementById("health");
@@ -62,23 +60,22 @@ class Cockpit extends GameObject {
 		super.update();
 
 		// Move cockpit
-		this.position = MathUtils.sum(this.position, [this.left - this.right, this.up - this.down, 0]);
+		const horizontal = (this.left - this.right) * this.#gameSettings.gameSpeed / this.#gameSettings.fpsLimit;
+		const vertical = (this.up - this.down) * this.#gameSettings.gameSpeed / this.#gameSettings.fpsLimit;
+		this.position = MathUtils.sum(this.position, [horizontal, vertical, 0]);
 
 		// Clamp position to borders
 		this.position[0] = Math.min(Math.max(this.position[0], -this.#gameSettings.maxHalfX), this.#gameSettings.maxHalfX);
 		this.position[1] = Math.min(Math.max(this.position[1], -this.#gameSettings.maxHalfY), this.#gameSettings.maxHalfY);
 
 		// Add points
-		const now = Date.now();
-		this.#points += this.#gameSettings.pointsPerSecond * (now - this.#lastFrame) / 1000;
+		this.#points += this.#gameSettings.pointsPerSecond * this.#gameSettings.gameSpeed / this.#gameSettings.fpsLimit;
 		this.#pointsDisplay.textContent = parseInt(this.#points).toString().padStart(8, "0");
 		
 		// Reduce health
-		this.#health -= this.#gameSettings.damagePerSecond * (now - this.#lastFrame) / 1000;
+		this.#health -= this.#gameSettings.damagePerSecond * this.#gameSettings.gameSpeed / this.#gameSettings.fpsLimit;
 		this.#health = Math.max(0, this.#health);
 		this.#healthDisplay.style.width = this.#health.toString() + '%';
-
-		this.#lastFrame = now;
 	}
 
 	onRingCollided(ring) {
