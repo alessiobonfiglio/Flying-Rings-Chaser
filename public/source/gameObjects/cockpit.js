@@ -8,34 +8,36 @@ class Cockpit extends GameObject {
 	static objFilename = "resources/cockpit/Cockpit.obj";
 	static textureFilename = "resources/cockpit/Cockpit_Texture.png";
 	static shaderClass = new CockpitShaderClass();
-    static #colliderRadius;
+	static #colliderRadius;
 	static #centerOfGravity;
 
-    #gameSettings;
+	#gameSettings;
 	#health;
 	#healthDisplay;
 	#points;
 	#pointsDisplay;
 	#lasers = [];
-	#lastLaser = 9;
+	#lastLaser;
 	#canShoot = true;
+	#lastShootingFrame = 0;
 
 	_materialColor = [0.5, 0.5, 0.5];
-    position;
-    scale;
-    orientation = [0, 180, 0];
-    deltaSpeed;
-    up = 0;
-    down = 0;
-    left = 0;
-    right = 0;
+	position;
+	scale;
+	orientation = [0, 180, 0];
+	deltaSpeed;
+	up = 0;
+	down = 0;
+	left = 0;
+	right = 0;
+	isShooting = false;
 
-    // Initialization
+	// Initialization
 	constructor(window, gameSettings) {
 		super();
 		this.collider = new SphericalCollider();
 		this.collider.radius = Cockpit.#colliderRadius;
-        this.#gameSettings = gameSettings;
+		this.#gameSettings = gameSettings;
 
 		this.deltaSpeed = gameSettings.cockpitSpeed;
 		this.#healthDisplay = document.getElementById("health");
@@ -44,18 +46,26 @@ class Cockpit extends GameObject {
 			this.#lasers[i] = document.getElementById("laser" + i);
 		}
 
-        window.addEventListener("keydown", this.#keyFunctionDown(this), false);
-        window.addEventListener("keyup", this.#keyFunctionUp(this), false);
+		window.addEventListener("keydown", this.#keyFunctionDown(this), false);
+		window.addEventListener("keyup", this.#keyFunctionUp(this), false);
 	}
 
 	initialize() {
+		// Reset cockpit
 		this.position = [0, 0, 0];
 		this.scale = 2;
 		this.#health = 100;
 		this.#points = 0;
+
+		// Reset lasers
+		for (const laser of this.#lasers) {
+			laser.style.opacity = 1;
+		}
+		this.#lastLaser = this.#gameSettings.maxLasers - 1;
+		this.#canShoot = true;
 	}
 
-    // properties
+	// Properties
 	get localCenterOfGravity() {
 		return Cockpit.#centerOfGravity;
 	}
@@ -65,7 +75,7 @@ class Cockpit extends GameObject {
 		Cockpit.#colliderRadius = GameObject._computeRadius(objModel, Cockpit.#centerOfGravity);
 	}
 
-    update() {
+	update(frameCount) {
 		super.update();
 
 		if (!GameEngine.isPlaying)
@@ -91,6 +101,18 @@ class Cockpit extends GameObject {
 		this.#health -= this.#gameSettings.damagePerSecond * this.#gameSettings.gameSpeed / this.#gameSettings.fpsLimit;
 		this.#health = Math.max(0, this.#health);
 		this.#healthDisplay.style.width = this.#health.toString() + '%';
+
+		// Update lasers
+		if (frameCount > this.#lastShootingFrame + this.#gameSettings.laserCooldown * this.#gameSettings.fpsLimit) {
+			this.#canShoot = true;
+		}
+
+		if (this.isShooting && this.#canShoot && this.#lastLaser >= 0) {
+			this.#shoot(frameCount);
+		} else if (this.#lastLaser < this.#gameSettings.maxLasers - 1 && 
+			frameCount > this.#lastShootingFrame + this.#gameSettings.laserReloadTime * this.#gameSettings.fpsLimit) {
+			this.#reload(frameCount);
+		}
 	}
 
 	isDead() {
@@ -139,44 +161,27 @@ class Cockpit extends GameObject {
 		this.#pointsDisplay.textContent = parseInt(this.#points).toString().padStart(8, "0");
 	}
 
-	shoot() {
-		// Shoot a laser and start the reload/cooldown async functions
-		if (GameEngine.isPlaying && this.#canShoot && this.#lastLaser >= 0) {
-			this.#lasers[this.#lastLaser].style.opacity = 0;
-			if (this.#lastLaser == this.#lasers.length - 1)
-				this.#delayedReload();
-			this.#lastLaser--;
-			this.#canShoot = false;
-			this.#delayedCooldown();
-		}
+	#shoot(frameCount) {
+		this.#lastShootingFrame = frameCount;
+		this.#lasers[this.#lastLaser].style.opacity = 0;
+		this.#lastLaser--;
+		this.#canShoot = false;
 	}
 
-	async #delayedReload() {
-		await this.#sleep(this.#gameSettings.laserReloadPerSecond * 1000);
+	#reload(frameCount) {
+		this.#lastShootingFrame = frameCount;
 		this.#lastLaser++;
 		this.#lasers[this.#lastLaser].style.opacity = 1;
-		if (this.#lastLaser < this.#lasers.length - 1) {
-			this.#delayedReload();
-		}
 	}
 
-	async #delayedCooldown() {
-		await this.#sleep(this.#gameSettings.laserCooldown * 1000);
-		this.#canShoot = true;
-	}
-
-	#sleep(ms) {
-		return new Promise(resolve => setTimeout(resolve, ms));
-	}
-
-    #keyFunctionDown(cockpit) {
+	#keyFunctionDown(cockpit) {
 		return function(e) {
 			if (e.keyCode == 87) {	// W
 				cockpit.up = cockpit.deltaSpeed;
 			}
-            if (e.keyCode == 83) {	// S
-                cockpit.down = cockpit.deltaSpeed;
-            }
+			if (e.keyCode == 83) {	// S
+				cockpit.down = cockpit.deltaSpeed;
+			}
 			if (e.keyCode == 65) {	// A
 				cockpit.left = cockpit.deltaSpeed;
 			}
@@ -184,7 +189,7 @@ class Cockpit extends GameObject {
 				cockpit.right = cockpit.deltaSpeed;
 			}
 			if (e.keyCode == 32) {	// Space
-				cockpit.shoot();
+				cockpit.isShooting = true;
 			}
 		}
 	}
@@ -194,14 +199,17 @@ class Cockpit extends GameObject {
 			if (e.keyCode == 87) {	// W
 				cockpit.up = 0;
 			}
-            if (e.keyCode == 83) {	// S
-                cockpit.down = 0;
-            }
+			if (e.keyCode == 83) {	// S
+				cockpit.down = 0;
+			}
 			if (e.keyCode == 65) {	// A
 				cockpit.left = 0;
 			}
 			if (e.keyCode == 68) {	// D
 				cockpit.right = 0;
+			}
+			if (e.keyCode == 32) {	// Space
+				cockpit.isShooting = false;
 			}
 		}
 	}
