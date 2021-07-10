@@ -103,6 +103,9 @@ async function init() {
 		return;
 	}
 
+	// Do not open context menu on right mouse click
+	window.oncontextmenu = () => false;
+
 	// de-comment to enable webgl debug (just print errors)
 	//gl = WebGLDebugUtils.makeDebugContext(gl);
 	// de-comment to enable webgl debug (with verbose logging of every function call)
