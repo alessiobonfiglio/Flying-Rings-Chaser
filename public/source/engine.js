@@ -115,6 +115,9 @@ class GameEngine {
 	}
 
 	#checkCollisions() {
+		if (!GameEngine.isPlaying)
+			return;
+
 		// rings
 		for (const ring of this.#rings) {
 			if (this.#cockpit.collider.intersectWithCircle(ring.collider)) {
