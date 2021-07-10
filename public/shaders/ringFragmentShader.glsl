@@ -16,7 +16,7 @@ in vec3 lxs[LIGHTS_NUM];				// lights direction (world space)
 uniform bool lxsEnabled[LIGHTS_NUM];	// if lights are enabled or not
 in float lightsDistances[LIGHTS_NUM];	// distance of the vertex from the light source (squared)
 
-const float maxLightDistance = 200.0;   // distance from that light lights starts become weaker
+const float maxLightDistance = 200.0;   // distance from that lights start to become weaker
 
 const float u = 1.0;					// metalness of the ring
 const float alpha = 0.2;				// roughness of the ring

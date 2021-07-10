@@ -15,7 +15,7 @@ in float lightsDistances[LIGHTS_NUM];	// distance of the vertex from the light s
 
 uniform sampler2D objectTexture;		// texture object
 
-const float maxLightDistance = 200.0;   // distance from that light lights starts become weaker
+const float maxLightDistance = 200.0;   // distance from that lights start to become weaker
 
 void main() {
 

@@ -44,11 +44,4 @@ void main() {
 	lightsDirection = lightsPositions[4] - position;
 	lxs[4] = normalize(lightsDirection);
 	lightsDistances[4] = lightsDirection.x*lightsDirection.x + lightsDirection.y*lightsDirection.y + lightsDirection.z*lightsDirection.z;
-
-
-	/*lxs[0] = normalize(lightsPositions[0] - position);
-	lxs[1] = normalize(lightsPositions[1] - position);
-	lxs[2] = normalize(lightsPositions[2] - position);
-	lxs[3] = normalize(lightsPositions[3] - position);
-	lxs[4] = normalize(lightsPositions[4] - position);*/
 }
