@@ -1,5 +1,7 @@
 #version 300 es
 
+#define LIGHTS_NUM 5
+
 in vec3 inPosition;								// vertex coordinates (local space)
 in vec3 inNormal;								// normal coordinates (local space)
 in vec2 inTexCoords;							// texture coordinates (uv space)
@@ -7,8 +9,9 @@ in vec2 inTexCoords;							// texture coordinates (uv space)
 out vec3 fsPosition;							// vertex coordinates (world space)
 out vec2 fsTexCoords;							// texture coordinates (uv space - repeated)
 
-uniform vec3 lightsPositions[5];				// lights positions (world space)
-out vec3 lxs[5];								// light directions (world space)
+uniform vec3 lightsPositions[LIGHTS_NUM];		// lights positions (world space)
+out vec3 lxs[LIGHTS_NUM];						// light directions (world space)
+out float lightsDistances[LIGHTS_NUM];			// distance of the vertex from the light source (squared)
 
 uniform float zOffset;							// offset of the terrain in the z coordinate (world space)
 
@@ -61,16 +64,30 @@ void main() {
 	gl_Position = matrix * vec4(newPosition, 1.0);
 
 	// multiply the texture coordinates in order to repeat the texture
-	vec2 newTexCoords = inTexCoords;
-	//newTexCoords.y += increment / 32.0;
-	fsTexCoords = newTexCoords * textureMoltiplicationFactor;
-	//fsTexCoords.y += increment * (textureMoltiplicationFactor * noiseResolution);
-	//fsTexCoords.y += increment;
+	fsTexCoords = inTexCoords * textureMoltiplicationFactor;
 
-	// compute the direction of the various light sources
-	lxs[0] = normalize(lightsPositions[0] - fsPosition);
+	// compute the direction ad distances of the various light sources
+	vec3 lightsDirection;
+	lightsDirection = lightsPositions[0] - fsPosition;
+	lxs[0] = normalize(lightsDirection);
+	lightsDistances[0] = lightsDirection.x*lightsDirection.x + lightsDirection.y*lightsDirection.y + lightsDirection.z*lightsDirection.z;
+	lightsDirection = lightsPositions[1] - fsPosition;
+	lxs[1] = normalize(lightsDirection);
+	lightsDistances[1] = lightsDirection.x*lightsDirection.x + lightsDirection.y*lightsDirection.y + lightsDirection.z*lightsDirection.z;
+	lightsDirection = lightsPositions[2] - fsPosition;
+	lxs[2] = normalize(lightsDirection);
+	lightsDistances[2] = lightsDirection.x*lightsDirection.x + lightsDirection.y*lightsDirection.y + lightsDirection.z*lightsDirection.z;
+	lightsDirection = lightsPositions[3] - fsPosition;
+	lxs[3] = normalize(lightsDirection);
+	lightsDistances[3] = lightsDirection.x*lightsDirection.x + lightsDirection.y*lightsDirection.y + lightsDirection.z*lightsDirection.z;
+	lightsDirection = lightsPositions[4] - fsPosition;
+	lxs[4] = normalize(lightsDirection);
+	lightsDistances[4] = lightsDirection.x*lightsDirection.x + lightsDirection.y*lightsDirection.y + lightsDirection.z*lightsDirection.z;
+
+	
+	/*lxs[0] = normalize(lightsPositions[0] - fsPosition);
 	lxs[1] = normalize(lightsPositions[1] - fsPosition);
 	lxs[2] = normalize(lightsPositions[2] - fsPosition);
 	lxs[3] = normalize(lightsPositions[3] - fsPosition);
-	lxs[4] = normalize(lightsPositions[4] - fsPosition);
+	lxs[4] = normalize(lightsPositions[4] - fsPosition);*/
 }

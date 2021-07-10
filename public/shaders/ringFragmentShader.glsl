@@ -1,21 +1,25 @@
 #version 300 es
 
 #define PI radians(180.0)
+#define LIGHTS_NUM 5
 
 precision mediump float;
 
-in vec3 fsNormal;					// normal to the surface (world space)
-in vec3 wr;							// eye direction (world space)
+in vec3 fsNormal;						// normal to the surface (world space)
+in vec3 wr;								// eye direction (world space)
 
-out vec4 outColor;					// computed color
+out vec4 outColor;						// computed color
 
-uniform vec3 mDiffColor;			// diffuse color
+uniform vec3 mDiffColor;				// diffuse color
 
-in vec3 lxs[5];						// lights direction (world space)
-uniform bool lxsEnabled[5];			// if lights are enabled or not
+in vec3 lxs[LIGHTS_NUM];				// lights direction (world space)
+uniform bool lxsEnabled[LIGHTS_NUM];	// if lights are enabled or not
+in float lightsDistances[LIGHTS_NUM];	// distance of the vertex from the light source (squared)
 
-const float u = 1.0;				// metalness of the ring
-const float alpha = 0.5;			// roughness of the ring
+const float maxLightDistance = 200.0;   // distance from that light lights starts become weaker
+
+const float u = 1.0;					// metalness of the ring
+const float alpha = 0.2;				// roughness of the ring
 
 vec3 nNormal;
 
@@ -64,11 +68,18 @@ void main() {
 	nNormal = normalize(fsNormal);
 
 	// computer the PBR color wrt each light source
-	vec3 sum = fr(lxs[0]) * float(lxsEnabled[0]);
-	sum += fr(lxs[1]) * float(lxsEnabled[1]);
-	sum += fr(lxs[2]) * float(lxsEnabled[2]);
-	sum += fr(lxs[3]) * float(lxsEnabled[3]);
-	sum += fr(lxs[4]) * float(lxsEnabled[4]);
+	vec3 sum;
+	float lightDistanceCoefficient;
+	lightDistanceCoefficient = clamp(maxLightDistance*maxLightDistance/lightsDistances[0], 0.0, 1.0);
+	sum = fr(lxs[0]) * float(lxsEnabled[0]) * lightDistanceCoefficient;
+	lightDistanceCoefficient = clamp(maxLightDistance*maxLightDistance/lightsDistances[1], 0.0, 1.0);
+	sum += fr(lxs[1]) * float(lxsEnabled[1]) * lightDistanceCoefficient;
+	lightDistanceCoefficient = clamp(maxLightDistance*maxLightDistance/lightsDistances[2], 0.0, 1.0);
+	sum += fr(lxs[2]) * float(lxsEnabled[2]) * lightDistanceCoefficient;
+	lightDistanceCoefficient = clamp(maxLightDistance*maxLightDistance/lightsDistances[3], 0.0, 1.0);
+	sum += fr(lxs[3]) * float(lxsEnabled[3]) * lightDistanceCoefficient;
+	lightDistanceCoefficient = clamp(maxLightDistance*maxLightDistance/lightsDistances[4], 0.0, 1.0);
+	sum += fr(lxs[4]) * float(lxsEnabled[4]) * lightDistanceCoefficient;
 
 	// sum all the colors and clamp them
 	outColor = vec4(clamp(sum, 0.0, 1.0), 1.0);
