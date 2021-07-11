@@ -14,6 +14,7 @@ class Asteroid extends GameObject {
 
 	speed = 1;
 	rotationSpeed = [1, 1, 1];
+	health;
 
 	// Initialization
 	constructor() {
@@ -25,6 +26,7 @@ class Asteroid extends GameObject {
 	// Initialization
 	initialize(gameSettings) {
 		this.#gameSettings = gameSettings;
+		this.health = gameSettings.asteroidHealth;
 
 		const x = MathUtils.getRandomInRange(-gameSettings.maxHalfX, gameSettings.maxHalfX);
 		const y = MathUtils.getRandomInRange(-gameSettings.maxHalfY, gameSettings.maxHalfY);
@@ -69,6 +71,13 @@ class Asteroid extends GameObject {
 
 	onSpaceshipCollided(spaceship) {
 		this.initialize(this.#gameSettings);
+	}
+
+	onLaserCollided(laser) {
+		console.log("Asteroid: laser hit");
+		this.health--;
+		if (this.health <= 0)
+			this.initialize(this.#gameSettings);
 	}
 }
 

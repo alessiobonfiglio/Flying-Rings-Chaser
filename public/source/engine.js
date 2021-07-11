@@ -1,6 +1,7 @@
 import {default as Camera} from "./gameObjects/camera.js";
 import {default as Asteroid} from "./gameObjects/asteroid.js";
 import {default as Ring} from "./gameObjects/ring.js";
+import {default as Laser} from "./gameObjects/laser.js";
 import {default as Terrain} from "./gameObjects/terrain.js";
 import {default as Cockpit} from "./gameObjects/cockpit.js";
 import {default as TerrainCollider} from "./gameObjects/terrainCollider.js";
@@ -27,6 +28,7 @@ class GameEngine {
 	#terrains = [];
 	#asteroids = [];
 	#rings = [];
+	#lasers = [];
 	#terrainCollider;
 
 	constructor(webGlManager, window, gameSettings) {
@@ -45,9 +47,10 @@ class GameEngine {
 
 		this.#webGlManager.skyboxGameObject = new Skybox(this.#gameSettings);
 
-		// Initialize the terrain and the cockpit
+		// Initialize the lasers, the terrain and the cockpit
+		this.#createLasers();
 		this.#createTerrainChunks();
-		this.#cockpit = new Cockpit(this.#window, this.#gameSettings);
+		this.#cockpit = new Cockpit(this.#window, this.#gameSettings, this.#lasers);
 		this.#cockpit.initialize();
 		this.#terrainCollider = this.#instantiateTerrainCollider();
 
@@ -85,6 +88,7 @@ class GameEngine {
 	
 	restartGame() {
 		this.#cockpit.initialize();
+		this.#cockpit.isVisible = true;
 		for (const ast of this.#asteroids)
 			ast.initialize(this.#gameSettings);
 		Ring.lastRing = this.#rings[0];
@@ -106,7 +110,7 @@ class GameEngine {
 		// If the player is dead end the game
 		if (this.#cockpit.isDead()) {
 			GameEngine.isPlaying = false;
-			this.#cockpit.scale = 0;
+			this.#cockpit.isVisible = false;
 			document.getElementById("end-score").textContent = "You scored " + (this.#cockpit.getScore()) + " points";
 			document.getElementById("end-game").style.zIndex = 1;
 			document.getElementById("end-game").style.opacity = 1;
@@ -126,11 +130,18 @@ class GameEngine {
 			}
 		}
 
-		// asteroid
+		// asteroids
 		for (const asteroid of this.#asteroids) {
 			if (this.#cockpit.collider.intersectWithSphere(asteroid.collider)) {
 				this.#cockpit.onAsteroidCollided(asteroid);
 				asteroid.onSpaceshipCollided(this.#cockpit);
+			}
+			// lasers
+			for (const laser of this.#lasers) {
+				if (laser.isVisible && laser.collider.intersectWithSphere(asteroid.collider)) {
+					laser.onAsteroidCollided(asteroid);
+					asteroid.onLaserCollided(laser);
+				}
 			}
 		}
 
@@ -200,6 +211,17 @@ class GameEngine {
 		}
 	}
 
+	#createLasers() {
+		const poolSize = this.#gameSettings.maxZ / this.#gameSettings.laserSpeed / this.#gameSettings.laserCooldown;
+		for (let i = 0; i < poolSize; i++) {
+			const laser = new Laser();
+			laser.initialize(this.#gameSettings);
+
+			this.#instantiate(laser);
+			this.#lasers.push(laser);
+		}
+	}
+
 	#createTerrainChunks() {
 		for (let i = -this.#gameSettings.halfNumberTerrainChunksColumns; i < this.#gameSettings.halfNumberTerrainChunksColumns; i++) {
 			for (let j = 0; j < this.#gameSettings.numberTerrainChunksRows; j++) {
@@ -215,7 +237,7 @@ class GameEngine {
 	}
 
 	#updateGameObjects() {
-		let gameObjectList = [this.#asteroids, this.#rings, [this.#cockpit], this.#terrains, [this.#webGlManager.skyboxGameObject]].flat();
+		let gameObjectList = [this.#asteroids, this.#rings, this.#lasers, [this.#cockpit], this.#terrains, [this.#webGlManager.skyboxGameObject]].flat();
 		for (let gameObject of gameObjectList) {
 			if (gameObject.update) {
 				gameObject.update(this.#frameCount);

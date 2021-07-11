@@ -25,7 +25,7 @@ canvas {
 	top: 1vh;
 	font-size: 3.5vw;
 	font-family: "8BitOperator";
-	letter-spacing: 0.3vw;
+	letter-spacing: 0.35vw;
 	color: green;
 }
 
@@ -39,6 +39,7 @@ canvas {
 	padding: 0 0.25vw;
 	align-items: center;
 	outline: 0.2vw solid white;
+	background-color: rgba(0, 0, 0, 0.4);
 }
 
 #health {
@@ -58,6 +59,7 @@ canvas {
 	align-items: center;
 	justify-content: space-between;
 	outline: 0.2vw solid white;
+	background-color: rgba(0, 0, 0, 0.4);
 }
 
 .laser {

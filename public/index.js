@@ -12,6 +12,7 @@ import {
 } from "./shaders/shaderClasses.js";
 import {default as Asteroid} from "./source/gameObjects/asteroid.js";
 import {default as Ring} from "./source/gameObjects/ring.js";
+import {default as Laser} from "./source/gameObjects/laser.js";
 import {default as Terrain} from "./source/gameObjects/terrain.js";
 import {default as Cockpit} from "./source/gameObjects/cockpit.js";
 import {default as Skybox} from "./source/skybox.js";
@@ -24,8 +25,9 @@ async function setupGlObjects(glManager, gl, gameSettings) {
 			[Spaceship, "Spaceship"],
 			[Cockpit, "Cockpit"],
 			[Asteroid, "Asteroid"],
+			[Ring, "Ring"],
+			[Laser, "Laser"],
 			[Terrain, "Terrain"],
-			[Ring, "Ring"]
 		];
 
 	for (const [objClass, className] of info) {
@@ -113,42 +115,55 @@ async function init() {
 
 	// create the setting of the game
 	const gameSetting = {
+		// Game engine
 		maxHalfX: 100,
 		maxHalfY: 50,
 		maxZ: 500,
 		fpsLimit: 60,
 		gameSpeed: 1,
+
+		// Cockpit
+		cockpitSpeed: 80,
+		pointsPerSecond: 50,
+		damagePerSecond: 1,
+
+		// Asteroids
 		numberOfAsteroids: 20,
 		asteroidScaleRange: [0.1, 0.1],
 		asteroidSpeedRange: [20, 40],
 		asteroidRotationSpeedRange: [0, 30],
+		asteroidPoints: 100,
+		asteroidDamage: 10,
+		asteroidHealth: 2,
+
+		// Rings
 		numberOfRings: 15,
 		minRingDistance: 35,
 		ringScaleRange: [12, 12],
 		ringSpeedRange: [20, 20],
+		ringPoints: 1000,
+		ringRestoreHealth: 25,
+
+		// Lasers
+		maxLasers: 10,
+		laserSpeed: 50,
+		laserReloadTime: 1,
+		laserCooldown: 0.5,
+
+		// Terrain
 		terrainChunkSize: 500,
 		terrainChunkResolution: 32,
 		halfNumberTerrainChunksColumns: 2,
 		numberTerrainChunksRows: 3,
 		terrainSpeed: 60,
+		terrainDamage: 5,
+		terrainPoints: 100,
+
+		// Skybox
 		skyboxDefaultPosition: [0, -200, 0],
 		skyboxOscillatingSpeed: 0.6,
 		skyboxTwoTimesMaxOscillation: 10,
 		skyboxParallaxFactor: 0.5, // between 1 and 0 (1->disabled)
-		cockpitSpeed: 80,
-		maxLasers: 10,
-		laserSpeed: 5,
-		laserReloadTime: 1,
-		laserCooldown: 0.5,
-		ringPoints: 1000,
-		ringRestoreHealth: 25,
-		asteroidPoints: 100,
-		asteroidDamage: 10,
-		asteroidHealth: 2,
-		pointsPerSecond: 50,
-		damagePerSecond: 1,
-		terrainDamage: 5,
-		terrainPoints: 100,
 	} //maybe load this from a json in the future?
 
 	// create and initialize the WebGL manager

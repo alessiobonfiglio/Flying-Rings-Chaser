@@ -16,6 +16,7 @@ class Cockpit extends GameObject {
 	#healthDisplay;
 	#points;
 	#pointsDisplay;
+	#laserPool;
 	#lasers = [];
 	#lastLaser;
 	#canShoot = true;
@@ -23,7 +24,7 @@ class Cockpit extends GameObject {
 
 	_materialColor = [0.5, 0.5, 0.5];
 	position;
-	scale;
+	scale = 2;
 	orientation = [0, 180, 0];
 	deltaSpeed;
 	up = 0;
@@ -33,11 +34,12 @@ class Cockpit extends GameObject {
 	isShooting = false;
 
 	// Initialization
-	constructor(window, gameSettings) {
+	constructor(window, gameSettings, laserObjects) {
 		super();
 		this.collider = new SphericalCollider();
 		this.collider.radius = Cockpit.#colliderRadius;
 		this.#gameSettings = gameSettings;
+		this.#laserPool = laserObjects;
 
 		this.deltaSpeed = gameSettings.cockpitSpeed;
 		this.#healthDisplay = document.getElementById("health");
@@ -53,7 +55,6 @@ class Cockpit extends GameObject {
 	initialize() {
 		// Reset cockpit
 		this.position = [0, 0, 0];
-		this.scale = 2;
 		this.#health = 100;
 		this.#points = 0;
 
@@ -166,6 +167,10 @@ class Cockpit extends GameObject {
 		this.#lasers[this.#lastLaser].style.opacity = 0;
 		this.#lastLaser--;
 		this.#canShoot = false;
+
+		// Shoot the first laser, then move it to the back of the list
+		this.#laserPool[0].shoot(this.position);
+		this.#laserPool.push(this.#laserPool.shift());
 	}
 
 	#reload(frameCount) {
