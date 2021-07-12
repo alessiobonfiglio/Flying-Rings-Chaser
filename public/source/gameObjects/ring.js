@@ -12,6 +12,8 @@ class Ring extends GameObject {
 	static #centerOfGravity;
 	#gameSettings;
 	_materialColor = [1, 215 / 255, 0];
+	#collided = false;
+	#spaceShip;
 
 	// Initialization
 	constructor() {
@@ -19,7 +21,7 @@ class Ring extends GameObject {
 		this.orientation = [90,0,0];
 		this.collider = new CircleCollider();
 		this.collider.radius = Ring.#colliderRadius;
-		this.collider.thickness = 0.5;
+		this.collider.thickness = 1;
 		this.collider.normal = [0, 0, 1];
 	}
 
@@ -50,11 +52,20 @@ class Ring extends GameObject {
 	// events
 	update() {
 		super.update();
-		this.#moveForward(this.#gameSettings);
+		if(!this.#collided)
+			this.#moveForward(this.#gameSettings);
+		else {
+			var newCenter = this.center;
+			newCenter[0] = this.#spaceShip.center[0];
+			newCenter[1] = this.#spaceShip.center[1];	
+			// newCenter[2] = spaceship.center[3];
+			this.center = newCenter;		
+		}
 	}
 	
 	#moveForward(gameSettings) {
 		this.position[2] -= this.speed * gameSettings.deltaT;
+
 		if (this.position[2] < 0) {
 			this.initialize(gameSettings);
 			return;
@@ -62,8 +73,30 @@ class Ring extends GameObject {
 		this.orientation[0] = (this.orientation[0] + 1) % 360;
 	}
 
-	onSpaceshipCollided(spaceship) {
-		this.initialize(this.#gameSettings);
+	bindCollider() {
+		super.bindCollider();
+		this.collider.center = MathUtils.sum(this.center, [0,0,-10])		
+	}
+
+	async onSpaceshipCollided(spaceship) {
+		if(this.#collided)
+			return;
+		
+		this.#spaceShip = spaceship;
+		this.#collided = true;
+		let startScale = this.scale;
+		await this.#collapseRing(spaceship);	
+		this.scale = startScale;
+		this.#collided = false;
+		this.initialize(this.#gameSettings);	
+	}
+
+	async #collapseRing(spaceship) {
+		
+		let animationDuration = 0.5; //s
+		let scaleAnimation = this.scaleTo(0, animationDuration);
+		let rotationAnimaiton = this.animation3(orientation => this.orientation = orientation, animationDuration, this.orientation, [90,0,0]);
+		await Promise.all([scaleAnimation, rotationAnimaiton]);
 	}
 }
 

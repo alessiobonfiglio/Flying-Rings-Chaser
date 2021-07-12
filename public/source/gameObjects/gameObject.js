@@ -116,7 +116,22 @@ class GameObject // should be an abstract class if js allows that
 		callback(end);
 	}
 
-	scaleTo(value, duration = 0.2) {
+
+	async animation3(callback, duration, start, end) {
+		let cur = start;		
+		var startDuration = duration;		
+		while(duration > 0) {			
+			callback(cur);
+			let deltaT = await this.#nextFrame;		
+
+			// cur = (duration*start + (startDuration - duration)*end) / startDuration;
+			cur = MathUtils.mul(1/startDuration, MathUtils.sum(MathUtils.mul(duration, start), MathUtils.mul(startDuration - duration, end)));			
+			duration -= deltaT;
+		}		
+		callback(end);
+	}
+
+	async scaleTo(value, duration = 0.2) {
 		return this.animation(scale => this.scale = scale, duration, this.scale, value);
 	} 
 
