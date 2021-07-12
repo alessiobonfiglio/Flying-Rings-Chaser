@@ -3,9 +3,12 @@ import {default as Asteroid} from "./gameObjects/asteroid.js";
 import {default as Ring} from "./gameObjects/ring.js";
 import {default as Laser} from "./gameObjects/laser.js";
 import {default as Terrain} from "./gameObjects/terrain.js";
+import {default as Explosion} from "./gameObjects/explosion.js";
 import {default as Cockpit} from "./gameObjects/cockpit.js";
 import {default as TerrainCollider} from "./gameObjects/terrainCollider.js";
 import Skybox from "./skybox.js";
+import { default as MathUtils } from "./math_utils.js"
+import {default as GameObject} from "./gameObjects/gameObject.js"
 
 class GameEngine {
 	#webGlManager;
@@ -29,7 +32,8 @@ class GameEngine {
 	#asteroids = [];
 	#rings = [];
 	#lasers = [];
-	#terrainCollider;
+	#terrainCollider;	
+	#explosions = []
 
 	constructor(webGlManager, window, gameSettings) {
 		this.#webGlManager = webGlManager;
@@ -50,11 +54,9 @@ class GameEngine {
 		// Initialize the lasers, the terrain and the cockpit
 		this.#createLasers();
 		this.#createTerrainChunks();
-		this.#cockpit = new Cockpit(this.#window, this.#gameSettings, this.#lasers);
-		this.#cockpit.initialize();
+		this.#createCockpit();
 		this.#terrainCollider = this.#instantiateTerrainCollider();
 
-		this.#instantiate(this.#cockpit);
 		this.#webGlManager.camera.initialize(this.#cockpit);
 
 		// must be done like this to keep a reference of 'this'
@@ -152,6 +154,7 @@ class GameEngine {
 	}
 
 	// this is done in order to limit the framerate to 'fpsLimit'
+	#nextFramePromiseResolve = () => {}
 	frameLoop() {
 		this.#window.requestAnimationFrame(this.#wrapperCallback);
 
@@ -174,8 +177,21 @@ class GameEngine {
 			this.#then = now - (delta % this.#frameInterval);
 
 			this.#frameCount++;
-			this.#gameLoop();
+			this.#gameLoop();	
+			this.#NextFramePromiseHandler();
 		}
+	}
+
+
+
+	// 
+	// GameObjects' creation
+	//
+
+	#createCockpit() {
+		this.#cockpit = new Cockpit(this.#window, this.#gameSettings, this.#lasers);
+		this.#cockpit.initialize();
+		this.#instantiate(this.#cockpit);
 	}
 
 	createAsteroids() {
@@ -237,7 +253,7 @@ class GameEngine {
 	}
 
 	#updateGameObjects() {
-		let gameObjectList = [this.#asteroids, this.#rings, this.#lasers, [this.#cockpit], this.#terrains, [this.#webGlManager.skyboxGameObject]].flat();
+		let gameObjectList = [this.#asteroids, this.#rings, this.#lasers, [this.#cockpit], this.#terrains, [this.#webGlManager.skyboxGameObject], this.#explosions].flat();
 		for (let gameObject of gameObjectList) {
 			if (gameObject.update) {
 				gameObject.update(this.#frameCount);
@@ -261,9 +277,28 @@ class GameEngine {
 
 	#instantiateAsteroid(asteroid) {
 		this.#instantiate(asteroid);
-		asteroid.destroyed.subscribe(ast => this.#removeItem(this.#asteroids, ast));
+		asteroid.destroyed.subscribe(ast => this.#removeItem(this.#asteroids, ast));		
+		asteroid.death.subscribe(ast => this.#createExplosion(ast));
 		return asteroid;
 	}
+
+	#createExplosion(asteroid) {
+		let explosion = new Explosion(this.#gameSettings);
+		explosion.velocity = [0,0, -asteroid.speed];
+		explosion.center = asteroid.center;		
+		explosion.destroyed.subscribe(exp => this.#removeItem(this.#explosions, exp))
+		this.#explosions.push(explosion);
+		this.#instantiate(explosion);
+		explosion.explode();
+	}
+
+	#instantiateTerrainCollider() {
+		const terrain = new TerrainCollider();
+		terrain.initialize(this.#cockpit, this.#gameSettings);
+		this.#instantiate(terrain);
+		return terrain;
+	}
+
 
 	#updateLights(){
 		this.#webGlManager.setAndEnableLightPosition(0, this.#cockpit.position);
@@ -279,12 +314,14 @@ class GameEngine {
 		return arr;
 	}
 
-	#instantiateTerrainCollider() {
-		const terrain = new TerrainCollider();
-		terrain.initialize(this.#cockpit, this.#gameSettings);
-		this.#instantiate(terrain);
-		return terrain;
+
+	#NextFramePromiseHandler() {
+		this.#nextFramePromiseResolve(this.#gameSettings.deltaT);
+		GameObject.nextFramePromise = new Promise((resolve, reject) => {
+			this.#nextFramePromiseResolve = resolve;
+		});
 	}
+
 }
 
 

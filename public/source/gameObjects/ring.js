@@ -42,6 +42,11 @@ class Ring extends GameObject {
 		Ring.#colliderRadius = GameObject._computeRadius(objModel, Ring.#centerOfGravity);
 	}
 
+	// Properties
+	get localCenterOfGravity() {
+		return Ring.#centerOfGravity;
+	}
+
 	// events
 	update() {
 		super.update();
@@ -49,7 +54,7 @@ class Ring extends GameObject {
 	}
 	
 	#moveForward(gameSettings) {
-		this.position[2] -= this.speed * (gameSettings.gameSpeed / gameSettings.fpsLimit);
+		this.position[2] -= this.speed * gameSettings.deltaT;
 		if (this.position[2] < 0) {
 			this.initialize(gameSettings);
 			return;

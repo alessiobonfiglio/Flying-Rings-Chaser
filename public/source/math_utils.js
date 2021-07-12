@@ -52,7 +52,15 @@ let math_utils = {
 			v = [v[0], v[1], v[2], 1];
 		let ret = utils.multiplyMatrixVector(m, v);
 		return hasThreeComponents ? ret.slice(0, 3) : ret;
-	}
+	},
+	
+	clamp(num, min, max) {
+		return num <= min 
+		  ? min 
+		  : num >= max 
+			? max 
+			: num
+	  }
 }
 
 export default math_utils;

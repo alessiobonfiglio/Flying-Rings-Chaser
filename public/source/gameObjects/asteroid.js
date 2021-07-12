@@ -2,8 +2,10 @@ import {default as GameObject} from "./gameObject.js";
 import {DefaultShaderClass} from "../../shaders/shaderClasses.js";
 import {default as MathUtils} from "../math_utils.js";
 import { default as SphericalCollider } from "../colliders/sphericalCollider.js";
+import { default as Event } from "../utils/event.js"
 
 class Asteroid extends GameObject {
+	death = new Event();
 	static objFilename = "resources/asteroids/brown_asteroid_n.obj";
 	static textureFilename = "resources/asteroids/brown.png";
 	static shaderClass = new DefaultShaderClass();
@@ -52,32 +54,45 @@ class Asteroid extends GameObject {
 		Asteroid.#colliderRadius = GameObject._computeRadius(objModel, Asteroid.#centerOfGravity);
 	}
 
+	// Properties
+	get localCenterOfGravity() {
+		return Asteroid.#centerOfGravity;
+	}
+
 	// game events handlers
 	update() {
 		super.update();
-		this.#moveForward(this.#gameSettings);
+		this.#moveForward(this.#gameSettings);			
 	}
 
 	#moveForward(gameSettings) {
-		this.position[2] -= this.speed * (gameSettings.gameSpeed / gameSettings.fpsLimit);
+		this.position[2] -= this.speed * gameSettings.deltaT;
 		if (this.position[2] < 0) {
 			this.initialize(gameSettings);
 			return;
 		}
-		this.orientation[0] += (this.rotationSpeed[0] * (gameSettings.gameSpeed / gameSettings.fpsLimit)) % 360;
-		this.orientation[1] += (this.rotationSpeed[1] * (gameSettings.gameSpeed / gameSettings.fpsLimit)) % 360;
-		this.orientation[2] += (this.rotationSpeed[2] * (gameSettings.gameSpeed / gameSettings.fpsLimit)) % 360;
+		this.orientation[0] += (this.rotationSpeed[0] * gameSettings.deltaT) % 360;
+		this.orientation[1] += (this.rotationSpeed[1] * gameSettings.deltaT) % 360;
+		this.orientation[2] += (this.rotationSpeed[2] * gameSettings.deltaT) % 360;
 	}
 
 	onSpaceshipCollided(spaceship) {
-		this.initialize(this.#gameSettings);
+		this.initialize(this.#gameSettings);			
 	}
 
 	onLaserCollided(laser) {
 		console.log("Asteroid: laser hit");
 		this.health--;
 		if (this.health <= 0)
-			this.initialize(this.#gameSettings);
+			this.#onAsteroidDeath();		
+	}
+
+
+	#onAsteroidDeath() {
+		this.death.invoke(this);	
+		
+		// initialization should be called after the event handling
+		this.initialize(this.#gameSettings);	
 	}
 }
 

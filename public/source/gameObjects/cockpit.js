@@ -3,6 +3,8 @@ import { CockpitShaderClass } from "../../shaders/shaderClasses.js";
 import { default as SphericalCollider } from "../colliders/sphericalCollider.js";
 import { default as MathUtils } from "../math_utils.js";
 import { default as GameEngine } from "../engine.js";
+import { default as Event } from "../utils/event.js"
+
 
 class Cockpit extends GameObject {
 	static objFilename = "resources/cockpit/Cockpit.obj";
@@ -86,8 +88,8 @@ class Cockpit extends GameObject {
 		this.collider.center[2] += 2;
 
 		// Move cockpit
-		const horizontal = (this.left - this.right) * this.#gameSettings.gameSpeed / this.#gameSettings.fpsLimit;
-		const vertical = (this.up - this.down) * this.#gameSettings.gameSpeed / this.#gameSettings.fpsLimit;
+		const horizontal = (this.left - this.right) * this.#gameSettings.deltaT;
+		const vertical = (this.up - this.down) * this.#gameSettings.deltaT;
 		this.position = MathUtils.sum(this.position, [horizontal, vertical, 0]);
 
 		// Clamp position to borders
@@ -95,11 +97,11 @@ class Cockpit extends GameObject {
 		this.position[1] = Math.min(Math.max(this.position[1], -this.#gameSettings.maxHalfY), this.#gameSettings.maxHalfY);
 
 		// Add points
-		this.#points += this.#gameSettings.pointsPerSecond * this.#gameSettings.gameSpeed / this.#gameSettings.fpsLimit;
+		this.#points += this.#gameSettings.pointsPerSecond * this.#gameSettings.deltaT;
 		this.#pointsDisplay.textContent = parseInt(this.#points).toString().padStart(8, "0");
 
 		// Reduce health
-		this.#health -= this.#gameSettings.damagePerSecond * this.#gameSettings.gameSpeed / this.#gameSettings.fpsLimit;
+		this.#health -= this.#gameSettings.damagePerSecond * this.#gameSettings.deltaT;
 		this.#health = Math.max(0, this.#health);
 		this.#healthDisplay.style.width = this.#health.toString() + '%';
 
@@ -147,6 +149,7 @@ class Cockpit extends GameObject {
 		this.#points -= this.#gameSettings.asteroidPoints;
 		this.#points = Math.max(0, this.#points);
 		this.#pointsDisplay.textContent = parseInt(this.#points).toString().padStart(8, "0");
+
 	}
 
 	onGroundCollided() {

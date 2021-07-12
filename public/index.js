@@ -16,21 +16,23 @@ import {default as Laser} from "./source/gameObjects/laser.js";
 import {default as Terrain} from "./source/gameObjects/terrain.js";
 import {default as Cockpit} from "./source/gameObjects/cockpit.js";
 import {default as Skybox} from "./source/skybox.js";
+import Explosion from "./source/gameObjects/explosion.js"
 
 
 async function setupGlObjects(glManager, gl, gameSettings) {
-	const info =
+	const classes =
 		[
-			[Cube, "Cube"],
-			[Spaceship, "Spaceship"],
-			[Cockpit, "Cockpit"],
-			[Asteroid, "Asteroid"],
-			[Ring, "Ring"],
-			[Laser, "Laser"],
-			[Terrain, "Terrain"],
+			Cube,
+			Spaceship,
+			Cockpit,
+			Asteroid,
+			Ring,
+			Laser,
+			Terrain,
+			Explosion
 		];
 
-	for (const [objClass, className] of info) {
+	for (const objClass of classes) {
 		// load the obj file
 		const objModel = objClass.meshGenerator
 			? objClass.meshGenerator(gameSettings)
@@ -43,7 +45,7 @@ async function setupGlObjects(glManager, gl, gameSettings) {
 		if (objClass.loadInfoFromObjModel)
 			objClass.loadInfoFromObjModel(objModel);
 
-		glManager.bindGlModel(objModel, texture, objClass.shaderClass, className);
+		glManager.bindGlModel(objModel, texture, objClass.shaderClass, objClass.name);
 	}
 }
 
@@ -164,6 +166,10 @@ async function init() {
 		skyboxOscillatingSpeed: 0.6,
 		skyboxTwoTimesMaxOscillation: 10,
 		skyboxParallaxFactor: 0.5, // between 1 and 0 (1->disabled)
+
+		get deltaT() {
+			return this.gameSpeed / this.fpsLimit;
+		}
 	} //maybe load this from a json in the future?
 
 	// create and initialize the WebGL manager

@@ -5,7 +5,7 @@ import { default as Event } from "../utils/event.js"
 class GameObject // should be an abstract class if js allows that
 {
 	// events
-	destroyed = new Event();
+	destroyed = new Event();	
 
 	// variables
 	position = [0, 0, 0]; //pivot in world coordinates
@@ -13,9 +13,23 @@ class GameObject // should be an abstract class if js allows that
 	orientation = [0, 0, 0]; // [rx, ry, rz]
 	collider;
 	isVisible = true;
+	static nextFramePromise;
+
+
+	// Initialization
+	constructor() {
+		if(this.collider && this.localCenterOfGravity == null)
+			throw new Error("Center of gravity property not set")
+	}
+
+
+	// Properties
+	get #nextFrame() {
+		return GameObject.nextFramePromise ?? new Promise((resolve, _) => resolve(0));
+	}
 
 	get localCenterOfGravity() {
-		return [0, 0, 0];
+		return [0,0,0]
 	}
 
 	get center() {
@@ -23,7 +37,7 @@ class GameObject // should be an abstract class if js allows that
 	}
 
 	set center(value) {
-		this.position = MathUtils.sub(value, MathUtils.mul(-this.scale, this.localCenterOfGravity)); // Isometry + scaling, scales distances
+		this.position = MathUtils.sub(value, MathUtils.mul(this.scale, this.localCenterOfGravity)); // Isometry + scaling, scales distances
 	}
 
 	// Color
@@ -64,7 +78,7 @@ class GameObject // should be an abstract class if js allows that
 	// engine events handlers
 	update() {
 		if (this.collider)
-			this.bindCollider();
+			this.bindCollider();		
 	}
 
 	bindCollider() {
@@ -85,6 +99,26 @@ class GameObject // should be an abstract class if js allows that
 	destroy() {
 		this.destroyed.invoke(this);
 	}
+
+
+	// Animations
+	async animation(callback, duration, start, end) {
+		let cur = start;		
+		var startDuration = duration;
+		let [max, min] = [Math.max(start, end), Math.min(start, end)]
+		while(duration > 0) {			
+			callback(cur);
+			let deltaT = await this.#nextFrame;		
+			cur = (duration*start + (startDuration - duration)*end) / startDuration;
+			cur = MathUtils.clamp(cur, min, max);
+			duration -= deltaT;
+		}		
+		callback(end);
+	}
+
+	scaleTo(value, duration) {
+		return this.animation(scale => this.scale = scale, duration, this.scale, value);
+	} 
 }
 
 export default GameObject;

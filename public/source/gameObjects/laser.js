@@ -24,7 +24,7 @@ class Laser extends GameObject {
 		this.collider = new CircleCollider();
 		this.collider.radius = Laser.#colliderRadius;
 		this.collider.thickness = 1;
-		this.collider.normal = [0, 0, 1];
+		this.collider.normal = [0, 0, 1];		
 	}
 
 	// Initialization
@@ -38,6 +38,13 @@ class Laser extends GameObject {
 		Laser.#colliderRadius = GameObject._computeRadius(objModel, Laser.#centerOfGravity);
 	}
 
+	// Properties
+	get localCenterOfGravity() {
+		return Laser.#centerOfGravity;
+	}
+
+
+	// Engine events
 	update() {
 		super.update();
 		if (this.isVisible)
@@ -45,7 +52,7 @@ class Laser extends GameObject {
 	}
 
 	#moveForward(gameSettings) {
-		this.position[2] += this.speed * (gameSettings.gameSpeed / gameSettings.fpsLimit);
+		this.position[2] += this.speed * gameSettings.deltaT;
 		if (this.position[2] > gameSettings.maxZ)
 			this.isVisible = false;
 	}
