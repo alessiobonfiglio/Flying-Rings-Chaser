@@ -25,11 +25,11 @@ class GameObject // should be an abstract class if js allows that
 
 	// Properties
 	get #nextFrame() {
-		return GameObject.nextFramePromise ?? new Promise((resolve, _) => resolve(0));
+		return GameObject.nextFramePromise ?? Promise.resolve(0);
 	}
 
 	// default material color
-	_materialColor = [1.0, 0.0, 1.0];
+	_materialColor = [0.5, 0.5, 0.5];
 
 	get localCenterOfGravity() {
 		return [0,0,0]

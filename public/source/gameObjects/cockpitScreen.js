@@ -25,7 +25,7 @@ class CockpitScreen extends GameObject {
 		this.isVisible = this.#cockpit.isVisible;
 
 		const maxAnimationCounterValue = 12;
-		this.#animationCounter = (this.#animationCounter + this.#gameSettings.cockpitScreenAnimationSpeed * this.#gameSettings.gameSpeed / this.#gameSettings.fpsLimit) % maxAnimationCounterValue;
+		this.#animationCounter = (this.#animationCounter + this.#gameSettings.cockpitScreenAnimationSpeed * this.#gameSettings.deltaT) % maxAnimationCounterValue;
 	}
 
 

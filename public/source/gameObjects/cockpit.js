@@ -3,8 +3,6 @@ import { CockpitShaderClass } from "../../shaders/shaderClasses.js";
 import { default as SphericalCollider } from "../colliders/sphericalCollider.js";
 import { default as MathUtils } from "../math_utils.js";
 import { default as GameEngine } from "../engine.js";
-import { default as Event } from "../utils/event.js"
-
 
 class Cockpit extends GameObject {
 	static objFilename = "resources/cockpit/cockpit_no_screen.obj";
@@ -105,15 +103,14 @@ class Cockpit extends GameObject {
 		this.#healthDisplay.style.width = this.#health.toString() + '%';
 
 		// Update lasers
-		const framePerSecond = this.#gameSettings.fpsLimit / this.#gameSettings.gameSpeed;
-		if (frameCount > this.#lastShootingFrame + this.#gameSettings.laserCooldown * framePerSecond) {
+		if (frameCount > this.#lastShootingFrame + this.#gameSettings.laserCooldown / this.#gameSettings.deltaT) {
 			this.#canShoot = true;
 		}
 
 		if (this.isShooting && this.#canShoot && this.#lastLaser >= 0) {
 			this.#shoot(frameCount);
 		} else if (this.#lastLaser < this.#gameSettings.maxLasers - 1 && 
-			frameCount > this.#lastShootingFrame + this.#gameSettings.laserReloadTime * framePerSecond) {
+			frameCount > this.#lastShootingFrame + this.#gameSettings.laserReloadTime / this.#gameSettings.deltaT) {
 			this.#reload(frameCount);
 		}
 	}
