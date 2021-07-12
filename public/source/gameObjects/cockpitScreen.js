@@ -31,12 +31,22 @@ class CockpitScreen extends GameObject {
 
 	uvTransformMatrix() {
 		const delta = 0.0625;
-		let du, dv;
-		du = 0.0;
-		dv = 0.75;
+		let du = 0.0, dv = 0.75;
 
 		du += delta * (Math.floor(this.#animationCounter / 3));
 		dv -= delta * (Math.floor(this.#animationCounter % 3));
+
+		if (this.#cockpit.up > 0 && this.#cockpit.down <= 0) {
+			dv += 3 * delta;
+		} else if (this.#cockpit.down > 0 && this.#cockpit.up <= 0) {
+			dv -= 3 * delta;
+		}
+
+		if (this.#cockpit.left > 0 && this.#cockpit.right <= 0) {
+			du += 4 * delta;
+		} else if (this.#cockpit.right > 0 && this.#cockpit.left <= 0) {
+			du += 8 * delta;
+		}
 
 		console.log(du, dv);
 

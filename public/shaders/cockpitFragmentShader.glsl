@@ -2,14 +2,12 @@
 
 precision mediump float;
 
-in vec3 fsNormal;
-in vec2 fsTexCoords;
+in vec3 fsNormal;						// normal to the surface (world space)
+in vec2 fsTexCoords;					// texture coordinates (uv space - repeated)
 
-out vec4 outColor;
+out vec4 outColor;						// the computed color
 
-uniform vec3 mDiffColor;
-
-uniform sampler2D objectTexture;
+uniform sampler2D objectTexture;		// texture object
 
 void main() {
 	vec3 nNormal = normalize(fsNormal);
