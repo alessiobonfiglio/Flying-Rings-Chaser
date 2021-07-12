@@ -5,7 +5,7 @@ import {default as Laser} from "./gameObjects/laser.js";
 import {default as Terrain} from "./gameObjects/terrain.js";
 import {default as Cockpit} from "./gameObjects/cockpit.js";
 import {default as TerrainCollider} from "./gameObjects/terrainCollider.js";
-import Skybox from "./skybox.js";
+import {default as Skybox} from "./skybox.js";
 
 class GameEngine {
 	#webGlManager;
@@ -212,8 +212,7 @@ class GameEngine {
 	}
 
 	#createLasers() {
-		const poolSize = this.#gameSettings.maxZ / this.#gameSettings.laserSpeed / this.#gameSettings.laserCooldown;
-		for (let i = 0; i < poolSize; i++) {
+		for (let i = 0; i < this.#webGlManager.maxNumOfLights - 1; i++) {
 			const laser = new Laser();
 			laser.initialize(this.#gameSettings);
 
@@ -267,8 +266,13 @@ class GameEngine {
 
 	#updateLights(){
 		this.#webGlManager.setAndEnableLightPosition(0, this.#cockpit.position);
-
-		//todo: lasers
+		for (let i = 0; i < this.#lasers.length; i++) {
+			if (this.#lasers[i].isVisible) {
+				this.#webGlManager.setAndEnableLightPosition(i + 1, this.#lasers[i].position);
+			} else {
+				this.#webGlManager.disableLight(i + 1);
+			}
+		}
 	}
 
 	#removeItem(arr, value) {

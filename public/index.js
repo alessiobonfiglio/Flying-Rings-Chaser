@@ -146,7 +146,7 @@ async function init() {
 
 		// Lasers
 		maxLasers: 10,
-		laserSpeed: 50,
+		laserSpeed: 100,
 		laserReloadTime: 1,
 		laserCooldown: 0.5,
 
