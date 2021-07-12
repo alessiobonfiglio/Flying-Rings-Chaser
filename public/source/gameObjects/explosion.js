@@ -47,11 +47,11 @@ class Explosion extends GameObject {
 		let startScale = this.scale;	
 		this.scale = 0;	
         this.isVisible = true;        
-		await this.scaleTo(startScale, 0.2);
+		await this.scaleTo(startScale);
         console.log("Exploded");
-		setTimeout(() => {
-			this.destroy();
-		}, 3000);
+		await this.delay(2);
+		await this.scaleTo(0);
+		this.destroy();
     }
 }
 

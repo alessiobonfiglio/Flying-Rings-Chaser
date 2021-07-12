@@ -55,8 +55,7 @@ class Laser extends GameObject {
 		this.position[2] += this.speed * gameSettings.deltaT;
 		// Make it go beyond gameSettings.maxZ because of the light it irradiates
 		if (this.position[2] > gameSettings.maxZ * 1.5)
-			this.position[2] += this.speed * gameSettings.deltaT;
-		this.isVisible = false;
+			this.isVisible = false;
 	}
 
 	shoot(cockpitPosition) {

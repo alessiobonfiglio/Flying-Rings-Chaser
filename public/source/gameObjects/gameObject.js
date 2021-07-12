@@ -116,9 +116,14 @@ class GameObject // should be an abstract class if js allows that
 		callback(end);
 	}
 
-	scaleTo(value, duration) {
+	scaleTo(value, duration = 0.2) {
 		return this.animation(scale => this.scale = scale, duration, this.scale, value);
 	} 
+
+	async delay(duration){
+		await new Promise((resolve, _) => setTimeout(() => resolve(), duration * 1000));
+		await this.#nextFrame;
+	}
 }
 
 export default GameObject;
