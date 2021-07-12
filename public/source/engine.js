@@ -8,14 +8,13 @@ import {default as Cockpit} from "./gameObjects/cockpit.js";
 import {default as TerrainCollider} from "./gameObjects/terrainCollider.js";
 import {default as GameObject} from "./gameObjects/gameObject.js"
 import {default as Skybox} from "./skybox.js";
+import {default as CockpitScreen} from "./gameObjects/cockpitScreen.js";
 
 class GameEngine {
+	static isPlaying = false;
 	#webGlManager;
 	#window;
-
 	#gameSettings;
-	static isPlaying = false;
-
 	#frameCount;
 
 	// used for the fps limit
@@ -27,6 +26,7 @@ class GameEngine {
 
 	// game objects
 	#cockpit;
+	#cockpitScreen;
 	#terrains = [];
 	#asteroids = [];
 	#rings = [];
@@ -54,8 +54,9 @@ class GameEngine {
 		this.#createLasers();
 		this.#createTerrainChunks();
 		this.#createCockpit();
+		this.#cockpitScreen = new CockpitScreen(this.#gameSettings, this.#cockpit);
 		this.#terrainCollider = this.#instantiateTerrainCollider();
-
+		this.#instantiate(this.#cockpitScreen);
 		this.#webGlManager.camera.initialize(this.#cockpit);
 
 		// must be done like this to keep a reference of 'this'
@@ -69,7 +70,7 @@ class GameEngine {
 	}
 
 	#start_game(gameEngine) {
-		return function() {
+		return function () {
 			GameEngine.isPlaying = true;
 			document.getElementById("start-game").style.zIndex = -1;
 			document.getElementById("start-button").disabled = true;
@@ -79,14 +80,14 @@ class GameEngine {
 	}
 
 	#end_game(gameEngine) {
-		return function() {
+		return function () {
 			GameEngine.isPlaying = true;
 			document.getElementById("end-game").style.zIndex = -1;
 			document.getElementById("end-button").disabled = true;
 			gameEngine.restartGame();
 		}
 	}
-	
+
 	restartGame() {
 		this.#cockpit.initialize();
 		this.#cockpit.isVisible = true;
@@ -251,7 +252,8 @@ class GameEngine {
 	}
 
 	#updateGameObjects() {
-		let gameObjectList = [this.#asteroids, this.#rings, this.#lasers, [this.#cockpit], this.#terrains, [this.#webGlManager.skyboxGameObject], this.#explosions].flat();
+		// cockpitScreen must be after cockpit
+		let gameObjectList = [this.#asteroids, this.#rings, this.#lasers, [this.#cockpit], [this.#cockpitScreen], this.#terrains, [this.#webGlManager.skyboxGameObject], this.#explosions].flat();
 		for (let gameObject of gameObjectList) {
 			if (gameObject.update) {
 				gameObject.update(this.#frameCount);

@@ -4,6 +4,7 @@ import {default as Cube} from "./source/gameObjects/cube.js"
 import {default as Spaceship} from "./source/gameObjects/spaceship.js"
 import {default as utils} from "./source/utils.js"
 import {
+	CockpitScreenShaderClass,
 	CockpitShaderClass,
 	DefaultShaderClass,
 	RingShaderClass,
@@ -15,6 +16,7 @@ import {default as Ring} from "./source/gameObjects/ring.js";
 import {default as Laser} from "./source/gameObjects/laser.js";
 import {default as Terrain} from "./source/gameObjects/terrain.js";
 import {default as Cockpit} from "./source/gameObjects/cockpit.js";
+import {default as CockpitScreen} from "./source/gameObjects/cockpitScreen.js";
 import {default as Skybox} from "./source/skybox.js";
 import Explosion from "./source/gameObjects/explosion.js"
 
@@ -25,6 +27,7 @@ async function setupGlObjects(glManager, gl, gameSettings) {
 			Cube,
 			Spaceship,
 			Cockpit,
+			CockpitScreen,
 			Asteroid,
 			Ring,
 			Laser,
@@ -55,7 +58,8 @@ async function setupGlShaders(glManager) {
 			DefaultShaderClass,
 			RingShaderClass,
 			TerrainShaderClass,
-			CockpitShaderClass
+			CockpitShaderClass,
+			CockpitScreenShaderClass
 		];
 
 	for (const shaderClass of info) {
@@ -128,6 +132,7 @@ async function init() {
 		cockpitSpeed: 80,
 		pointsPerSecond: 50,
 		damagePerSecond: 1,
+		cockpitScreenAnimationSpeed: 3,
 
 		// Asteroids
 		numberOfAsteroids: 20,

@@ -12,7 +12,6 @@ class Asteroid extends GameObject {
 	static #colliderRadius;
 	static #centerOfGravity;
 	#gameSettings;
-	_materialColor = [0.5, 0.5, 0.5];
 
 	speed = 1;
 	rotationSpeed = [1, 1, 1];

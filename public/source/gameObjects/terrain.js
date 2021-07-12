@@ -6,7 +6,6 @@ class Terrain extends GameObject {
 	static meshGenerator = Terrain.createMesh;
 	static textureFilename = "resources/terrain/terrain.png";
 	static shaderClass = new TerrainShaderClass();
-	_materialColor = [0.5, 0.5, 0.5];
 
 	#gameSettings;
 	rowNumber;
