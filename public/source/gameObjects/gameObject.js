@@ -105,18 +105,22 @@ class GameObject // should be an abstract class if js allows that
 
 
 	// Animations
-	async animation(callback, duration, start, end) {
+	async animation(callback, duration, start, end, abort) {
+		abort ??= () => false;
 		let cur = start;		
 		var startDuration = duration;
 		let [max, min] = [Math.max(start, end), Math.min(start, end)]
-		while(duration > 0) {			
+
+		let aborted;
+		while(!(aborted = abort()) && duration > 0) {			
 			callback(cur);
 			let deltaT = await this.#nextFrame;		
 			cur = (duration*start + (startDuration - duration)*end) / startDuration;
 			cur = MathUtils.clamp(cur, min, max);
 			duration -= deltaT;
 		}		
-		callback(end);
+		if(!aborted)
+			callback(end);
 	}
 
 

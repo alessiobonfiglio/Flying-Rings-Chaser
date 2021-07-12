@@ -27,7 +27,7 @@ let math_utils = {
 	},
 
 	normalize: function (v) {
-		return this.mul(1 / this.length(v), v);
+		return v == [0,0] ? [0,0] : this.mul(1 / this.length(v), v);
 	},
 
 	distance: function (v, w) {
@@ -60,7 +60,11 @@ let math_utils = {
 		  : num >= max 
 			? max 
 			: num
-	  }
+	  },
+
+	randomVersor() {
+		return this.normalize([Math.random(), 0, Math.random()]);
+	}
 }
 
 export default math_utils;

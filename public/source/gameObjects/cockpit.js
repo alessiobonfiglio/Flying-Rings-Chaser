@@ -3,13 +3,16 @@ import { CockpitShaderClass } from "../../shaders/shaderClasses.js";
 import { default as SphericalCollider } from "../colliders/sphericalCollider.js";
 import { default as MathUtils } from "../math_utils.js";
 import { default as GameEngine } from "../engine.js";
+import { default as Event } from "../utils/event.js"
 
-class Cockpit extends GameObject {
+class Cockpit extends GameObject {	
 	static objFilename = "resources/cockpit/cockpit_no_screen.obj";
 	static textureFilename = "resources/cockpit/Cockpit_Texture.png";
 	static shaderClass = new CockpitShaderClass();
 	static #colliderRadius;
 	static #centerOfGravity;
+
+	ringHit = new Event();
 
 	#gameSettings;
 	#health;
@@ -21,6 +24,8 @@ class Cockpit extends GameObject {
 	#lastLaser;
 	#canShoot = true;
 	#lastShootingFrame = 0;
+	#boostSpeed = 0;
+	#totBoosts = 0;
 
 	position;
 	scale = 2;
@@ -36,7 +41,7 @@ class Cockpit extends GameObject {
 	constructor(window, gameSettings, laserObjects) {
 		super();
 		this.collider = new SphericalCollider();
-		this.collider.radius = Cockpit.#colliderRadius;
+		this.collider.radius = Cockpit.#colliderRadius*=1.2;
 		this.#gameSettings = gameSettings;
 		this.#laserPool = laserObjects;
 
@@ -78,6 +83,8 @@ class Cockpit extends GameObject {
 	update(frameCount) {
 		super.update();
 
+		this.#gameSettings.cockpitSpeed = this.deltaSpeed + this.#boostSpeed;
+		console.log(this.#gameSettings.cockpitSpeed)
 		if (!GameEngine.isPlaying)
 			return;
 
@@ -133,6 +140,9 @@ class Cockpit extends GameObject {
 		// Add points
 		this.#points += this.#gameSettings.ringPoints;
 		this.#pointsDisplay.textContent = parseInt(this.#points).toString().padStart(8, "0");
+
+		this.ringHit.invoke(this);
+		this.#boost();
 	}
 
 	onAsteroidCollided(asteroid) {
@@ -177,6 +187,16 @@ class Cockpit extends GameObject {
 		this.#lastShootingFrame = frameCount;
 		this.#lastLaser++;
 		this.#lasers[this.#lastLaser].style.opacity = 1;
+	}
+
+	async #boost() {		
+		const animLength = 3;
+		this.#totBoosts++;
+		await this.animation(speed => this.#boostSpeed = Math.max(speed, this.#boostSpeed), animLength, this.#boostSpeed, this.#gameSettings.cockpitBoostSpeed);
+		this.#totBoosts--;
+
+		const anyBoost = () => this.#totBoosts > 0;
+		await this.animation(speed => this.#boostSpeed = speed, animLength, this.#boostSpeed, 0, anyBoost);		
 	}
 
 	#keyFunctionDown(cockpit) {

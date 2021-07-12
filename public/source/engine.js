@@ -190,6 +190,7 @@ class GameEngine {
 
 	#createCockpit() {
 		this.#cockpit = new Cockpit(this.#window, this.#gameSettings, this.#lasers);
+		this.#cockpit.ringHit.subscribe(_ => this.#webGlManager.camera.boost());
 		this.#cockpit.initialize();
 		this.#instantiate(this.#cockpit);
 	}

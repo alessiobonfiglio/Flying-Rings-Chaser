@@ -20,8 +20,8 @@ class Ring extends GameObject {
 		super();
 		this.orientation = [90,0,0];
 		this.collider = new CircleCollider();
-		this.collider.radius = Ring.#colliderRadius;
-		this.collider.thickness = 1;
+		this.collider.radius = Ring.#colliderRadius*1.5;
+		this.collider.thickness = 2;
 		this.collider.normal = [0, 0, 1];
 	}
 
@@ -65,12 +65,34 @@ class Ring extends GameObject {
 	
 	#moveForward(gameSettings) {
 		this.position[2] -= this.speed * gameSettings.deltaT;
-
+		
 		if (this.position[2] < 0) {
 			this.initialize(gameSettings);
 			return;
 		}
-		this.orientation[0] = (this.orientation[0] + 1) % 360;
+		this.#rotate();		
+	}
+	
+	#rotationDir;
+	#currentAngle = 0;
+	#rotationAngle = 25;
+	#rotate() {
+		const newDir = () => {
+			return MathUtils.normalize([Math.random() - 0.5, 0, Math.random() - 0.5]);
+		}
+
+		this.#rotationDir ??= newDir();		
+		if(this.#currentAngle >= 2*this.#rotationAngle){
+			this.#rotationDir = newDir();
+			this.#currentAngle = 0;
+		}		
+		else if(this.#currentAngle == this.#rotationAngle)
+		{
+			this.#rotationDir = MathUtils.mul(-1, this.#rotationDir)			
+		}		
+
+		this.orientation = MathUtils.sum(this.orientation, this.#rotationDir);
+		this.#currentAngle++;
 	}
 
 	bindCollider() {
@@ -85,7 +107,7 @@ class Ring extends GameObject {
 		this.#spaceShip = spaceship;
 		this.#collided = true;
 		let startScale = this.scale;
-		await this.#collapseRing(spaceship);	
+		// await this.#collapseRing(spaceship);	
 		this.scale = startScale;
 		this.#collided = false;
 		this.initialize(this.#gameSettings);	

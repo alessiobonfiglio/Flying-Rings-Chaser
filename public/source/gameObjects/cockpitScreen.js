@@ -46,9 +46,7 @@ class CockpitScreen extends GameObject {
 			du += 4 * delta;
 		} else if (this.#cockpit.right > 0 && this.#cockpit.left <= 0) {
 			du += 8 * delta;
-		}
-
-		console.log(du, dv);
+		}		
 
 		return utils.MakeTranslateMatrix2D(du, dv)
 	}
