@@ -1,6 +1,6 @@
 #version 300 es
 
-#define LIGHTS_NUM 5
+#define LIGHTS_NUM 10
 
 in vec3 inPosition;								// vertex coordinates (local space)
 in vec3 inNormal;								// normal coordinates (local space)
@@ -68,7 +68,7 @@ void main() {
 
 	// compute the direction ad distances of the various light sources
 	vec3 lightsDirection;
-	for(int i = 0; i < LIGHTS_NUM; i++) {
+	for (int i = 0; i < LIGHTS_NUM; i++) {
 		lightsDirection = lightsPositions[i] - fsPosition;
 		lxs[i] = normalize(lightsDirection);
 		lightsDistances[i] = lightsDirection.x*lightsDirection.x + lightsDirection.y*lightsDirection.y + lightsDirection.z*lightsDirection.z;

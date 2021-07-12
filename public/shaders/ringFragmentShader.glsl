@@ -1,7 +1,7 @@
 #version 300 es
 
 #define PI radians(180.0)
-#define LIGHTS_NUM 5
+#define LIGHTS_NUM 10
 
 precision mediump float;
 
@@ -17,6 +17,7 @@ uniform bool lxsEnabled[LIGHTS_NUM];	// if lights are enabled or not
 in float lightsDistances[LIGHTS_NUM];	// distance of the vertex from the light source (squared)
 
 const float maxLightDistance = 200.0;   // distance from that lights start to become weaker
+const float laserReduction = 0.4;		// reduction of the light intensity of the lasers
 
 const float u = 1.0;					// metalness of the ring
 const float alpha = 0.2;				// roughness of the ring
@@ -68,11 +69,11 @@ void main() {
 	nNormal = normalize(fsNormal);
 
 	// computer the PBR color wrt each light source
-	vec3 sum = vec3(0.0, 0.0, 0.0);
-	float lightDistanceCoefficient;
-	for(int i = 0; i < LIGHTS_NUM; i++) {
+	float lightDistanceCoefficient = clamp(maxLightDistance*maxLightDistance/lightsDistances[0], 0.0, 1.0);
+	vec3 sum = fr(lxs[0]) * float(lxsEnabled[0]) * lightDistanceCoefficient;
+	for (int i = 1; i < LIGHTS_NUM; i++) {
 		lightDistanceCoefficient = clamp(maxLightDistance*maxLightDistance/lightsDistances[i], 0.0, 1.0);
-		sum += fr(lxs[i]) * float(lxsEnabled[i]) * lightDistanceCoefficient;
+		sum += fr(lxs[i]) * float(lxsEnabled[i]) * lightDistanceCoefficient * laserReduction;
 	}
 
 	// sum all the colors and clamp them

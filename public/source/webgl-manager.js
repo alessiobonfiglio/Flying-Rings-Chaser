@@ -12,7 +12,7 @@ class WebGlManager {
 
 	#classToGLShaderProgramMap = new Map(); // maps shaderClass class -> GLShaderProgram
 
-	maxNumOfLights = 5;
+	maxNumOfLights = 10;
 	#lights;
 	#lightsEnabled;
 
