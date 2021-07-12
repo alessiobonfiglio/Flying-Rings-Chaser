@@ -32,6 +32,8 @@ class WebGlManager {
 	initialize() {
 		// Deep test
 		this.#gl.enable(this.#gl.DEPTH_TEST);
+		this.#gl.enable(this.#gl.CULL_FACE);
+		this.#gl.cullFace(this.#gl.BACK);
 	}
 
 	// Public Methods
