@@ -338,7 +338,7 @@ var utils = {
 
 	transposeMatrix3: function (a) {
 
-		out = [];
+		const out = [];
 
 		out[0] = a[0];
 		out[1] = a[3];
@@ -528,6 +528,16 @@ var utils = {
 		out[3] = dx;
 		out[7] = dy;
 		out[11] = dz;
+		return out;
+	},
+
+	MakeTranslateMatrix2D: function (dx, dy) {
+		// Create a transform matrix for a translation of ({dx}, {dy}).
+
+		const out = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+
+		out[2] = dx;
+		out[5] = dy;
 		return out;
 	},
 

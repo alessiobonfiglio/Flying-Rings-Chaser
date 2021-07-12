@@ -187,6 +187,11 @@ class WebGlManager {
 					this.#gl.uniform1i(glObject.shaderProgram.locations.textureUniformLocation, 0);
 				}
 
+				if(gameObject.uvTransformMatrix) {
+					const uvMatrix = gameObject.uvTransformMatrix();
+					this.#gl.uniformMatrix3fv(glObject.shaderProgram.locations.uvMatrixUniformLocation, this.#gl.FALSE, utils.transposeMatrix3(uvMatrix));
+				}
+
 				// GameObject Color
 				this.#gl.uniform3fv(glObject.shaderProgram.locations.materialDiffColorHandle, gameObject.materialColor);
 
@@ -293,6 +298,7 @@ class GLShaderProgram {
 		this.locations.positionUniformLocation = gl.getUniformLocation(this.program, "matrix");
 		this.locations.normalUniformLocation = gl.getUniformLocation(this.program, "nMatrix");
 		this.locations.inverseViewProjMatrixUniformLocation = gl.getUniformLocation(this.program, "inverseMVPMatrix");
+		this.locations.uvMatrixUniformLocation = gl.getUniformLocation(this.program, "uvMatrix");
 
 		this.locations.materialDiffColorHandle = gl.getUniformLocation(this.program, "mDiffColor");
 

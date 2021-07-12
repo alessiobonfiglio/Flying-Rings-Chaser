@@ -9,7 +9,6 @@ class Laser extends GameObject {
 	static shaderClass = new CockpitShaderClass();
 	static #colliderRadius;
 	static #centerOfGravity;
-	_materialColor = [0.5, 0.5, 0.5];
 
 	#gameSettings;
 

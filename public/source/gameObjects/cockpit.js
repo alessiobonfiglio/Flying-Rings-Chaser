@@ -7,7 +7,7 @@ import { default as Event } from "../utils/event.js"
 
 
 class Cockpit extends GameObject {
-	static objFilename = "resources/cockpit/Cockpit.obj";
+	static objFilename = "resources/cockpit/cockpit_no_screen.obj";
 	static textureFilename = "resources/cockpit/Cockpit_Texture.png";
 	static shaderClass = new CockpitShaderClass();
 	static #colliderRadius;
@@ -24,7 +24,6 @@ class Cockpit extends GameObject {
 	#canShoot = true;
 	#lastShootingFrame = 0;
 
-	_materialColor = [0.5, 0.5, 0.5];
 	position;
 	scale = 2;
 	orientation = [0, 180, 0];
@@ -54,6 +53,16 @@ class Cockpit extends GameObject {
 		window.addEventListener("keyup", this.#keyFunctionUp(this), false);
 	}
 
+	// Properties
+	get localCenterOfGravity() {
+		return Cockpit.#centerOfGravity;
+	}
+
+	static loadInfoFromObjModel(objModel) {
+		Cockpit.#centerOfGravity = GameObject._computeCenterOfGravity(objModel);
+		Cockpit.#colliderRadius = GameObject._computeRadius(objModel, Cockpit.#centerOfGravity);
+	}
+
 	initialize() {
 		// Reset cockpit
 		this.position = [0, 0, 0];
@@ -66,16 +75,6 @@ class Cockpit extends GameObject {
 		}
 		this.#lastLaser = this.#gameSettings.maxLasers - 1;
 		this.#canShoot = true;
-	}
-
-	// Properties
-	get localCenterOfGravity() {
-		return Cockpit.#centerOfGravity;
-	}
-
-	static loadInfoFromObjModel(objModel) {
-		Cockpit.#centerOfGravity = GameObject._computeCenterOfGravity(objModel);
-		Cockpit.#colliderRadius = GameObject._computeRadius(objModel, Cockpit.#centerOfGravity);
 	}
 
 	update(frameCount) {
@@ -184,7 +183,7 @@ class Cockpit extends GameObject {
 	}
 
 	#keyFunctionDown(cockpit) {
-		return function(e) {
+		return function (e) {
 			if (e.keyCode == 87) {	// W
 				cockpit.up = cockpit.deltaSpeed;
 			}
@@ -204,7 +203,7 @@ class Cockpit extends GameObject {
 	}
 
 	#keyFunctionUp(cockpit) {
-		return function(e) {
+		return function (e) {
 			if (e.keyCode == 87) {	// W
 				cockpit.up = 0;
 			}

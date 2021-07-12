@@ -9,7 +9,6 @@ class Spaceship extends GameObject {
 	static shaderClass = new DefaultShaderClass();
 	static #colliderRadius;
 	static #centerOfGravity;
-	_materialColor = [0.5, 0.5, 0.5];
 
 
 	// Initialization
