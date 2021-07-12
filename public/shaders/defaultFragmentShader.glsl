@@ -16,7 +16,7 @@ in float lightsDistances[LIGHTS_NUM];	// distance of the vertex from the light s
 uniform sampler2D objectTexture;		// texture object
 
 const float maxLightDistance = 200.0;   // distance from that lights start to become weaker
-const float laserReduction = 0.4;		// reduction of the light intensity of the lasers
+const float laserReduction = 0.3;		// reduction of the light intensity of the lasers
 
 void main() {
 	vec3 nNormal = normalize(fsNormal);

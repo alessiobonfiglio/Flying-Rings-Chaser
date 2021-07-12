@@ -17,7 +17,7 @@ uniform bool lxsEnabled[LIGHTS_NUM];	// if lights are enabled or not
 in float lightsDistances[LIGHTS_NUM];	// distance of the vertex from the light source (squared)
 
 const float maxLightDistance = 200.0;   // distance from that lights start to become weaker
-const float laserReduction = 0.4;		// reduction of the light intensity of the lasers
+const float laserReduction = 0.3;		// reduction of the light intensity of the lasers
 
 const float u = 1.0;					// metalness of the ring
 const float alpha = 0.2;				// roughness of the ring
