@@ -8,7 +8,8 @@ class Camera extends GameObject {
 	verticalAngle;
 	#cockpit;
 	#zPos = 0.65;
-	#boostDuration = 0.6;
+	#boostDuration = 0.4;
+	fov = 90;
 
 	constructor(position, horizontalAngle, verticalAngle) {
 		super();
@@ -31,11 +32,21 @@ class Camera extends GameObject {
 
 	async boost() {
 		console.log("hit")
-		let startZ = this.#zPos;
-		let endZ = 1.3*startZ;
-		await this.animation(z => this.#zPos = z, this.#boostDuration, startZ, endZ);
-		await this.delay(0.2);
-		await this.animation(z => this.#zPos = z, this.#boostDuration*2, endZ, startZ);
+		let [start, end] = [this.fov, 110];
+		let [startZ, endZ] = [this.#zPos, 0.7 * this.#zPos];
+		
+		await Promise.all([
+			this.animation(fov => this.fov = fov, this.#boostDuration, start, end),
+			this.animation(z => this.#zPos = z, this.#boostDuration, startZ, endZ)
+		]);
+
+		await this.delay(this.#boostDuration/2);
+
+		console.log("nice")
+		await Promise.all([
+			this.animation(fov => this.fov = fov, this.#boostDuration*2, end, start),
+			this.animation(z => this.#zPos = z, this.#boostDuration*2, endZ, startZ)
+		]);
 	}
 }
 

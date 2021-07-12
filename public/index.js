@@ -138,7 +138,7 @@ async function init() {
 		// Asteroids
 		numberOfAsteroids: 20,
 		asteroidScaleRange: [0.1, 0.1],
-		asteroidSpeedRange: [20, 40],
+		asteroidSpeedRange: [50, 70],
 		asteroidRotationSpeedRange: [0, 30],
 		asteroidPoints: 100,
 		asteroidDamage: 10,
@@ -148,7 +148,7 @@ async function init() {
 		numberOfRings: 15,
 		minRingDistance: 35,
 		ringScaleRange: [12, 12],
-		ringSpeedRange: [20, 20],
+		ringSpeedRange: [60, 60],
 		ringPoints: 1000,
 		ringRestoreHealth: 25,
 
@@ -163,7 +163,7 @@ async function init() {
 		terrainChunkResolution: 32,
 		halfNumberTerrainChunksColumns: 2,
 		numberTerrainChunksRows: 3,
-		terrainSpeed: 60,
+		terrainSpeed: 120,
 		terrainDamage: 5,
 		terrainPoints: 100,
 

@@ -73,7 +73,7 @@ class WebGlManager {
 		this.#gl.clearColor(0, 0, 0, 0);
 		this.#gl.clear(this.#gl.COLOR_BUFFER_BIT | this.#gl.DEPTH_BUFFER_BIT);
 
-		const perspectiveMatrix = utils.MakePerspective(90, this.#gl.canvas.width / this.#gl.canvas.height, 0.1, this.#gameSetting.maxZ);
+		const perspectiveMatrix = utils.MakePerspective(this.camera.fov, this.#gl.canvas.width / this.#gl.canvas.height, 0.01, this.#gameSetting.maxZ);
 		const viewMatrix = this.camera?.viewMatrix() ?? utils.MakeView(3.0, 3.0, 2.5, -45.0, -40.0); // default viewMatrix
 		const viewProjectionMatrix = utils.multiplyAllMatrices(perspectiveMatrix, viewMatrix)
 
