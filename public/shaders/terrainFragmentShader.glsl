@@ -19,23 +19,17 @@ const float maxLightDistance = 200.0;   // distance from that lights start to be
 
 void main() {
 
-	// compute the normal to the surface using the derivatves offered by WebGL
+	// compute the normal to the surface using the derivatives offered by WebGL
 	vec3 nNormal = normalize(cross(dFdx(fsPosition), dFdy(fsPosition)));
 
 	vec3 texColor = texture(objectTexture, fsTexCoords).xyz;
 
 	// compute the lambert diffuse of each light source
-	float lightDistanceCoefficient, diffuseIntensity;
-	lightDistanceCoefficient = clamp(maxLightDistance*maxLightDistance/lightsDistances[0], 0.0, 1.0);
-	diffuseIntensity = dot(lxs[0], nNormal) * float(lxsEnabled[0]) * lightDistanceCoefficient;
-	lightDistanceCoefficient = clamp(maxLightDistance*maxLightDistance/lightsDistances[1], 0.0, 1.0);
-	diffuseIntensity += dot(lxs[1], nNormal) * float(lxsEnabled[1]) * lightDistanceCoefficient;
-	lightDistanceCoefficient = clamp(maxLightDistance*maxLightDistance/lightsDistances[2], 0.0, 1.0);
-	diffuseIntensity += dot(lxs[2], nNormal) * float(lxsEnabled[2]) * lightDistanceCoefficient;
-	lightDistanceCoefficient = clamp(maxLightDistance*maxLightDistance/lightsDistances[3], 0.0, 1.0);
-	diffuseIntensity += dot(lxs[3], nNormal) * float(lxsEnabled[3]) * lightDistanceCoefficient;
-	lightDistanceCoefficient = clamp(maxLightDistance*maxLightDistance/lightsDistances[4], 0.0, 1.0);
-	diffuseIntensity += dot(lxs[4], nNormal) * float(lxsEnabled[4]) * lightDistanceCoefficient;
+	float lightDistanceCoefficient, diffuseIntensity = 0.0;
+	for(int i = 0; i < LIGHTS_NUM; i++) {
+		lightDistanceCoefficient = clamp(maxLightDistance*maxLightDistance/lightsDistances[i], 0.0, 1.0);
+		diffuseIntensity += dot(lxs[i], nNormal) * float(lxsEnabled[i]) * lightDistanceCoefficient;
+	}
 
 	// compute the lambert diffuse color
 	outColor = vec4(texColor * clamp(diffuseIntensity, 0.0, 1.0), 1.0);

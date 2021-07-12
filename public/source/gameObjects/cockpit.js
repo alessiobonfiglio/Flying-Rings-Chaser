@@ -106,14 +106,15 @@ class Cockpit extends GameObject {
 		this.#healthDisplay.style.width = this.#health.toString() + '%';
 
 		// Update lasers
-		if (frameCount > this.#lastShootingFrame + this.#gameSettings.laserCooldown * this.#gameSettings.fpsLimit) {
+		const framePerSecond = this.#gameSettings.fpsLimit / this.#gameSettings.gameSpeed;
+		if (frameCount > this.#lastShootingFrame + this.#gameSettings.laserCooldown * framePerSecond) {
 			this.#canShoot = true;
 		}
 
 		if (this.isShooting && this.#canShoot && this.#lastLaser >= 0) {
 			this.#shoot(frameCount);
 		} else if (this.#lastLaser < this.#gameSettings.maxLasers - 1 && 
-			frameCount > this.#lastShootingFrame + this.#gameSettings.laserReloadTime * this.#gameSettings.fpsLimit) {
+			frameCount > this.#lastShootingFrame + this.#gameSettings.laserReloadTime * framePerSecond) {
 			this.#reload(frameCount);
 		}
 	}

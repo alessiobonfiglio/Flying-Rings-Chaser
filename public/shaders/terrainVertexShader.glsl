@@ -18,7 +18,7 @@ uniform float zOffset;							// offset of the terrain in the z coordinate (world
 uniform mat4 matrix;							// WVP Matrix
 uniform mat4 nMatrix;							// world matrix for the normals (because we only use uniform scaling)
 
-const float textureMoltiplicationFactor = 32.0;	// how many times repeat the texture
+const float textureMultiplicationFactor = 32.0;	// how many times repeat the texture
 const float noiseFactor = 13.0;					// how much the noise varies the Y coordinate
 const float noiseResolution =  0.01;
 
@@ -64,23 +64,13 @@ void main() {
 	gl_Position = matrix * vec4(newPosition, 1.0);
 
 	// multiply the texture coordinates in order to repeat the texture
-	fsTexCoords = inTexCoords * textureMoltiplicationFactor;
+	fsTexCoords = inTexCoords * textureMultiplicationFactor;
 
 	// compute the direction ad distances of the various light sources
 	vec3 lightsDirection;
-	lightsDirection = lightsPositions[0] - fsPosition;
-	lxs[0] = normalize(lightsDirection);
-	lightsDistances[0] = lightsDirection.x*lightsDirection.x + lightsDirection.y*lightsDirection.y + lightsDirection.z*lightsDirection.z;
-	lightsDirection = lightsPositions[1] - fsPosition;
-	lxs[1] = normalize(lightsDirection);
-	lightsDistances[1] = lightsDirection.x*lightsDirection.x + lightsDirection.y*lightsDirection.y + lightsDirection.z*lightsDirection.z;
-	lightsDirection = lightsPositions[2] - fsPosition;
-	lxs[2] = normalize(lightsDirection);
-	lightsDistances[2] = lightsDirection.x*lightsDirection.x + lightsDirection.y*lightsDirection.y + lightsDirection.z*lightsDirection.z;
-	lightsDirection = lightsPositions[3] - fsPosition;
-	lxs[3] = normalize(lightsDirection);
-	lightsDistances[3] = lightsDirection.x*lightsDirection.x + lightsDirection.y*lightsDirection.y + lightsDirection.z*lightsDirection.z;
-	lightsDirection = lightsPositions[4] - fsPosition;
-	lxs[4] = normalize(lightsDirection);
-	lightsDistances[4] = lightsDirection.x*lightsDirection.x + lightsDirection.y*lightsDirection.y + lightsDirection.z*lightsDirection.z;
+	for(int i = 0; i < LIGHTS_NUM; i++) {
+		lightsDirection = lightsPositions[i] - fsPosition;
+		lxs[i] = normalize(lightsDirection);
+		lightsDistances[i] = lightsDirection.x*lightsDirection.x + lightsDirection.y*lightsDirection.y + lightsDirection.z*lightsDirection.z;
+	}
 }

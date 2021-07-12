@@ -68,18 +68,12 @@ void main() {
 	nNormal = normalize(fsNormal);
 
 	// computer the PBR color wrt each light source
-	vec3 sum;
+	vec3 sum = vec3(0.0, 0.0, 0.0);
 	float lightDistanceCoefficient;
-	lightDistanceCoefficient = clamp(maxLightDistance*maxLightDistance/lightsDistances[0], 0.0, 1.0);
-	sum = fr(lxs[0]) * float(lxsEnabled[0]) * lightDistanceCoefficient;
-	lightDistanceCoefficient = clamp(maxLightDistance*maxLightDistance/lightsDistances[1], 0.0, 1.0);
-	sum += fr(lxs[1]) * float(lxsEnabled[1]) * lightDistanceCoefficient;
-	lightDistanceCoefficient = clamp(maxLightDistance*maxLightDistance/lightsDistances[2], 0.0, 1.0);
-	sum += fr(lxs[2]) * float(lxsEnabled[2]) * lightDistanceCoefficient;
-	lightDistanceCoefficient = clamp(maxLightDistance*maxLightDistance/lightsDistances[3], 0.0, 1.0);
-	sum += fr(lxs[3]) * float(lxsEnabled[3]) * lightDistanceCoefficient;
-	lightDistanceCoefficient = clamp(maxLightDistance*maxLightDistance/lightsDistances[4], 0.0, 1.0);
-	sum += fr(lxs[4]) * float(lxsEnabled[4]) * lightDistanceCoefficient;
+	for(int i = 0; i < LIGHTS_NUM; i++) {
+		lightDistanceCoefficient = clamp(maxLightDistance*maxLightDistance/lightsDistances[i], 0.0, 1.0);
+		sum += fr(lxs[i]) * float(lxsEnabled[i]) * lightDistanceCoefficient;
+	}
 
 	// sum all the colors and clamp them
 	outColor = vec4(clamp(sum, 0.0, 1.0), 1.0);

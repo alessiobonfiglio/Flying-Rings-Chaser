@@ -1,5 +1,4 @@
 import {default as utils} from "./utils.js"
-import {default as Light} from "./light.js";
 import {SkyboxShaderClass} from "../shaders/shaderClasses.js";
 
 class WebGlManager {
@@ -13,7 +12,7 @@ class WebGlManager {
 
 	#classToGLShaderProgramMap = new Map(); // maps shaderClass class -> GLShaderProgram
 
-	#maxNumOfLights = 5;
+	maxNumOfLights = 5;
 	#lights;
 	#lightsEnabled;
 
@@ -25,13 +24,15 @@ class WebGlManager {
 		this.#gl = context;
 		this.#gameSetting = gameSetting;
 
-		this.#lights = Array(this.#maxNumOfLights).fill(new Light([0, 0, 0]));
-		this.#lightsEnabled = Array(this.#maxNumOfLights).fill(false);
+		this.#lights = Array(this.maxNumOfLights).fill([0, 0, 0]);
+		this.#lightsEnabled = Array(this.maxNumOfLights).fill(false);
 	}
 
 	initialize() {
 		// Deep test
 		this.#gl.enable(this.#gl.DEPTH_TEST);
+		this.#gl.enable(this.#gl.CULL_FACE);
+		this.#gl.cullFace(this.#gl.BACK);
 	}
 
 	// Public Methods
@@ -45,15 +46,15 @@ class WebGlManager {
 	}
 
 	setAndEnableLightPosition(index, position) {
-		if (index >= this.#maxNumOfLights) {
+		if (index >= this.maxNumOfLights) {
 			throw new Error();
 		}
-		this.#lights[index].position = position.slice();
+		this.#lights[index] = position;
 		this.#lightsEnabled[index] = true;
 	}
 
 	disableLight(index) {
-		if (index >= this.#maxNumOfLights) {
+		if (index >= this.maxNumOfLights) {
 			throw new Error();
 		}
 		this.#lightsEnabled[index] = false;
@@ -154,7 +155,7 @@ class WebGlManager {
 	}
 
 	#drawGameObjects(viewProjectionMatrix) {
-		const lightsArray = this.#lights.map((x) => x.position).flat();
+		const lightsArray = this.#lights.flat();
 
 		// setup transformation matrix from local coordinates to Clip coordinates
 		for (const [gameObject, glObject] of this.#instantiatedObjects.entries())

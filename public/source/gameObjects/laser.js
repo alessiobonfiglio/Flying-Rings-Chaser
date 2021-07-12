@@ -1,12 +1,12 @@
 import { default as GameObject } from "./gameObject.js";
-import { DefaultShaderClass } from "../../shaders/shaderClasses.js";
+import { CockpitShaderClass } from "../../shaders/shaderClasses.js";
 import { default as CircleCollider } from "../colliders/sphericalCollider.js";
 import { default as MathUtils } from "../math_utils.js";
 
 class Laser extends GameObject {
 	static objFilename = "resources/laser/laser.obj";
 	static textureFilename = "resources/laser/warp_blue.png";
-	static shaderClass = new DefaultShaderClass();
+	static shaderClass = new CockpitShaderClass();
 	static #colliderRadius;
 	static #centerOfGravity;
 	_materialColor = [0.5, 0.5, 0.5];
@@ -53,8 +53,10 @@ class Laser extends GameObject {
 
 	#moveForward(gameSettings) {
 		this.position[2] += this.speed * gameSettings.deltaT;
-		if (this.position[2] > gameSettings.maxZ)
-			this.isVisible = false;
+		// Make it go beyond gameSettings.maxZ because of the light it irradiates
+		if (this.position[2] > gameSettings.maxZ * 1.5)
+			this.position[2] += this.speed * gameSettings.deltaT;
+		this.isVisible = false;
 	}
 
 	shoot(cockpitPosition) {

@@ -33,19 +33,9 @@ void main() {
 
 	// compute the lights directions and light distances
 	vec3 lightsDirection;
-	lightsDirection = lightsPositions[0] - position;
-	lxs[0] = normalize(lightsDirection);
-	lightsDistances[0] = lightsDirection.x*lightsDirection.x + lightsDirection.y*lightsDirection.y + lightsDirection.z*lightsDirection.z;
-	lightsDirection = lightsPositions[1] - position;
-	lxs[1] = normalize(lightsDirection);
-	lightsDistances[1] = lightsDirection.x*lightsDirection.x + lightsDirection.y*lightsDirection.y + lightsDirection.z*lightsDirection.z;
-	lightsDirection = lightsPositions[2] - position;
-	lxs[2] = normalize(lightsDirection);
-	lightsDistances[2] = lightsDirection.x*lightsDirection.x + lightsDirection.y*lightsDirection.y + lightsDirection.z*lightsDirection.z;
-	lightsDirection = lightsPositions[3] - position;
-	lxs[3] = normalize(lightsDirection);
-	lightsDistances[3] = lightsDirection.x*lightsDirection.x + lightsDirection.y*lightsDirection.y + lightsDirection.z*lightsDirection.z;
-	lightsDirection = lightsPositions[4] - position;
-	lxs[4] = normalize(lightsDirection);
-	lightsDistances[4] = lightsDirection.x*lightsDirection.x + lightsDirection.y*lightsDirection.y + lightsDirection.z*lightsDirection.z;
+	for(int i = 0; i < LIGHTS_NUM; i++) {
+		lightsDirection = lightsPositions[i] - position;
+		lxs[i] = normalize(lightsDirection);
+		lightsDistances[i] = lightsDirection.x*lightsDirection.x + lightsDirection.y*lightsDirection.y + lightsDirection.z*lightsDirection.z;
+	}
 }
