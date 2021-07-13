@@ -16,7 +16,13 @@ in float lightsDistances[LIGHTS_NUM];	// distance of the vertex from the light s
 uniform sampler2D objectTexture;		// texture object
 
 const float maxLightDistance = 130.0;   // distance from that lights start to become weaker
-const float laserReduction = 0.5;		// reduction of the light intensity of the lasers
+const float laserReduction = 0.2;		// reduction of the light intensity of the lasers
+
+
+vec3 clamp3(vec3 v) {
+	return vec3(clamp(v[0], 0.0, 1.0), clamp(v[1], 0.0, 1.0), clamp(v[2], 0.0, 1.0));
+}
+
 
 void main() {
 
@@ -27,12 +33,16 @@ void main() {
 
 	// compute the lambert diffuse of each light source
 	float lightDistanceCoefficient = clamp(maxLightDistance*maxLightDistance/lightsDistances[0], 0.0, 1.0);
-	float diffuseIntensity = dot(lxs[0], nNormal) * float(lxsEnabled[0]) * lightDistanceCoefficient;
+	vec3 diffuseComponent = dot(lxs[0], nNormal) * float(lxsEnabled[0]) * lightDistanceCoefficient * vec3(1.0, 1.0, 1.0);
 	for (int i = 1; i < LIGHTS_NUM; i++) {
 		lightDistanceCoefficient = clamp(maxLightDistance*maxLightDistance/lightsDistances[i], 0.0, 1.0);
-		diffuseIntensity += dot(lxs[i], nNormal) * float(lxsEnabled[i]) * lightDistanceCoefficient * laserReduction;
+		diffuseComponent += dot(lxs[i], nNormal) * float(lxsEnabled[i]) * lightDistanceCoefficient * laserReduction * vec3(0,  0.0,1.0);
 	}
 
-	// compute the lambert diffuse color
-	outColor = vec4(texColor * clamp(diffuseIntensity, 0.0, 1.0), 1.0);
+	vec3 color = vec3(texColor[0] * diffuseComponent[0], texColor[1] * diffuseComponent[1], texColor[2] * diffuseComponent[2]);
+	color = clamp3(color);
+	// compute the lambert diffuse color	
+	outColor = vec4(color , 1.0);
 }
+
+

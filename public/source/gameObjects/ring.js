@@ -2,6 +2,7 @@ import { default as GameObject } from "./gameObject.js"
 import { RingShaderClass } from "../../shaders/shaderClasses.js";
 import { default as CircleCollider } from "../colliders/circleCollider.js"
 import { default as MathUtils } from "../math_utils.js"
+import Animations from "../utils/animations.js";
 
 class Ring extends GameObject {
 	static objFilename = "resources/ring/ring_smooth.obj";
@@ -44,12 +45,6 @@ class Ring extends GameObject {
 		Ring.#colliderRadius = GameObject._computeRadius(objModel, Ring.#centerOfGravity);
 	}
 
-	bindCollider() {
-		super.bindCollider();
-		console.log(this.collider.center)
-		// this.collider.center = MathUtils.sum(this.center, [0,200, 2000]);
-	}
-
 	// Properties
 	get localCenterOfGravity() {
 		return Ring.#centerOfGravity;
@@ -61,10 +56,7 @@ class Ring extends GameObject {
 		if(!this.#collided)
 			this.#moveForward(this.#gameSettings);
 		else {
-			var newCenter = this.center;
-			newCenter[0] = this.#spaceShip.center[0];
-			newCenter[1] = this.#spaceShip.center[1];	
-			this.center = newCenter;		
+			this.center = MathUtils.sum(this.#spaceShip.center, [0,0, 4]);
 		}
 	}
 	
@@ -122,7 +114,7 @@ class Ring extends GameObject {
 		
 		let animationDuration = 0.5; //s
 		let scaleAnimation = this.scaleTo(0, animationDuration);
-		let rotationAnimation = this.animation3(orientation => this.orientation = orientation, animationDuration, this.orientation, [90,0,0]);
+		let rotationAnimation = Animations.lerp3(orientation => this.orientation = orientation, animationDuration, this.orientation, [90,0,0]);
 		await Promise.all([scaleAnimation, rotationAnimation]);
 	}
 }
