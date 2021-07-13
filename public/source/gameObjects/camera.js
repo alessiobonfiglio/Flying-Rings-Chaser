@@ -15,7 +15,6 @@ class Camera extends GameObject {
 	#startFov = 90;
 	#boostDuration = 1.2;
 	fov;
-	#totBosts = 0;
 	#animationCancellationToken = new CancellationToken();
 
 	constructor(position, horizontalAngle, verticalAngle) {
@@ -39,30 +38,26 @@ class Camera extends GameObject {
 		this.position = MathUtils.sum(this.#cockpit.position, [0, -0.125, -this.#zPos]);
 	}
 
-	i=0;
-	async boost() {
-		// Aborting prebious animation if any
+	async boost(speedUpTime, maintainingTime, slowDownTime) {
+		// Aborting previous animation if any
 		this.#animationCancellationToken.abort();
 		const cancellationToken = new CancellationToken();
 		this.#animationCancellationToken = cancellationToken;
 
 		let [end, endZ] = [110, this.#startZPos*0.8];
-		
-		this.#totBosts++;				
-		const totBoost = this.#totBosts;
+
 		const cancelCondition = () => cancellationToken.isAborted;
 		await Promise.all([
-			Animations.lerp(fov => this.fov = fov, this.#boostDuration/5, this.fov, end, cancelCondition),
-			Animations.lerp(z => this.#zPos = z, this.#boostDuration/5, this.#zPos, endZ, cancelCondition)
+			Animations.lerp(fov => this.fov = fov, speedUpTime, this.fov, end, cancelCondition),
+			Animations.lerp(z => this.#zPos = z, speedUpTime, this.#zPos, endZ, cancelCondition)
 		]);
 
-		await Animations.delay(this.#boostDuration);
+		await Animations.delay(maintainingTime);
 
 		await Promise.all([
-			Animations.lerp(fov => this.fov = fov, this.#boostDuration/4, this.fov, this.#startFov, cancelCondition),
-			Animations.lerp(z => this.#zPos = z, this.#boostDuration/4, this.#zPos, this.#startZPos, cancelCondition)
+			Animations.lerp(fov => this.fov = fov, slowDownTime, this.fov, this.#startFov, cancelCondition),
+			Animations.lerp(z => this.#zPos = z, slowDownTime, this.#zPos, this.#startZPos, cancelCondition)
 		]);
-		this.#totBosts--
 	}
 }
 

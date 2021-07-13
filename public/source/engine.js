@@ -8,7 +8,6 @@ import {default as Terrain} from "./gameObjects/terrain.js";
 import {default as Explosion} from "./gameObjects/explosion.js";
 import {default as Cockpit} from "./gameObjects/cockpit.js";
 import {default as TerrainCollider} from "./gameObjects/terrainCollider.js";
-import {default as GameObject} from "./gameObjects/gameObject.js"
 import {default as Skybox} from "./skybox.js";
 import {default as CockpitScreen} from "./gameObjects/cockpitScreen.js";
 import Square from "./gameObjects/square.js";
@@ -35,8 +34,10 @@ class GameEngine {
 	#asteroids = [];
 	#rings = [];
 	#lasers = [];
-	#terrainCollider;	
-	#explosions = []
+	#terrainCollider;
+	#explosions = [];
+
+	#boostFactor = 1.0;
 
 	constructor(webGlManager, window, gameSettings) {
 		this.#webGlManager = webGlManager;
@@ -161,6 +162,7 @@ class GameEngine {
 
 	// this is done in order to limit the framerate to 'fpsLimit'
 	#nextFramePromiseResolve = () => ({});
+
 	frameLoop() {
 		this.#window.requestAnimationFrame(this.#wrapperCallback);
 
@@ -183,22 +185,34 @@ class GameEngine {
 			this.#then = now - (delta % this.#frameInterval);
 
 			this.#frameCount++;
-			this.#gameLoop();	
+			this.#gameLoop();
 			this.#NextFramePromiseHandler();
 		}
 	}
 
 
-
-	// 
+	//
 	// GameObjects' creation
 	//
 
 	#createCockpit() {
 		this.#cockpit = new Cockpit(this.#window, this.#gameSettings, this.#lasers);
-		this.#cockpit.ringHit.subscribe(_ => this.#webGlManager.camera.boost());
+
+		const speedUpTime = this.#gameSettings.boostDuration / 5.0;
+		const maintainingTime = this.#gameSettings.boostDuration;
+		const slowDownTime = this.#gameSettings.boostDuration / 4.0;
+		const totBoostTime = speedUpTime + maintainingTime + slowDownTime;
+		this.#cockpit.ringHit.subscribe(_ => this.#webGlManager.camera.boost(speedUpTime, maintainingTime, slowDownTime));
+		this.#cockpit.ringHit.subscribe(_ => this.activateSpeedBoost(totBoostTime));
+
 		this.#cockpit.initialize();
 		this.#instantiate(this.#cockpit);
+	}
+
+	async activateSpeedBoost(time) {
+		this.#boostFactor = this.#gameSettings.boostFactor;
+		await Animations.delay(time);
+		this.#boostFactor = 1.0;
 	}
 
 	createAsteroids() {
@@ -274,7 +288,7 @@ class GameEngine {
 		let gameObjectList = [this.#asteroids, this.#rings, this.#lasers, [this.#cockpit], [this.#cockpitScreen], this.#terrains, [this.#webGlManager.skyboxGameObject], this.#explosions].flat();
 		for (let gameObject of gameObjectList) {
 			if (gameObject.update) {
-				gameObject.update(this.#frameCount);
+				gameObject.update(this.#frameCount, this.#boostFactor);
 			}
 		}
 		this.#webGlManager.camera.update();
@@ -295,15 +309,15 @@ class GameEngine {
 
 	#instantiateAsteroid(asteroid) {
 		this.#instantiate(asteroid);
-		asteroid.destroyed.subscribe(ast => this.#removeItem(this.#asteroids, ast));		
+		asteroid.destroyed.subscribe(ast => this.#removeItem(this.#asteroids, ast));
 		asteroid.death.subscribe(ast => this.#createExplosion(ast));
 		return asteroid;
 	}
 
 	#createExplosion(asteroid) {
 		let explosion = new Explosion(this.#gameSettings);
-		explosion.velocity = [0,0, -asteroid.speed];
-		explosion.center = asteroid.center;		
+		explosion.velocity = [0, 0, -asteroid.speed];
+		explosion.center = asteroid.center;
 		explosion.destroyed.subscribe(exp => this.#removeItem(this.#explosions, exp))
 		this.#explosions.push(explosion);
 		this.#instantiate(explosion);
@@ -318,7 +332,7 @@ class GameEngine {
 	}
 
 
-	#updateLights(){
+	#updateLights() {
 		this.#webGlManager.setAndEnableLightPosition(0, this.#cockpit.position);
 		for (let i = 0; i < this.#lasers.length; i++) {
 			if (this.#lasers[i].isVisible) {
