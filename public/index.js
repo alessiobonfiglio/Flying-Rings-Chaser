@@ -11,7 +11,9 @@ import {
 	SkyboxShaderClass,
 	TerrainShaderClass
 } from "./shaders/shaderClasses.js";
-import {default as Asteroid} from "./source/gameObjects/asteroid.js";
+import {default as BrownAsteroid} from "./source/gameObjects/brownAsteroid.js";
+import {default as GreyAsteroid} from "./source/gameObjects/greyAsteroid.js";
+import {default as MetalAsteroid} from "./source/gameObjects/metalAsteroid.js";
 import {default as Ring} from "./source/gameObjects/ring.js";
 import {default as Laser} from "./source/gameObjects/laser.js";
 import {default as Terrain} from "./source/gameObjects/terrain.js";
@@ -28,7 +30,9 @@ async function setupGlObjects(glManager, gl, gameSettings) {
 			Spaceship,
 			Cockpit,
 			CockpitScreen,
-			Asteroid,
+			BrownAsteroid,
+			GreyAsteroid,
+			MetalAsteroid,
 			Ring,
 			Laser,
 			Terrain,

@@ -1,13 +1,12 @@
-import {default as GameObject} from "./gameObject.js";
-import {DefaultShaderClass} from "../../shaders/shaderClasses.js";
-import {default as MathUtils} from "../math_utils.js";
+import { default as GameObject } from "./gameObject.js";
+import { DefaultShaderClass } from "../../shaders/shaderClasses.js";
+import { default as MathUtils } from "../math_utils.js";
 import { default as SphericalCollider } from "../colliders/sphericalCollider.js";
-import { default as Event } from "../utils/event.js"
+import { default as Event } from "../utils/event.js";
 
+// Abstract class, must be extended with object file and texture
 class Asteroid extends GameObject {
 	death = new Event();
-	static objFilename = "resources/asteroids/brown_asteroid_n.obj";
-	static textureFilename = "resources/asteroids/brown.png";
 	static shaderClass = new DefaultShaderClass();
 	static #colliderRadius;
 	static #centerOfGravity;

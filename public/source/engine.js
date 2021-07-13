@@ -1,5 +1,7 @@
 import {default as Camera} from "./gameObjects/camera.js";
-import {default as Asteroid} from "./gameObjects/asteroid.js";
+import {default as BrownAsteroid} from "./gameObjects/brownAsteroid.js";
+import {default as GreyAsteroid} from "./gameObjects/greyAsteroid.js";
+import {default as MetalAsteroid} from "./gameObjects/metalAsteroid.js";
 import {default as Ring} from "./gameObjects/ring.js";
 import {default as Laser} from "./gameObjects/laser.js";
 import {default as Terrain} from "./gameObjects/terrain.js";
@@ -154,7 +156,7 @@ class GameEngine {
 	}
 
 	// this is done in order to limit the framerate to 'fpsLimit'
-	#nextFramePromiseResolve = () => {}
+	#nextFramePromiseResolve = () => ({});
 	frameLoop() {
 		this.#window.requestAnimationFrame(this.#wrapperCallback);
 
@@ -197,11 +199,22 @@ class GameEngine {
 
 	createAsteroids() {
 		for (let i = 0; i < this.#gameSettings.numberOfAsteroids; i++) {
-			const ast = new Asteroid();
+			const ast = this.#getAsteroid(i);
 			ast.initialize(this.#gameSettings);
 
 			this.#instantiateAsteroid(ast);
 			this.#asteroids.push(ast);
+		}
+	}
+
+	#getAsteroid(index) {
+		switch (index % 3) {
+			case 0:
+				return new BrownAsteroid();
+			case 1:
+				return new GreyAsteroid();
+			default:
+				return new MetalAsteroid();
 		}
 	}
 
@@ -329,6 +342,5 @@ class GameEngine {
 	}
 
 }
-
 
 export default GameEngine;
