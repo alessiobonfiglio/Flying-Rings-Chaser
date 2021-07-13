@@ -3,14 +3,13 @@ import {TerrainShaderClass} from "../../shaders/shaderClasses.js";
 
 
 class Terrain extends GameObject {
-	static meshGenerator = Terrain.createMesh;
 	static textureFilename = "resources/terrain/terrain.png";
 	static shaderClass = new TerrainShaderClass();
 
 	#gameSettings;
 	rowNumber;
 
-	static createMesh(gameSettings) {
+	static meshGenerator(gameSettings) {
 		const res = gameSettings.terrainChunkResolution;
 		const maxXZ = gameSettings.terrainChunkSize;
 

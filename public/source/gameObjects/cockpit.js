@@ -84,7 +84,7 @@ class Cockpit extends GameObject {
 		super.update();
 
 		this.#gameSettings.cockpitSpeed = this.deltaSpeed + this.#boostSpeed;
-		console.log(this.#gameSettings.cockpitSpeed)
+		// console.log(this.#gameSettings.cockpitSpeed)
 		if (!GameEngine.isPlaying)
 			return;
 

@@ -21,6 +21,7 @@ import {default as Cockpit} from "./source/gameObjects/cockpit.js";
 import {default as CockpitScreen} from "./source/gameObjects/cockpitScreen.js";
 import {default as Skybox} from "./source/skybox.js";
 import Explosion from "./source/gameObjects/explosion.js"
+import Square from "./source/gameObjects/square.js"
 
 
 async function setupGlObjects(glManager, gl, gameSettings) {
@@ -36,7 +37,8 @@ async function setupGlObjects(glManager, gl, gameSettings) {
 			Ring,
 			Laser,
 			Terrain,
-			Explosion
+			Explosion,
+			Square
 		];
 
 	for (const objClass of classes) {
@@ -150,8 +152,8 @@ async function init() {
 
 		// Rings
 		numberOfRings: 15,
-		minRingDistance: 35,
-		ringScaleRange: [12, 12],
+		minRingDistance: 60,
+		ringScaleRange: [30, 30],
 		ringSpeedRange: [60, 60],
 		ringPoints: 1000,
 		ringRestoreHealth: 25,

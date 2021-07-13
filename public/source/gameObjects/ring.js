@@ -9,7 +9,7 @@ class Ring extends GameObject {
 	static shaderClass = new RingShaderClass();
 	static lastRing;
 	static #colliderRadius;
-	static #centerOfGravity;
+	static #centerOfGravity;	
 	#gameSettings;
 	_materialColor = [1, 215 / 255, 0];
 	#collided = false;
@@ -21,8 +21,8 @@ class Ring extends GameObject {
 		this.orientation = [90,0,0];
 		this.collider = new CircleCollider();
 		this.collider.radius = Ring.#colliderRadius*1.5;
-		this.collider.thickness = 2;
-		this.collider.normal = [0, 0, 1];
+		this.collider.thickness = 5;
+		this.collider.normal = [0, 0, 1];		
 	}
 
 	// Initialization
@@ -44,6 +44,12 @@ class Ring extends GameObject {
 		Ring.#colliderRadius = GameObject._computeRadius(objModel, Ring.#centerOfGravity);
 	}
 
+	bindCollider() {
+		super.bindCollider();
+		console.log(this.collider.center)
+		this.collider.center = MathUtils.sum(this.center, [0,200, 2000]);
+	}
+
 	// Properties
 	get localCenterOfGravity() {
 		return Ring.#centerOfGravity;
@@ -51,7 +57,7 @@ class Ring extends GameObject {
 
 	// events
 	update() {
-		super.update();
+		super.update();		
 		if(!this.#collided)
 			this.#moveForward(this.#gameSettings);
 		else {

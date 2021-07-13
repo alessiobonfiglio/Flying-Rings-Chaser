@@ -11,6 +11,7 @@ import {default as TerrainCollider} from "./gameObjects/terrainCollider.js";
 import {default as GameObject} from "./gameObjects/gameObject.js"
 import {default as Skybox} from "./skybox.js";
 import {default as CockpitScreen} from "./gameObjects/cockpitScreen.js";
+import Square from "./gameObjects/square.js";
 
 class GameEngine {
 	static isPlaying = false;
@@ -56,6 +57,8 @@ class GameEngine {
 		this.#createLasers();
 		this.#createTerrainChunks();
 		this.#createCockpit();
+		this.#instantiate(new Square());
+
 		this.#cockpitScreen = new CockpitScreen(this.#gameSettings, this.#cockpit);
 		this.#terrainCollider = this.#instantiateTerrainCollider();
 		this.#instantiate(this.#cockpitScreen);
