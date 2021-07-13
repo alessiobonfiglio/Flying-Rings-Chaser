@@ -3,7 +3,7 @@ import MathUtils from "../math_utils.js";
 class Animations {
     static nextFramePromise;
 
-    static get #nextFrame() {
+    static get nextFrame() {
 		return Animations.nextFramePromise ?? Promise.resolve(0);
 	}
 
@@ -17,7 +17,7 @@ class Animations {
 		let aborted = shouldAbort();
 		while(!aborted && duration > 0) {			
 			callback(cur);
-			let deltaT = await this.#nextFrame;		
+			let deltaT = await this.nextFrame;		
 			cur = (duration*start + (startDuration - duration)*end) / startDuration;
 			cur = MathUtils.clamp(cur, min, max);
 			duration -= deltaT;
@@ -28,12 +28,12 @@ class Animations {
 	}
 
 
-	static async lerp3(callback, duration, start, end) {
+	static async lerp3(callback, duration, start, end) {        
 		let cur = start;		
 		var startDuration = duration;		
 		while(duration > 0) {			
 			callback(cur);
-			let deltaT = await this.#nextFrame;		
+			let deltaT = await this.nextFrame;		
 
 			cur = MathUtils.mul(1/startDuration, MathUtils.sum(MathUtils.mul(duration, start), MathUtils.mul(startDuration - duration, end)));			
 			duration -= deltaT;
@@ -44,7 +44,7 @@ class Animations {
     
 	static async delay(duration){
 		await new Promise((resolve, _) => setTimeout(() => resolve(), duration * 1000));
-		await this.#nextFrame;
+		await this.nextFrame;
 	}
 }
 
