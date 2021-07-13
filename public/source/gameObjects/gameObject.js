@@ -102,6 +102,9 @@ class GameObject // should be an abstract class if js allows that
 		return Animations.lerp(scale => this.scale = scale, duration, this.scale, value);
 	} 
 
+	async rotateTo(rotation, duration = 0.2) {
+		return Animations.lerp3(rot => this.orientation = rot, duration, this.orientation, rotation);
+	}
 }
 
 export default GameObject;

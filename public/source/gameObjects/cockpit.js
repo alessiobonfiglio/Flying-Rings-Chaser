@@ -13,6 +13,7 @@ class Cockpit extends GameObject {
 	static #centerOfGravity;
 
 	ringHit = new Event();
+	asteroidHit = new Event();
 
 	#gameSettings;
 	#health;
@@ -149,7 +150,7 @@ class Cockpit extends GameObject {
 		this.#points -= this.#gameSettings.asteroidPoints;
 		this.#points = Math.max(0, this.#points);
 		this.#pointsDisplay.textContent = parseInt(this.#points).toString().padStart(8, "0");
-
+		this.asteroidHit.invoke(this);
 	}
 
 	onGroundCollided() {

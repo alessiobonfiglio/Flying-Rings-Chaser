@@ -206,6 +206,7 @@ class GameEngine {
 		const totBoostTime = speedUpTime + maintainingTime + slowDownTime;
 		this.#cockpit.ringHit.subscribe(_ => this.#webGlManager.camera.boost(speedUpTime, maintainingTime, slowDownTime));
 		this.#cockpit.ringHit.subscribe(_ => this.activateSpeedBoost(totBoostTime));
+		this.#cockpit.asteroidHit.subscribe(_ => this.#webGlManager.camera.tilt());
 
 		this.#cockpit.initialize();
 		this.#instantiate(this.#cockpit);

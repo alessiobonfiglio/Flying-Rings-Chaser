@@ -59,6 +59,39 @@ class Camera extends GameObject {
 			Animations.lerp(z => this.#zPos = z, slowDownTime, this.#zPos, this.#startZPos, cancelCondition)
 		]);
 	}
+
+
+	async tilt() {
+		const startAngle = this.verticalAngle;
+		const deltaRotation = 3;
+		const animationLength = 0.1;
+
+		const fovAnimation = async () =>  {
+			this.#animationCancellationToken.abort();
+			const cancellationToken = new CancellationToken();
+			this.#animationCancellationToken = cancellationToken;
+
+			const cancelCondition = () => cancellationToken.isAborted;
+			const [end, endZ] = [85, this.#startZPos * 1.1];
+			await Promise.all([
+				Animations.lerp(fov => this.fov = fov, 3*animationLength, this.fov, end, cancelCondition),
+				Animations.lerp(z => this.#zPos = z, 3*animationLength, this.#zPos, endZ, cancelCondition)
+			]);
+			
+			await Promise.all([
+				Animations.lerp(fov => this.fov = fov, 1*animationLength, this.fov, this.#startFov, cancelCondition),
+				Animations.lerp(z => this.#zPos = z, 1*animationLength, this.#zPos, this.#startZPos, cancelCondition)
+			]);
+		}
+
+		const tiltAnimation = async () => {
+			await Animations.lerp(angle => this.verticalAngle = angle, animationLength, this.verticalAngle, startAngle + deltaRotation);
+			await Animations.lerp(angle => this.verticalAngle = angle, 2* animationLength, this.verticalAngle, startAngle - deltaRotation);
+			await Animations.lerp(angle => this.verticalAngle = angle, animationLength, this.verticalAngle, startAngle);		
+		}
+
+		await Promise.all([fovAnimation(), tiltAnimation()]);
+	}
 }
 
 export default Camera;
