@@ -45,7 +45,7 @@ class Camera extends GameObject {
 		const cancellationToken = new CancellationToken();
 		this.#animationCancellationToken = cancellationToken;
 
-		let [end, endZ] = [110, this.#startZPos*0.8];		
+		let [end, endZ] = [110, this.#startZPos*0.9];		
 		
 		this.#totBosts++;				
 		const totBoost = this.#totBosts;

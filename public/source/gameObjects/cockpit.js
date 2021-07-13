@@ -41,7 +41,7 @@ class Cockpit extends GameObject {
 	constructor(window, gameSettings, laserObjects) {
 		super();
 		this.collider = new SphericalCollider();
-		this.collider.radius = Cockpit.#colliderRadius*=1.2;
+		this.collider.radius = Cockpit.#colliderRadius;
 		this.#gameSettings = gameSettings;
 		this.#laserPool = laserObjects;
 
@@ -63,7 +63,7 @@ class Cockpit extends GameObject {
 
 	static loadInfoFromObjModel(objModel) {
 		Cockpit.#centerOfGravity = GameObject._computeCenterOfGravity(objModel);
-		Cockpit.#colliderRadius = 1.5*GameObject._computeRadius(objModel, Cockpit.#centerOfGravity);
+		Cockpit.#colliderRadius = GameObject._computeRadius(objModel, Cockpit.#centerOfGravity);
 	}
 
 	initialize() {

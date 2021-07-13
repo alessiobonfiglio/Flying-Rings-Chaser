@@ -20,9 +20,9 @@ class Ring extends GameObject {
 		super();
 		this.orientation = [90,0,0];
 		this.collider = new CircleCollider();
-		this.collider.radius = Ring.#colliderRadius*1.5;
+		this.collider.radius = Ring.#colliderRadius;
 		this.collider.thickness = 5;
-		this.collider.normal = [0, 0, 1];		
+		this.collider.normal = [1, 0, 0];		
 	}
 
 	// Initialization
@@ -47,7 +47,7 @@ class Ring extends GameObject {
 	bindCollider() {
 		super.bindCollider();
 		console.log(this.collider.center)
-		this.collider.center = MathUtils.sum(this.center, [0,200, 2000]);
+		// this.collider.center = MathUtils.sum(this.center, [0,200, 2000]);
 	}
 
 	// Properties
