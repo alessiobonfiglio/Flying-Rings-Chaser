@@ -17,8 +17,7 @@ class SphericalCollider extends Collider {
         // Fast check (sufficient condition). far colliders
         if (MathUtils.distance(this.center, circleCollider.center) > this.scaledRadius + circleCollider.scaledRadius)
             return false;
-        
-        console.log(circleCollider.currentNormal);
+                
 
         // close colliders
         let Cc = circleCollider.center;

@@ -49,7 +49,6 @@ class Camera extends GameObject {
 		
 		this.#totBosts++;				
 		const totBoost = this.#totBosts;
-		console.log("in ", totBoost)	
 		const cancelCondition = () => cancellationToken.isAborted;
 		await Promise.all([
 			this.animation(fov => this.fov = fov, this.#boostDuration/5, this.fov, end, cancelCondition),
@@ -58,13 +57,11 @@ class Camera extends GameObject {
 
 		await this.delay(this.#boostDuration);
 
-		console.log("nice")
 		await Promise.all([
 			this.animation(fov => this.fov = fov, this.#boostDuration/3, this.fov, this.#startFov, cancelCondition),
 			this.animation(z => this.#zPos = z, this.#boostDuration/3, this.#zPos, this.#startZPos, cancelCondition)
 		]);
 		this.#totBosts--
-		console.log("out ", totBoost, "canceled: ", cancelCondition())
 	}
 }
 

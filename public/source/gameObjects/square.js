@@ -21,8 +21,7 @@ class Square extends GameObject{
             1,0,
             1,1
         ];
-        const ind = [0,1,2, 2,3,0];
-        console.log("OKkk")
+        const ind = [0,1,2, 2,3,0];        
         return {indices: ind, vertices: vert, textures: uv}
     }
 }
