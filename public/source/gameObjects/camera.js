@@ -84,7 +84,7 @@ class Camera extends GameObject {
 
 		const tiltAnimation = async () => {
 			const startAngle = this.verticalAngle;
-			const deltaRotation = MathUtils.getRandomInRange(-4, 4);
+			const deltaRotation = 2+ MathUtils.getRandomInRange(-2, 2);
 
 			await Animations.lerp(angle => this.verticalAngle = angle, animationLength, this.verticalAngle, startAngle + deltaRotation);
 			await Animations.lerp(angle => this.verticalAngle = angle, 2* animationLength, this.verticalAngle, startAngle - deltaRotation);
