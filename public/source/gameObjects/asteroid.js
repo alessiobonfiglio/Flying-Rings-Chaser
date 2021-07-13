@@ -38,7 +38,7 @@ class Asteroid extends GameObject {
 		const rz = MathUtils.getRandomInRange(0, 360);
 		this.orientation = [rx, ry, rz];
 
-		this.scale = MathUtils.getRandomInRange(gameSettings.asteroidScaleRange[0], gameSettings.asteroidScaleRange[1]);
+		this.scale = 7;
 		this.speed = MathUtils.getRandomInRange(gameSettings.asteroidSpeedRange[0], gameSettings.asteroidSpeedRange[1]);
 
 		const rsx = MathUtils.getRandomInRange(gameSettings.asteroidRotationSpeedRange[0], gameSettings.asteroidRotationSpeedRange[1]);

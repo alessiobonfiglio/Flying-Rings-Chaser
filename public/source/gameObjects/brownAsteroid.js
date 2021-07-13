@@ -1,7 +1,7 @@
 import {default as Asteroid} from "./asteroid.js";
 
 class BrownAsteroid extends Asteroid {
-	static objFilename = "resources/asteroids/brown_asteroid_n.obj";
+	static objFilename = "resources/sphere/sphere.obj";
 	static textureFilename = "resources/asteroids/brown.png";
 }
 
