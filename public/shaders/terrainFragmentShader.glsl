@@ -39,7 +39,7 @@ void main() {
 		diffuseComponent += dot(lxs[i], nNormal) * float(lxsEnabled[i]) * lightDistanceCoefficient * laserReduction * vec3(0,  0.0,1.0);
 	}
 
-	vec3 color = vec3(texColor[0] * diffuseComponent[0], texColor[1] * diffuseComponent[1], texColor[2] * diffuseComponent[2]);
+	vec3 color = texColor * diffuseComponent;
 	color = clamp3(color);
 	// compute the lambert diffuse color	
 	outColor = vec4(color , 1.0);
