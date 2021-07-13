@@ -63,7 +63,7 @@ class Cockpit extends GameObject {
 
 	static loadInfoFromObjModel(objModel) {
 		Cockpit.#centerOfGravity = GameObject._computeCenterOfGravity(objModel);
-		Cockpit.#colliderRadius = GameObject._computeRadius(objModel, Cockpit.#centerOfGravity);
+		Cockpit.#colliderRadius = 1.5*GameObject._computeRadius(objModel, Cockpit.#centerOfGravity);
 	}
 
 	initialize() {

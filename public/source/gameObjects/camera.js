@@ -1,21 +1,27 @@
 import {default as utils} from "/source/utils.js"
 import { default as MathUtils } from "../math_utils.js"
 import GameObject from "./gameObject.js";
+import CancellationToken from "../utils/cancellationToken.js";
+
 
 class Camera extends GameObject {
 	position = [0, 0, 0];
 	horizontalAngle;
 	verticalAngle;
 	#cockpit;
-	#zPos = 0.65;
-	#boostDuration = 0.4;
+	#zPos;
+	#startZPos = 0.65;
+	#boostDuration = 0.6;
 	fov = 90;
+	#totBosts = 0;
+	#animationCancellationToken = new CancellationToken();
 
 	constructor(position, horizontalAngle, verticalAngle) {
 		super();
 		this.position = position;
 		this.horizontalAngle = horizontalAngle;
-		this.verticalAngle = verticalAngle;
+		this.verticalAngle = verticalAngle;		
+		this.#zPos = this.#startZPos;
 	}
 
 	initialize(cockpit) {
@@ -31,22 +37,29 @@ class Camera extends GameObject {
 	}
 
 	async boost() {
-		console.log("hit")
+		// Aborting prebious animation if any
+		this.#animationCancellationToken.abort();
+		const cancellationToken = new CancellationToken();
+		this.#animationCancellationToken = cancellationToken;
+
 		let [start, end] = [this.fov, 110];
 		let [startZ, endZ] = [this.#zPos, 0.7 * this.#zPos];
 		
+		this.#totBosts++;				
+		const cancelCondition = () => cancellationToken.isAborted;
 		await Promise.all([
-			this.animation(fov => this.fov = fov, this.#boostDuration, start, end),
-			this.animation(z => this.#zPos = z, this.#boostDuration, startZ, endZ)
+			this.animation(fov => this.fov = fov, this.#boostDuration, start, end, cancelCondition),
+			this.animation(z => this.#zPos = z, this.#boostDuration, startZ, endZ, cancelCondition)
 		]);
 
 		await this.delay(this.#boostDuration/2);
 
 		console.log("nice")
 		await Promise.all([
-			this.animation(fov => this.fov = fov, this.#boostDuration*2, end, start),
-			this.animation(z => this.#zPos = z, this.#boostDuration*2, endZ, startZ)
+			this.animation(fov => this.fov = fov, this.#boostDuration*3, end, start, cancelCondition),
+			this.animation(z => this.#zPos = z, this.#boostDuration*3, endZ, this.#startZPos, cancelCondition)
 		]);
+		this.#totBosts--
 	}
 }
 
