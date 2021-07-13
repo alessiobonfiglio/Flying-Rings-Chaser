@@ -58,7 +58,6 @@ class Ring extends GameObject {
 			var newCenter = this.center;
 			newCenter[0] = this.#spaceShip.center[0];
 			newCenter[1] = this.#spaceShip.center[1];	
-			// newCenter[2] = spaceship.center[3];
 			this.center = newCenter;		
 		}
 	}
@@ -117,8 +116,8 @@ class Ring extends GameObject {
 		
 		let animationDuration = 0.5; //s
 		let scaleAnimation = this.scaleTo(0, animationDuration);
-		let rotationAnimaiton = this.animation3(orientation => this.orientation = orientation, animationDuration, this.orientation, [90,0,0]);
-		await Promise.all([scaleAnimation, rotationAnimaiton]);
+		let rotationAnimation = this.animation3(orientation => this.orientation = orientation, animationDuration, this.orientation, [90,0,0]);
+		await Promise.all([scaleAnimation, rotationAnimation]);
 	}
 }
 

@@ -35,7 +35,7 @@ class SphericalCollider extends Collider {
         // if they intersect, then one of the following point is an intersection:
         // {x, Cc + rv, Cc - rv}     
 
-        const checkInside = x => this.isInside(x) && circleCollider.isInside(x);
+        const checkInside = p => this.isInside(p) && circleCollider.isInside(p);
         if (checkInside(x))
             return true;
         var v = MathUtils.normalize(MathUtils.sub(Cc, x));

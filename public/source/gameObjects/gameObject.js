@@ -111,13 +111,14 @@ class GameObject // should be an abstract class if js allows that
 		var startDuration = duration;
 		let [max, min] = [Math.max(start, end), Math.min(start, end)]
 
-		let aborted;
-		while(!(aborted = abort()) && duration > 0) {			
+		let aborted = abort();
+		while(!aborted && duration > 0) {			
 			callback(cur);
 			let deltaT = await this.#nextFrame;		
 			cur = (duration*start + (startDuration - duration)*end) / startDuration;
 			cur = MathUtils.clamp(cur, min, max);
 			duration -= deltaT;
+			aborted = abort();
 		}		
 		if(!aborted)
 			callback(end);
@@ -131,7 +132,6 @@ class GameObject // should be an abstract class if js allows that
 			callback(cur);
 			let deltaT = await this.#nextFrame;		
 
-			// cur = (duration*start + (startDuration - duration)*end) / startDuration;
 			cur = MathUtils.mul(1/startDuration, MathUtils.sum(MathUtils.mul(duration, start), MathUtils.mul(startDuration - duration, end)));			
 			duration -= deltaT;
 		}		

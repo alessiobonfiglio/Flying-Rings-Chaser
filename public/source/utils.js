@@ -248,7 +248,7 @@ var utils = {
 
 
 //*** Interaction UTILS	
-	initInteraction: function () {
+	initInteraction: function (cx, cy, cz, angle, elevation) {
 		var keyFunction = function (e) {
 
 			if (e.keyCode == 37) {	// Left arrow
@@ -310,7 +310,7 @@ var utils = {
 
 	// returns the 3x3 submatrix from a Matrix4x4
 	sub3x3from4x4: function (m) {
-		out = [];
+		let out = [];
 		out[0] = m[0];
 		out[1] = m[1];
 		out[2] = m[2];
@@ -326,7 +326,7 @@ var utils = {
 	// Multiply the mat3 with a vec3.
 	multiplyMatrix3Vector3: function (m, a) {
 
-		out = [];
+		let out = [];
 		var x = a[0], y = a[1], z = a[2];
 		out[0] = x * m[0] + y * m[1] + z * m[2];
 		out[1] = x * m[3] + y * m[4] + z * m[5];
@@ -355,7 +355,7 @@ var utils = {
 	},
 
 	invertMatrix3: function (m) {
-		out = [];
+		let out = [];
 
 		var a00 = m[0], a01 = m[1], a02 = m[2],
 			a10 = m[3], a11 = m[4], a12 = m[5],
@@ -641,7 +641,7 @@ var utils = {
 		return out;
 	},
 
-	MakeWorldNonUnif: function (tx, ty, tz, rx, ry, rz, sx, sy, sz) {
+	MakeWorldNonUnif: function ([tx, ty, tz], [rx, ry, rz], [sx, sy, sz]) {
 		//Creates a world matrix for an object.
 
 		var Rx = this.MakeRotateXMatrix(rx);
@@ -650,7 +650,7 @@ var utils = {
 		var S = this.MakeScaleNuMatrix(sx, sy, sz);
 		var T = this.MakeTranslateMatrix(tx, ty, tz);
 
-		out = this.multiplyMatrices(Rz, S);
+		let out = this.multiplyMatrices(Rz, S);
 		out = this.multiplyMatrices(Ry, out);
 		out = this.multiplyMatrices(Rx, out);
 		out = this.multiplyMatrices(T, out);

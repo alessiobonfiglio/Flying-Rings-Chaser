@@ -1,6 +1,5 @@
 import { default as GameObject } from "./gameObject.js";
 import { DefaultShaderClass } from "../../shaders/shaderClasses.js";
-import { default as CircleCollider } from "../colliders/sphericalCollider.js";
 import { default as MathUtils } from "../math_utils.js";
 
 class Explosion extends GameObject {

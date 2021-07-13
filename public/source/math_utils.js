@@ -55,12 +55,8 @@ let math_utils = {
 	},
 	
 	clamp(num, min, max) {
-		return num <= min 
-		  ? min 
-		  : num >= max 
-			? max 
-			: num
-	  },
+		return Math.min(Math.max(num, min), max);
+	},
 
 	randomVersor() {
 		return this.normalize([Math.random(), 0, Math.random()]);
