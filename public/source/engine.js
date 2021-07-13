@@ -297,9 +297,9 @@ class GameEngine {
 
 	#updateGameObjects() {
 		// cockpitScreen must be after cockpit
-		let gameObjectList = [this.#asteroids, this.#backgroundAsteroids, this.#rings, this.#lasers,
+		const gameObjectList = [this.#asteroids, this.#backgroundAsteroids, this.#rings, this.#lasers,
 			[this.#cockpit], [this.#cockpitScreen], this.#terrains, [this.#webGlManager.skyboxGameObject], this.#explosions].flat();
-		for (let gameObject of gameObjectList) {
+		for (const gameObject of gameObjectList) {
 			if (gameObject.update) {
 				gameObject.update(this.#frameCount, this.#boostFactor);
 			}
@@ -331,7 +331,7 @@ class GameEngine {
 	}
 
 	#createExplosion(asteroid) {
-		let explosion = new Explosion(this.#gameSettings);
+		const explosion = new Explosion(this.#gameSettings);
 		explosion.velocity = [0, 0, -asteroid.speed];
 		explosion.center = asteroid.center;
 		explosion.destroyed.subscribe(exp => this.#removeItem(this.#explosions, exp))

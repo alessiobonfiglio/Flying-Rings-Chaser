@@ -15,11 +15,6 @@ class SemispaceCollider extends Collider {
         return this._currentOrientation(this.normal);
     }
 
-
-    get currentNormal() {
-       return this._currentOrientation(this.normal);
-    }
-
     intersectWithSphere(sphericalCollider) {
         const Pc = this.center;        
         const n = this.currentNormal;

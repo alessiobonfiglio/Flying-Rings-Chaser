@@ -29,15 +29,15 @@ class CircleCollider extends Collider{
 
     isInside(point) {
         // check if is too far from the plane that contains the circle
-        let deltaPos = MathUtils.sub(point, this.center);
-        let dot = MathUtils.dot(deltaPos, this.currentNormal);        
+        const deltaPos = MathUtils.sub(point, this.center);
+        const dot = MathUtils.dot(deltaPos, this.currentNormal);
 
         if (dot > this.thickness || dot < -this.currentThickness)
             return false;
 
         // check if is inside the circle
-        let newCenter = MathUtils.sum(this.center, MathUtils.mul(dot, this.currentNormal));
-        var distance = MathUtils.distance(newCenter, point);
+        const newCenter = MathUtils.sum(this.center, MathUtils.mul(dot, this.currentNormal));
+        const distance = MathUtils.distance(newCenter, point);
         return distance <= this.scaledRadius;
     }           
 }

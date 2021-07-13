@@ -184,19 +184,19 @@ class Cockpit extends GameObject {
 
 	#keyFunctionDown(cockpit) {
 		return function (e) {
-			if (e.keyCode == 87) {	// W
+			if (e.keyCode === 87) {	// W
 				cockpit.up = cockpit.deltaSpeed;
 			}
-			if (e.keyCode == 83) {	// S
+			if (e.keyCode === 83) {	// S
 				cockpit.down = cockpit.deltaSpeed;
 			}
-			if (e.keyCode == 65) {	// A
+			if (e.keyCode === 65) {	// A
 				cockpit.left = cockpit.deltaSpeed;
 			}
-			if (e.keyCode == 68) {	// D
+			if (e.keyCode === 68) {	// D
 				cockpit.right = cockpit.deltaSpeed;
 			}
-			if (e.keyCode == 32) {	// Space
+			if (e.keyCode === 32) {	// Space
 				cockpit.isShooting = true;
 			}
 		}
@@ -204,19 +204,19 @@ class Cockpit extends GameObject {
 
 	#keyFunctionUp(cockpit) {
 		return function (e) {
-			if (e.keyCode == 87) {	// W
+			if (e.keyCode === 87) {	// W
 				cockpit.up = 0;
 			}
-			if (e.keyCode == 83) {	// S
+			if (e.keyCode === 83) {	// S
 				cockpit.down = 0;
 			}
-			if (e.keyCode == 65) {	// A
+			if (e.keyCode === 65) {	// A
 				cockpit.left = 0;
 			}
-			if (e.keyCode == 68) {	// D
+			if (e.keyCode === 68) {	// D
 				cockpit.right = 0;
 			}
-			if (e.keyCode == 32) {	// Space
+			if (e.keyCode === 32) {	// Space
 				cockpit.isShooting = false;
 			}
 		}

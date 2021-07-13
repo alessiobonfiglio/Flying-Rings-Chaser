@@ -44,7 +44,7 @@ class Explosion extends GameObject {
 
     // Public
     async explode() {
-		let startScale = this.scale;	
+		const startScale = this.scale;
 		this.scale = 0;	
         this.isVisible = true;        
 		await this.scaleTo(startScale);

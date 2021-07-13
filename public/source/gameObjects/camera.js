@@ -1,4 +1,4 @@
-import {default as utils} from "/source/utils.js"
+import {default as utils} from "../utils.js"
 import { default as MathUtils } from "../math_utils.js"
 import GameObject from "./gameObject.js";
 import CancellationToken from "../utils/cancellationToken.js";
@@ -13,7 +13,7 @@ class Camera extends GameObject {
 	#zPos;
 	#startZPos = 0.65;
 	#startFov = 90;
-	#boostDuration = 1.2;
+
 	fov;
 	#animationCancellationToken = new CancellationToken();
 
@@ -44,7 +44,7 @@ class Camera extends GameObject {
 		const cancellationToken = new CancellationToken();
 		this.#animationCancellationToken = cancellationToken;
 
-		let [end, endZ] = [110, this.#startZPos*0.8];
+		const [end, endZ] = [110, this.#startZPos * 0.8];
 
 		const cancelCondition = () => cancellationToken.isAborted;
 		await Promise.all([

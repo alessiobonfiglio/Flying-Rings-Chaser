@@ -59,7 +59,7 @@ class GameObject // should be an abstract class if js allows that
 	static _computeRadius(objModel, center) {
 		let radius = 0;
 		for (const v of this.#verticesFromObj(objModel.vertices)) {
-			let distance = MathUtils.distance(v, center);
+			const distance = MathUtils.distance(v, center);
 			if (distance > radius)
 				radius = distance;
 		}

@@ -2,6 +2,7 @@ import {default as GameObject} from "./gameObject.js"
 import {RingShaderClass} from "../../shaders/shaderClasses.js";
 import {default as CircleCollider} from "../colliders/circleCollider.js"
 import {default as MathUtils} from "../math_utils.js"
+import {default as Animations} from "../utils/animations.js"
 
 class Ring extends GameObject {
 	static objFilename = "resources/ring/ring_smooth.obj";
@@ -85,7 +86,7 @@ class Ring extends GameObject {
 		if (this.#currentAngle >= 2 * this.#rotationAngle) {
 			this.#rotationDir = newDir();
 			this.#currentAngle = 0;
-		} else if (this.#currentAngle == this.#rotationAngle) {
+		} else if (this.#currentAngle === this.#rotationAngle) {
 			this.#rotationDir = MathUtils.mul(-1, this.#rotationDir)
 		}
 
@@ -104,8 +105,8 @@ class Ring extends GameObject {
 
 		this.#spaceShip = spaceship;
 		this.#collided = true;
-		let startScale = this.scale;
-		// await this.#collapseRing(spaceship);	
+		const startScale = this.scale;
+		// await this.#collapseRing(spaceship);
 		this.scale = startScale;
 		this.#collided = false;
 		this.initialize(this.#gameSettings);
@@ -113,9 +114,9 @@ class Ring extends GameObject {
 
 	async #collapseRing(spaceship) {
 
-		let animationDuration = 0.5; //s
-		let scaleAnimation = this.scaleTo(0, animationDuration);
-		let rotationAnimation = Animations.lerp3(orientation => this.orientation = orientation, animationDuration, this.orientation, [90,0,0]);
+		const animationDuration = 0.5; //s
+		const scaleAnimation = this.scaleTo(0, animationDuration);
+		const rotationAnimation = Animations.lerp3(orientation => this.orientation = orientation, animationDuration, this.orientation, [90,0,0]);
 		await Promise.all([scaleAnimation, rotationAnimation]);
 	}
 }

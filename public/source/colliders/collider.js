@@ -9,8 +9,8 @@ class Collider {
 
     // Protected
     _currentOrientation(v) {
-        let R = utils.MakeRotateXYZMatrix(this.orientation[0], this.orientation[1], this.orientation[2]);
-        return MathUtils.multiplyMatrixVector(R, v);
+		const R = utils.MakeRotateXYZMatrix(this.orientation[0], this.orientation[1], this.orientation[2]);
+		return MathUtils.multiplyMatrixVector(R, v);
     }
 }
 

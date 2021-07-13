@@ -1,6 +1,6 @@
 import {default as utils} from "./utils.js"
 
-let math_utils = {
+const math_utils = {
 
 	getRandomInRange: function (min, max) {
 		return Math.random() * (max - min) + min;
@@ -47,10 +47,10 @@ let math_utils = {
 	},
 
 	multiplyMatrixVector: function (m, v) {
-		var hasThreeComponents = (v[4] == undefined);
+		const hasThreeComponents = (v[4] == undefined);
 		if (hasThreeComponents)
 			v = [v[0], v[1], v[2], 1];
-		let ret = utils.multiplyMatrixVector(m, v);
+		const ret = utils.multiplyMatrixVector(m, v);
 		return hasThreeComponents ? ret.slice(0, 3) : ret;
 	},
 	

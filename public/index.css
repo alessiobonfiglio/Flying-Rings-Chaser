@@ -5,7 +5,6 @@ body {
 	background: black;
 	display: flex;
 	padding: 0;
-	margin: 0;
 }
 
 canvas {

@@ -3,21 +3,21 @@
 //Includes texture operations
 //Includes initInteraction() function
 
-var utils = {
+const utils = {
 
 	createAndCompileShaders: function (gl, shaderText) {
 
-		var vertexShader = utils.createShader(gl, gl.VERTEX_SHADER, shaderText[0]);
-		var fragmentShader = utils.createShader(gl, gl.FRAGMENT_SHADER, shaderText[1]);
+		const vertexShader = utils.createShader(gl, gl.VERTEX_SHADER, shaderText[0]);
+		const fragmentShader = utils.createShader(gl, gl.FRAGMENT_SHADER, shaderText[1]);
 
 		return utils.createProgram(gl, vertexShader, fragmentShader);
 	},
 
 	createShader: function (gl, type, source) {
-		var shader = gl.createShader(type);
+		const shader = gl.createShader(type);
 		gl.shaderSource(shader, source);
 		gl.compileShader(shader);
-		var success = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
+		const success = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
 		if (!success) {
 			console.log(gl.getShaderInfoLog(shader));
 			if (type == gl.VERTEX_SHADER)
@@ -31,11 +31,11 @@ var utils = {
 	},
 
 	createProgram: function (gl, vertexShader, fragmentShader) {
-		var program = gl.createProgram();
+		const program = gl.createProgram();
 		gl.attachShader(program, vertexShader);
 		gl.attachShader(program, fragmentShader);
 		gl.linkProgram(program);
-		var success = gl.getProgramParameter(program, gl.LINK_STATUS);
+		const success = gl.getProgramParameter(program, gl.LINK_STATUS);
 		if (!success) {
 			gl.deleteProgram(program);
 			throw Error("Program filed to link:" + gl.getProgramInfoLog(program));
@@ -57,7 +57,7 @@ var utils = {
 //**** MODEL UTILS
 	// Function to load a 3D model in JSON format
 	get_json: function (url, func) {
-		var xmlHttp = new XMLHttpRequest();
+		const xmlHttp = new XMLHttpRequest();
 		xmlHttp.open("GET", url, false); // if true == asynchronous...
 		xmlHttp.onreadystatechange = function () {
 			if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
@@ -69,7 +69,7 @@ var utils = {
 		xmlHttp.send();
 	},
 	get_objstr: async function (url) {
-		var response = await fetch(url);
+		const response = await fetch(url);
 		if (!response.ok) {
 			alert('Network response was not ok');
 			return;
@@ -77,9 +77,9 @@ var utils = {
 		return response.text();
 	},
 
-	//function to convert decimal value of colors 
+	//function to convert decimal value of colors
 	decimalToHex: function (d, padding) {
-		var hex = Number(d).toString(16);
+		let hex = Number(d).toString(16);
 		padding = typeof (padding) === "undefined" || padding === null ? 2 : padding;
 
 		while (hex.length < padding) {
@@ -90,7 +90,7 @@ var utils = {
 	},
 
 
-//*** SHADERS UTILS	
+//*** SHADERS UTILS
 	/*Function to load a shader's code, compile it and return the handle to it
 	Requires:
 		path to the shader's text (url)
@@ -106,7 +106,7 @@ var utils = {
 
 	loadFile: function (url, data, callback, errorCallback) {
 		// Set up an synchronous request! Important!
-		var request = new XMLHttpRequest();
+		const request = new XMLHttpRequest();
 		request.open('GET', url, false);
 
 		// Hook the event that gets called as the request progresses
@@ -130,9 +130,9 @@ var utils = {
 	},
 
 	loadFiles: function (urls, callback, errorCallback) {
-		var numUrls = urls.length;
-		var numComplete = 0;
-		var result = [];
+		const numUrls = urls.length;
+		let numComplete = 0;
+		const result = [];
 
 		// Callback for a single file
 		function partialCallback(text, urlIndex) {
@@ -145,7 +145,7 @@ var utils = {
 			}
 		}
 
-		for (var i = 0; i < numUrls; i++) {
+		for (let i = 0; i < numUrls; i++) {
 			this.loadFile(urls[i], i, partialCallback, errorCallback);
 		}
 	},
@@ -154,13 +154,13 @@ var utils = {
 
 	getTexture: function (context, image_URL) {
 
-		var image = new Image();
+		const image = new Image();
 		image.webglTexture = false;
 		image.isLoaded = false;
 
 		image.onload = function (e) {
 
-			var texture = context.createTexture();
+			const texture = context.createTexture();
 
 			context.bindTexture(context.TEXTURE_2D, texture);
 
@@ -240,16 +240,16 @@ var utils = {
 
 	nextHighestPowerOfTwo: function (x) {
 		--x;
-		for (var i = 1; i < 32; i <<= 1) {
+		for (let i = 1; i < 32; i <<= 1) {
 			x = x | x >> i;
 		}
 		return x + 1;
 	},
 
 
-//*** Interaction UTILS	
+//*** Interaction UTILS
 	initInteraction: function (cx, cy, cz, angle, elevation) {
-		var keyFunction = function (e) {
+		const keyFunction = function (e) {
 
 			if (e.keyCode == 37) {	// Left arrow
 				cx -= delta;
@@ -283,7 +283,7 @@ var utils = {
 				elevation -= delta * 10.0;
 			}
 
-		}
+		};
 		//'window' is a JavaScript object (if "canvas", it will not work)
 		window.addEventListener("keyup", keyFunction, false);
 	},
@@ -310,7 +310,7 @@ var utils = {
 
 	// returns the 3x3 submatrix from a Matrix4x4
 	sub3x3from4x4: function (m) {
-		let out = [];
+		const out = [];
 		out[0] = m[0];
 		out[1] = m[1];
 		out[2] = m[2];
@@ -326,8 +326,8 @@ var utils = {
 	// Multiply the mat3 with a vec3.
 	multiplyMatrix3Vector3: function (m, a) {
 
-		let out = [];
-		var x = a[0], y = a[1], z = a[2];
+		const out = [];
+		const x = a[0], y = a[1], z = a[2];
 		out[0] = x * m[0] + y * m[1] + z * m[2];
 		out[1] = x * m[3] + y * m[4] + z * m[5];
 		out[2] = x * m[6] + y * m[7] + z * m[8];
@@ -355,17 +355,16 @@ var utils = {
 	},
 
 	invertMatrix3: function (m) {
-		let out = [];
+		const out = [];
 
-		var a00 = m[0], a01 = m[1], a02 = m[2],
+		const a00 = m[0], a01 = m[1], a02 = m[2],
 			a10 = m[3], a11 = m[4], a12 = m[5],
 			a20 = m[6], a21 = m[7], a22 = m[8],
 
 			b01 = a22 * a11 - a12 * a21,
 			b11 = -a22 * a10 + a12 * a20,
-			b21 = a21 * a10 - a11 * a20,
-
-			// Calculate the determinant
+			b21 = a21 * a10 - a11 * a20;
+		let // Calculate the determinant
 			det = a00 * b01 + a01 * b11 + a02 * b21;
 
 		if (!det) {
@@ -389,9 +388,9 @@ var utils = {
 	//requires as a parameter a 4x4 matrix (array of 16 values)
 	invertMatrix: function (m) {
 
-		var out = [];
-		var inv = [];
-		var det, i;
+		const out = [];
+		const inv = [];
+		let det, i;
 
 		inv[0] = m[5] * m[10] * m[15] - m[5] * m[11] * m[14] - m[9] * m[6] * m[15] +
 			m[9] * m[7] * m[14] + m[13] * m[6] * m[11] - m[13] * m[7] * m[10];
@@ -456,9 +455,9 @@ var utils = {
 	},
 
 	transposeMatrix: function (m) {
-		var out = [];
+		const out = [];
 
-		var row, column, row_offset;
+		let row, column, row_offset;
 
 		for (row = 0; row < 4; ++row) {
 			row_offset = row * 4;
@@ -471,9 +470,9 @@ var utils = {
 
 	multiplyMatrices: function (m1, m2) {
 		// Perform matrix product  { out = m1 * m2;}
-		var out = [];
+		const out = [];
 
-		var row, column, row_offset;
+		let row, column, row_offset;
 
 		for (row = 0; row < 4; ++row) {
 			row_offset = row * 4;
@@ -489,8 +488,8 @@ var utils = {
 	},
 
 	multiplyAllMatrices: function (...matrices) {
-		var product = matrices[0];
-		for (var i = 1; i < matrices.length; i++)
+		let product = matrices[0];
+		for (let i = 1; i < matrices.length; i++)
 			product = this.multiplyMatrices(product, matrices[i]);
 		return product;
 	},
@@ -498,9 +497,9 @@ var utils = {
 	multiplyMatrixVector: function (m, v) {
 		/* Mutiplies a matrix [m] by a vector [v] */
 
-		var out = [];
+		const out = [];
 
-		var row, row_offset;
+		let row, row_offset;
 
 		row_offset = 0;
 		for (row = 0; row < 4; ++row) {
@@ -523,7 +522,7 @@ var utils = {
 	MakeTranslateMatrix: function (dx, dy, dz) {
 		// Create a transform matrix for a translation of ({dx}, {dy}, {dz}).
 
-		var out = this.identityMatrix();
+		const out = this.identityMatrix();
 
 		out[3] = dx;
 		out[7] = dy;
@@ -545,11 +544,11 @@ var utils = {
 	MakeRotateXMatrix: function (a) {
 		// Create a transform matrix for a rotation of {a} along the X axis.
 
-		var out = this.identityMatrix();
+		const out = this.identityMatrix();
 
-		var adeg = this.degToRad(a);
-		var c = Math.cos(adeg);
-		var s = Math.sin(adeg);
+		const adeg = this.degToRad(a);
+		const c = Math.cos(adeg);
+		const s = Math.sin(adeg);
 
 		out[5] = out[10] = c;
 		out[6] = -s;
@@ -561,12 +560,12 @@ var utils = {
 	MakeRotateYMatrix: function (a) {
 		// Create a transform matrix for a rotation of {a} along the Y axis.
 
-		var out = this.identityMatrix();
+		const out = this.identityMatrix();
 
-		var adeg = this.degToRad(a);
+		const adeg = this.degToRad(a);
 
-		var c = Math.cos(adeg);
-		var s = Math.sin(adeg);
+		const c = Math.cos(adeg);
+		const s = Math.sin(adeg);
 
 		out[0] = out[10] = c;
 		out[2] = -s;
@@ -578,11 +577,11 @@ var utils = {
 	MakeRotateZMatrix: function (a) {
 		// Create a transform matrix for a rotation of {a} along the Z axis.
 
-		var out = this.identityMatrix();
+		const out = this.identityMatrix();
 
-		var adeg = this.degToRad(a);
-		var c = Math.cos(adeg);
-		var s = Math.sin(adeg);
+		const adeg = this.degToRad(a);
+		const c = Math.cos(adeg);
+		const s = Math.sin(adeg);
 
 		out[0] = out[5] = c;
 		out[4] = -s;
@@ -593,11 +592,11 @@ var utils = {
 
 	MakeRotateXYZMatrix: function (rx, ry, rz, s) {
 		//Creates a world matrix for an object.
-		var Rx = this.MakeRotateXMatrix(ry);
-		var Ry = this.MakeRotateYMatrix(rx);
-		var Rz = this.MakeRotateZMatrix(rz);
+		const Rx = this.MakeRotateXMatrix(ry);
+		const Ry = this.MakeRotateYMatrix(rx);
+		const Rz = this.MakeRotateZMatrix(rz);
 
-		var out = this.multiplyMatrices(Ry, Rz);
+		let out = this.multiplyMatrices(Ry, Rz);
 		out = this.multiplyMatrices(Rx, out);
 		return out;
 	},
@@ -605,7 +604,7 @@ var utils = {
 	MakeScaleMatrix: function (s) {
 		// Create a transform matrix for proportional scale
 
-		var out = this.identityMatrix();
+		const out = this.identityMatrix();
 
 		out[0] = out[5] = out[10] = s;
 
@@ -615,7 +614,7 @@ var utils = {
 	MakeScaleNuMatrix: function (sx, sy, sz) {
 		// Create a scale matrix for a scale of ({sx}, {sy}, {sz}).
 
-		var out = this.identityMatrix();
+		const out = this.identityMatrix();
 		out[0] = sx;
 		out[5] = sy;
 		out[10] = sz;
@@ -627,13 +626,13 @@ var utils = {
 	MakeWorld: function (tx, ty, tz, rx, ry, rz, s) {
 		//Creates a world matrix for an object.
 
-		var Rx = this.MakeRotateXMatrix(rx);
-		var Ry = this.MakeRotateYMatrix(ry);
-		var Rz = this.MakeRotateZMatrix(rz);
-		var S = this.MakeScaleMatrix(s);
-		var T = this.MakeTranslateMatrix(tx, ty, tz);
+		const Rx = this.MakeRotateXMatrix(rx);
+		const Ry = this.MakeRotateYMatrix(ry);
+		const Rz = this.MakeRotateZMatrix(rz);
+		const S = this.MakeScaleMatrix(s);
+		const T = this.MakeTranslateMatrix(tx, ty, tz);
 
-		var out = this.multiplyMatrices(Rz, S);
+		let out = this.multiplyMatrices(Rz, S);
 		out = this.multiplyMatrices(Ry, out);
 		out = this.multiplyMatrices(Rx, out);
 		out = this.multiplyMatrices(T, out);
@@ -644,11 +643,11 @@ var utils = {
 	MakeWorldNonUnif: function ([tx, ty, tz], [rx, ry, rz], [sx, sy, sz]) {
 		//Creates a world matrix for an object.
 
-		var Rx = this.MakeRotateXMatrix(rx);
-		var Ry = this.MakeRotateYMatrix(ry);
-		var Rz = this.MakeRotateZMatrix(rz);
-		var S = this.MakeScaleNuMatrix(sx, sy, sz);
-		var T = this.MakeTranslateMatrix(tx, ty, tz);
+		const Rx = this.MakeRotateXMatrix(rx);
+		const Ry = this.MakeRotateYMatrix(ry);
+		const Rz = this.MakeRotateZMatrix(rz);
+		const S = this.MakeScaleNuMatrix(sx, sy, sz);
+		const T = this.MakeTranslateMatrix(tx, ty, tz);
 
 		let out = this.multiplyMatrices(Rz, S);
 		out = this.multiplyMatrices(Ry, out);
@@ -662,11 +661,11 @@ var utils = {
 		// Creates in {out} a view matrix. The camera is centered in ({cx}, {cy}, {cz}).
 		// It looks {ang} degrees on y axis, and {elev} degrees on the x axis.
 
-		var T = [];
-		var Rx = [];
-		var Ry = [];
-		var tmp = [];
-		var out = [];
+		let T = [];
+		let Rx = [];
+		let Ry = [];
+		let tmp = [];
+		let out = [];
 
 		T = this.MakeTranslateMatrix(-cx, -cy, -cz);
 		Rx = this.MakeRotateXMatrix(-elev);
@@ -683,10 +682,10 @@ var utils = {
 		// {fovy} contains the vertical field-of-view in degrees. {a} is the aspect ratio.
 		// {n} is the distance of the near plane, and {f} is the far plane.
 
-		var perspective = this.identityMatrix();
+		const perspective = this.identityMatrix();
 
-		var halfFovyRad = this.degToRad(fovy / 2);	// stores {fovy/2} in radiants
-		var ct = 1.0 / Math.tan(halfFovyRad);			// cotangent of {fov/2}
+		const halfFovyRad = this.degToRad(fovy / 2);	// stores {fovy/2} in radiants
+		const ct = 1.0 / Math.tan(halfFovyRad);			// cotangent of {fov/2}
 
 		perspective[0] = ct / a;
 		perspective[5] = ct;
@@ -698,6 +697,6 @@ var utils = {
 		return perspective;
 	}
 
-}
+};
 
 export default utils;
