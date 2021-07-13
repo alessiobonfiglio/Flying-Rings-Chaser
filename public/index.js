@@ -133,6 +133,7 @@ async function init() {
 		maxZ: 500,
 		fpsLimit: 60,
 		gameSpeed: 1,
+		liftGameObjectsOffset: 5.0,
 
 		// Cockpit
 		cockpitSpeed: 80,

@@ -20,7 +20,7 @@ uniform mat4 nMatrix;							// world matrix for the normals (because we only use
 
 const float textureMultiplicationFactor = 32.0;	// how many times repeat the texture
 const float noiseFactor = 13.0;					// how much the noise varies the Y coordinate
-const float noiseResolution =  0.01;
+const float noiseResolution =  0.01;			// the resolution/zoom factor of the noise
 
 vec3 permute(vec3 x) { return mod(((x*34.0)+1.0)*x, 289.0); }
 

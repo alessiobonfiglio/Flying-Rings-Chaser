@@ -20,7 +20,7 @@ class Terrain extends GameObject {
 		for (let i = 0; i < res; i++) {
 			for (let j = 0; j < res; j++) {
 				vert[vertexPointer * 3] = j * maxXZ / (res - 1);
-				vert[vertexPointer * 3 + 1] = -gameSettings.maxHalfY;
+				vert[vertexPointer * 3 + 1] = -gameSettings.maxHalfY - 12.0;
 				vert[vertexPointer * 3 + 2] = i * maxXZ / (res - 1);
 				uv[vertexPointer * 2] = j / (res - 1);
 				uv[vertexPointer * 2 + 1] = i / (res - 1);
