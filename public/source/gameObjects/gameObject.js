@@ -1,6 +1,7 @@
 import { default as utils } from "../utils.js"
 import { default as MathUtils } from "../math_utils.js"
 import { default as Event } from "../utils/event.js"
+import Animations from "../utils/animations.js";
 
 class GameObject // should be an abstract class if js allows that
 {
@@ -12,20 +13,13 @@ class GameObject // should be an abstract class if js allows that
 	scale = 1;
 	orientation = [0, 0, 0]; // [rx, ry, rz]
 	collider;
-	isVisible = true;
-	static nextFramePromise;
+	isVisible = true;	
 
 
 	// Initialization
 	constructor() {
 		if(this.collider && this.localCenterOfGravity == null)
 			throw new Error("Center of gravity property not set")
-	}
-
-
-	// Properties
-	get #nextFrame() {
-		return GameObject.nextFramePromise ?? Promise.resolve(0);
 	}
 
 	// default material color
@@ -104,48 +98,10 @@ class GameObject // should be an abstract class if js allows that
 	}
 
 
-	// Animations
-	async animation(callback, duration, start, end, shouldAbort) {
-		shouldAbort ??= () => false;
-		let cur = start;		
-		var startDuration = duration;
-		let [max, min] = [Math.max(start, end), Math.min(start, end)]
-
-		let aborted = shouldAbort();
-		while(!aborted && duration > 0) {			
-			callback(cur);
-			let deltaT = await this.#nextFrame;		
-			cur = (duration*start + (startDuration - duration)*end) / startDuration;
-			cur = MathUtils.clamp(cur, min, max);
-			duration -= deltaT;
-			aborted = shouldAbort();
-		}		
-		if(!aborted)
-			callback(end);
-	}
-
-
-	async animation3(callback, duration, start, end) {
-		let cur = start;		
-		var startDuration = duration;		
-		while(duration > 0) {			
-			callback(cur);
-			let deltaT = await this.#nextFrame;		
-
-			cur = MathUtils.mul(1/startDuration, MathUtils.sum(MathUtils.mul(duration, start), MathUtils.mul(startDuration - duration, end)));			
-			duration -= deltaT;
-		}		
-		callback(end);
-	}
-
 	async scaleTo(value, duration = 0.2) {
-		return this.animation(scale => this.scale = scale, duration, this.scale, value);
+		return Animations.lerp(scale => this.scale = scale, duration, this.scale, value);
 	} 
 
-	async delay(duration){
-		await new Promise((resolve, _) => setTimeout(() => resolve(), duration * 1000));
-		await this.#nextFrame;
-	}
 }
 
 export default GameObject;

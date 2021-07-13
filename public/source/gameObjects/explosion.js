@@ -1,6 +1,7 @@
 import { default as GameObject } from "./gameObject.js";
 import { DefaultShaderClass } from "../../shaders/shaderClasses.js";
 import { default as MathUtils } from "../math_utils.js";
+import Animations from "../utils/animations.js";
 
 class Explosion extends GameObject {
 	static objFilename = "resources/cube/cube.obj";
@@ -48,7 +49,7 @@ class Explosion extends GameObject {
         this.isVisible = true;        
 		await this.scaleTo(startScale);
         console.log("Exploded");
-		await this.delay(2);
+		await Animations.delay(2);
 		await this.scaleTo(0);
 		this.destroy();
     }

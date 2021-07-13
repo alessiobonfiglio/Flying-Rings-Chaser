@@ -2,6 +2,7 @@ import {default as utils} from "/source/utils.js"
 import { default as MathUtils } from "../math_utils.js"
 import GameObject from "./gameObject.js";
 import CancellationToken from "../utils/cancellationToken.js";
+import Animations from "../utils/animations.js";
 
 
 class Camera extends GameObject {
@@ -51,15 +52,15 @@ class Camera extends GameObject {
 		const totBoost = this.#totBosts;
 		const cancelCondition = () => cancellationToken.isAborted;
 		await Promise.all([
-			this.animation(fov => this.fov = fov, this.#boostDuration/5, this.fov, end, cancelCondition),
-			this.animation(z => this.#zPos = z, this.#boostDuration/5, this.#zPos, endZ, cancelCondition)
+			Animations.lerp(fov => this.fov = fov, this.#boostDuration/5, this.fov, end, cancelCondition),
+			Animations.lerp(z => this.#zPos = z, this.#boostDuration/5, this.#zPos, endZ, cancelCondition)
 		]);
 
-		await this.delay(this.#boostDuration);
+		await Animations.delay(this.#boostDuration);
 
 		await Promise.all([
-			this.animation(fov => this.fov = fov, this.#boostDuration/4, this.fov, this.#startFov, cancelCondition),
-			this.animation(z => this.#zPos = z, this.#boostDuration/4, this.#zPos, this.#startZPos, cancelCondition)
+			Animations.lerp(fov => this.fov = fov, this.#boostDuration/4, this.fov, this.#startFov, cancelCondition),
+			Animations.lerp(z => this.#zPos = z, this.#boostDuration/4, this.#zPos, this.#startZPos, cancelCondition)
 		]);
 		this.#totBosts--
 	}

@@ -12,6 +12,7 @@ import {default as GameObject} from "./gameObjects/gameObject.js"
 import {default as Skybox} from "./skybox.js";
 import {default as CockpitScreen} from "./gameObjects/cockpitScreen.js";
 import Square from "./gameObjects/square.js";
+import Animations from "./utils/animations.js";
 
 class GameEngine {
 	static isPlaying = false;
@@ -339,7 +340,7 @@ class GameEngine {
 
 	#NextFramePromiseHandler() {
 		this.#nextFramePromiseResolve(this.#gameSettings.deltaT);
-		GameObject.nextFramePromise = new Promise((resolve, reject) => {
+		Animations.nextFramePromise = new Promise((resolve, _) => {
 			this.#nextFramePromiseResolve = resolve;
 		});
 	}
