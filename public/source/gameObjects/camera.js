@@ -62,9 +62,7 @@ class Camera extends GameObject {
 
 
 	async tilt() {
-		const startAngle = this.verticalAngle;
-		const deltaRotation = 3;
-		const animationLength = 0.1;
+		const animationLength = MathUtils.getRandomInRange(0.1, 0.25);
 
 		const fovAnimation = async () =>  {
 			this.#animationCancellationToken.abort();
@@ -85,6 +83,9 @@ class Camera extends GameObject {
 		}
 
 		const tiltAnimation = async () => {
+			const startAngle = this.verticalAngle;
+			const deltaRotation = MathUtils.getRandomInRange(-4, 4);
+
 			await Animations.lerp(angle => this.verticalAngle = angle, animationLength, this.verticalAngle, startAngle + deltaRotation);
 			await Animations.lerp(angle => this.verticalAngle = angle, 2* animationLength, this.verticalAngle, startAngle - deltaRotation);
 			await Animations.lerp(angle => this.verticalAngle = angle, animationLength, this.verticalAngle, startAngle);		
