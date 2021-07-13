@@ -1,8 +1,7 @@
-import { default as GameObject } from "./gameObject.js"
-import { RingShaderClass } from "../../shaders/shaderClasses.js";
-import { default as CircleCollider } from "../colliders/circleCollider.js"
-import { default as MathUtils } from "../math_utils.js"
-import Animations from "../utils/animations.js";
+import {default as GameObject} from "./gameObject.js"
+import {RingShaderClass} from "../../shaders/shaderClasses.js";
+import {default as CircleCollider} from "../colliders/circleCollider.js"
+import {default as MathUtils} from "../math_utils.js"
 
 class Ring extends GameObject {
 	static objFilename = "resources/ring/ring_smooth.obj";
@@ -10,7 +9,7 @@ class Ring extends GameObject {
 	static shaderClass = new RingShaderClass();
 	static lastRing;
 	static #colliderRadius;
-	static #centerOfGravity;	
+	static #centerOfGravity;
 	#gameSettings;
 	_materialColor = [1, 215 / 255, 0];
 	#collided = false;
@@ -19,11 +18,11 @@ class Ring extends GameObject {
 	// Initialization
 	constructor() {
 		super();
-		this.orientation = [90,0,0];
+		this.orientation = [90, 0, 0];
 		this.collider = new CircleCollider();
 		this.collider.radius = Ring.#colliderRadius;
 		this.collider.thickness = 5;
-		this.collider.normal = [1, 0, 0];		
+		this.collider.normal = [1, 0, 0];
 	}
 
 	// Initialization
@@ -51,42 +50,44 @@ class Ring extends GameObject {
 	}
 
 	// events
-	update() {
-		super.update();		
-		if(!this.#collided)
-			this.#moveForward(this.#gameSettings);
+	update(_, boostFactor) {
+		super.update();
+		if (!this.#collided)
+			this.#moveForward(this.#gameSettings, boostFactor);
 		else {
-			this.center = MathUtils.sum(this.#spaceShip.center, [0,0, 4]);
+			const newCenter = this.center;
+			newCenter[0] = this.#spaceShip.center[0];
+			newCenter[1] = this.#spaceShip.center[1];
+			this.center = newCenter;
 		}
 	}
-	
-	#moveForward(gameSettings) {
-		this.position[2] -= this.speed * gameSettings.deltaT;
-		
+
+	#moveForward(gameSettings, boostFactor) {
+		this.position[2] -= this.speed * boostFactor * gameSettings.deltaT;
+
 		if (this.position[2] < 0) {
 			this.initialize(gameSettings);
 			return;
 		}
-		this.#rotate();		
+		this.#rotate();
 	}
-	
+
 	#rotationDir;
 	#currentAngle = 0;
 	#rotationAngle = 25;
+
 	#rotate() {
 		const newDir = () => {
 			return MathUtils.normalize([Math.random() - 0.5, 0, Math.random() - 0.5]);
 		}
 
-		this.#rotationDir ??= newDir();		
-		if(this.#currentAngle >= 2*this.#rotationAngle){
+		this.#rotationDir ??= newDir();
+		if (this.#currentAngle >= 2 * this.#rotationAngle) {
 			this.#rotationDir = newDir();
 			this.#currentAngle = 0;
-		}		
-		else if(this.#currentAngle == this.#rotationAngle)
-		{
-			this.#rotationDir = MathUtils.mul(-1, this.#rotationDir)			
-		}		
+		} else if (this.#currentAngle == this.#rotationAngle) {
+			this.#rotationDir = MathUtils.mul(-1, this.#rotationDir)
+		}
 
 		this.orientation = MathUtils.sum(this.orientation, this.#rotationDir);
 		this.#currentAngle++;
@@ -94,24 +95,24 @@ class Ring extends GameObject {
 
 	bindCollider() {
 		super.bindCollider();
-		this.collider.center = MathUtils.sum(this.center, [0,0,-10])		
+		this.collider.center = MathUtils.sum(this.center, [0, 0, -10])
 	}
 
 	async onSpaceshipCollided(spaceship) {
-		if(this.#collided)
+		if (this.#collided)
 			return;
-		
+
 		this.#spaceShip = spaceship;
 		this.#collided = true;
 		let startScale = this.scale;
 		// await this.#collapseRing(spaceship);	
 		this.scale = startScale;
 		this.#collided = false;
-		this.initialize(this.#gameSettings);	
+		this.initialize(this.#gameSettings);
 	}
 
 	async #collapseRing(spaceship) {
-		
+
 		let animationDuration = 0.5; //s
 		let scaleAnimation = this.scaleTo(0, animationDuration);
 		let rotationAnimation = Animations.lerp3(orientation => this.orientation = orientation, animationDuration, this.orientation, [90,0,0]);

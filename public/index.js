@@ -135,9 +135,12 @@ async function init() {
 		gameSpeed: 1,
 		liftGameObjectsOffset: 5.0,
 
+		// Boost
+		boostFactor: 1.1,
+		boostDuration: 1.3,
+
 		// Cockpit
 		cockpitSpeed: 80,
-		cockpitBoostSpeed: 200,
 		pointsPerSecond: 50,
 		damagePerSecond: 1,
 		cockpitScreenAnimationSpeed: 3,

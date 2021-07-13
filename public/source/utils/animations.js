@@ -11,13 +11,13 @@ class Animations {
 	static async lerp(callback, duration, start, end, shouldAbort) {
 		shouldAbort ??= () => false;
 		let cur = start;		
-		var startDuration = duration;
-		let [max, min] = [Math.max(start, end), Math.min(start, end)]
+		const startDuration = duration;
+		const [max, min] = [Math.max(start, end), Math.min(start, end)]
 
 		let aborted = shouldAbort();
 		while(!aborted && duration > 0) {			
 			callback(cur);
-			let deltaT = await this.nextFrame;		
+			const deltaT = await this.nextFrame;
 			cur = (duration*start + (startDuration - duration)*end) / startDuration;
 			cur = MathUtils.clamp(cur, min, max);
 			duration -= deltaT;
@@ -30,10 +30,10 @@ class Animations {
 
 	static async lerp3(callback, duration, start, end) {        
 		let cur = start;		
-		var startDuration = duration;		
+		const startDuration = duration;
 		while(duration > 0) {			
 			callback(cur);
-			let deltaT = await this.nextFrame;		
+			const deltaT = await this.nextFrame;
 
 			cur = MathUtils.mul(1/startDuration, MathUtils.sum(MathUtils.mul(duration, start), MathUtils.mul(startDuration - duration, end)));			
 			duration -= deltaT;

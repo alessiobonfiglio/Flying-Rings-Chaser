@@ -52,12 +52,16 @@ class Terrain extends GameObject {
 	}
 
 	// events
-	update() {
+	update(_, boostFactor) {
 		super.update();
-		this.position[2] -= this.#gameSettings.terrainSpeed * this.#gameSettings.deltaT;
+		const esp = 1e-10; // used to prevent problems because floating print precision
+		this.position[2] -= this.#gameSettings.terrainSpeed * boostFactor * this.#gameSettings.deltaT;
 		const newZ = ((this.position[2] - this.#gameSettings.terrainChunkSize) % (this.#gameSettings.terrainChunkSize * this.#gameSettings.numberTerrainChunksRows)) + this.#gameSettings.terrainChunkSize;
-		if (newZ > this.position[2]){
+		if (newZ > this.position[2] + esp) {
+			if(this.position[0]===0)
+				console.log(this.position[0], newZ, this.position[2], this.#gameSettings.terrainChunkSize * this.#gameSettings.numberTerrainChunksRows);
 			this.rowNumber += this.#gameSettings.numberTerrainChunksRows;
+			//this.rowNumber += 1;
 		}
 		this.position[2] = newZ;
 	}

@@ -1,8 +1,8 @@
-import { default as GameObject } from "./gameObject.js";
-import { DefaultShaderClass } from "../../shaders/shaderClasses.js";
-import { default as MathUtils } from "../math_utils.js";
-import { default as SphericalCollider } from "../colliders/sphericalCollider.js";
-import { default as Event } from "../utils/event.js";
+import {default as GameObject} from "./gameObject.js";
+import {DefaultShaderClass} from "../../shaders/shaderClasses.js";
+import {default as MathUtils} from "../math_utils.js";
+import {default as SphericalCollider} from "../colliders/sphericalCollider.js";
+import {default as Event} from "../utils/event.js";
 
 // Abstract class, must be extended with object file and texture
 class Asteroid extends GameObject {
@@ -45,13 +45,13 @@ class Asteroid extends GameObject {
 	}
 
 	// game events handlers
-	update() {
+	update(_, boostFactor) {
 		super.update();
-		this.#moveForward(this.#gameSettings);			
+		this.#moveForward(this.#gameSettings, boostFactor);
 	}
 
-	#moveForward(gameSettings) {
-		this.position[2] -= this.speed * gameSettings.deltaT;
+	#moveForward(gameSettings, boostFactor) {
+		this.position[2] -= this.speed * boostFactor * gameSettings.deltaT;
 		if (this.position[2] < 0) {
 			this.initialize(gameSettings);
 			return;
@@ -62,22 +62,22 @@ class Asteroid extends GameObject {
 	}
 
 	onSpaceshipCollided(spaceship) {
-		this.initialize(this.#gameSettings);			
+		this.initialize(this.#gameSettings);
 	}
 
 	onLaserCollided(laser) {
 		console.log("Asteroid: laser hit");
 		this.health--;
 		if (this.health <= 0)
-			this.#onAsteroidDeath();		
+			this.#onAsteroidDeath();
 	}
 
 
 	#onAsteroidDeath() {
-		this.death.invoke(this);	
-		
+		this.death.invoke(this);
+
 		// initialization should be called after the event handling
-		this.initialize(this.#gameSettings);	
+		this.initialize(this.#gameSettings);
 	}
 }
 
