@@ -4,7 +4,7 @@ class Animations {
     static nextFramePromise;
 
     static get nextFrame() {
-		return Animations.nextFramePromise ?? Promise.resolve(0);
+		return Animations.nextFramePromise ?? new Promise(resolve => requestAnimationFrame(() => resolve (1/60)));
 	}
 
     // Animations
@@ -43,8 +43,9 @@ class Animations {
 
     
 	static async delay(duration){
-		await new Promise((resolve, _) => setTimeout(() => resolve(), duration * 1000));
-		await this.nextFrame;
+		for(; duration >= 0; duration -= await this.nextFrame)
+			;
+		
 	}
 }
 

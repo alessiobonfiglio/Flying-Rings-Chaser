@@ -2,6 +2,7 @@ import { default as GameObject } from "./gameObject.js";
 import { CockpitShaderClass } from "../../shaders/shaderClasses.js";
 import { default as CircleCollider } from "../colliders/sphericalCollider.js";
 import { default as MathUtils } from "../math_utils.js";
+import Animations from "../utils/animations.js";
 
 class Laser extends GameObject {
 	static objFilename = "resources/laser/laser.obj";
