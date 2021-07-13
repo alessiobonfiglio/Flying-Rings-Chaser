@@ -45,7 +45,7 @@ class Camera extends GameObject {
 		const cancellationToken = new CancellationToken();
 		this.#animationCancellationToken = cancellationToken;
 
-		let [end, endZ] = [110, this.#startZPos*0.9];		
+		let [end, endZ] = [110, this.#startZPos*0.8];
 		
 		this.#totBosts++;				
 		const totBoost = this.#totBosts;
@@ -58,8 +58,8 @@ class Camera extends GameObject {
 		await this.delay(this.#boostDuration);
 
 		await Promise.all([
-			this.animation(fov => this.fov = fov, this.#boostDuration/3, this.fov, this.#startFov, cancelCondition),
-			this.animation(z => this.#zPos = z, this.#boostDuration/3, this.#zPos, this.#startZPos, cancelCondition)
+			this.animation(fov => this.fov = fov, this.#boostDuration/4, this.fov, this.#startFov, cancelCondition),
+			this.animation(z => this.#zPos = z, this.#boostDuration/4, this.#zPos, this.#startZPos, cancelCondition)
 		]);
 		this.#totBosts--
 	}

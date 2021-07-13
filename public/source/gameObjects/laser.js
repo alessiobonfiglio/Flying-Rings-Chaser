@@ -14,6 +14,7 @@ class Laser extends GameObject {
 
 	position = [0, -1, 4];
 	orientation = [180, 0, 0];
+	scale = 1.2;
 	speed;
 	isVisible = false;
 

@@ -128,8 +128,8 @@ async function init() {
 	// create the setting of the game
 	const gameSetting = {
 		// Game engine
-		maxHalfX: 100,
-		maxHalfY: 50,
+		maxHalfX: 200,
+		maxHalfY: 70,
 		maxZ: 500,
 		fpsLimit: 60,
 		gameSpeed: 1,
@@ -142,18 +142,18 @@ async function init() {
 		cockpitScreenAnimationSpeed: 3,
 
 		// Asteroids
-		numberOfAsteroids: 20,
+		numberOfAsteroids: 25,
 		asteroidScaleRange: [0.1, 0.1],
 		asteroidSpeedRange: [50, 70],
 		asteroidRotationSpeedRange: [0, 30],
 		asteroidPoints: 100,
 		asteroidDamage: 10,
-		asteroidHealth: 2,
+		asteroidHealth: 1,
 
 		// Rings
 		numberOfRings: 15,
-		minRingDistance: 60,
-		ringScaleRange: [30, 30],
+		minRingDistance: 250,
+		ringScaleRange: [12, 12],
 		ringSpeedRange: [60, 60],
 		ringPoints: 1000,
 		ringRestoreHealth: 25,
