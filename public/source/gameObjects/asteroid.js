@@ -8,8 +8,6 @@ import { default as Event } from "../utils/event.js";
 class Asteroid extends GameObject {
 	death = new Event();
 	static shaderClass = new DefaultShaderClass();
-	static #colliderRadius;
-	static #centerOfGravity;
 	#gameSettings;
 
 	speed = 1;
@@ -20,7 +18,6 @@ class Asteroid extends GameObject {
 	constructor() {
 		super();
 		this.collider = new SphericalCollider();
-		this.collider.radius = Asteroid.#colliderRadius;
 	}
 
 	// Initialization
@@ -38,23 +35,13 @@ class Asteroid extends GameObject {
 		const rz = MathUtils.getRandomInRange(0, 360);
 		this.orientation = [rx, ry, rz];
 
-		this.scale = 7;
+		this.scale = MathUtils.getRandomInRange(gameSettings.asteroidScaleRange[0], gameSettings.asteroidScaleRange[1]);
 		this.speed = MathUtils.getRandomInRange(gameSettings.asteroidSpeedRange[0], gameSettings.asteroidSpeedRange[1]);
 
 		const rsx = MathUtils.getRandomInRange(gameSettings.asteroidRotationSpeedRange[0], gameSettings.asteroidRotationSpeedRange[1]);
 		const rsy = MathUtils.getRandomInRange(gameSettings.asteroidRotationSpeedRange[0], gameSettings.asteroidRotationSpeedRange[1]);
 		const rsz = MathUtils.getRandomInRange(gameSettings.asteroidRotationSpeedRange[0], gameSettings.asteroidRotationSpeedRange[1]);
 		this.rotationSpeed = [rsx, rsy, rsz];
-	}
-	
-	static loadInfoFromObjModel(objModel) {
-		Asteroid.#centerOfGravity = GameObject._computeCenterOfGravity(objModel);
-		Asteroid.#colliderRadius = GameObject._computeRadius(objModel, Asteroid.#centerOfGravity);
-	}
-
-	// Properties
-	get localCenterOfGravity() {
-		return Asteroid.#centerOfGravity;
 	}
 
 	// game events handlers
