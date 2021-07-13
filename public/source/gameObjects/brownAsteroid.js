@@ -7,8 +7,8 @@ class BrownAsteroid extends Asteroid {
 	static #colliderRadius;
 	static #centerOfGravity;
 
-	constructor() {
-		super();
+	constructor(isBackground) {
+		super(isBackground);
 		this.collider.radius = BrownAsteroid.#colliderRadius;
 	}
 

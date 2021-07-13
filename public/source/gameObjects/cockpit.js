@@ -46,9 +46,7 @@ class Cockpit extends GameObject {
 		this.deltaSpeed = gameSettings.cockpitSpeed;
 		this.#healthDisplay = document.getElementById("health");
 		this.#pointsDisplay = document.getElementById("points");
-		for (let i = 0; i < gameSettings.maxLasers; ++i) {
-			this.#lasers[i] = document.getElementById("laser" + i);
-		}
+		this.#lasers = document.getElementsByClassName("laser");
 
 		window.addEventListener("keydown", this.#keyFunctionDown(this), false);
 		window.addEventListener("keyup", this.#keyFunctionUp(this), false);
@@ -74,14 +72,13 @@ class Cockpit extends GameObject {
 		for (const laser of this.#lasers) {
 			laser.style.opacity = 1;
 		}
-		this.#lastLaser = this.#gameSettings.maxLasers - 1;
+		this.#lastLaser = this.#lasers.length - 1;
 		this.#canShoot = true;
 	}
 
 	update(frameCount) {
 		super.update();
 
-		// console.log(this.#gameSettings.cockpitSpeed)
 		if (!GameEngine.isPlaying)
 			return;
 
@@ -113,7 +110,7 @@ class Cockpit extends GameObject {
 
 		if (this.isShooting && this.#canShoot && this.#lastLaser >= 0) {
 			this.#shoot(frameCount);
-		} else if (this.#lastLaser < this.#gameSettings.maxLasers - 1 && 
+		} else if (this.#lastLaser < this.#lasers.length - 1 && 
 			frameCount > this.#lastShootingFrame + this.#gameSettings.laserReloadTime / this.#gameSettings.deltaT) {
 			this.#reload(frameCount);
 		}

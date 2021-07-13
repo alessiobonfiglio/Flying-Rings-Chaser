@@ -7,8 +7,8 @@ class GreyAsteroid extends Asteroid {
 	static #colliderRadius;
 	static #centerOfGravity;
 
-	constructor() {
-		super();
+	constructor(isBackground) {
+		super(isBackground);
 		this.collider.radius = GreyAsteroid.#colliderRadius;
 	}
 

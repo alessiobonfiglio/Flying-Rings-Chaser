@@ -141,29 +141,29 @@ async function init() {
 
 		// Cockpit
 		cockpitSpeed: 80,
-		pointsPerSecond: 50,
-		damagePerSecond: 1,
+		pointsPerSecond: 80,
+		damagePerSecond: 2,
 		cockpitScreenAnimationSpeed: 3,
 
 		// Asteroids
-		numberOfAsteroids: 25,
+		numberOfAsteroids: 45,
+		numberOfBackgroundAsteroids: 120,
 		asteroidScaleRange: [0.1, 0.1],
 		asteroidSpeedRange: [50, 70],
 		asteroidRotationSpeedRange: [0, 30],
-		asteroidPoints: 100,
-		asteroidDamage: 10,
+		asteroidPoints: 250,
+		asteroidDamage: 20,
 		asteroidHealth: 1,
 
 		// Rings
-		numberOfRings: 15,
-		minRingDistance: 250,
+		numberOfRings: 5,
+		minRingDistance: 200,
 		ringScaleRange: [12, 12],
 		ringSpeedRange: [60, 60],
 		ringPoints: 1000,
-		ringRestoreHealth: 25,
+		ringRestoreHealth: 15,
 
 		// Lasers
-		maxLasers: 10,
 		laserSpeed: 150,
 		laserReloadTime: 1,
 		laserCooldown: 0.5,
@@ -174,8 +174,8 @@ async function init() {
 		halfNumberTerrainChunksColumns: 2,
 		numberTerrainChunksRows: 3,
 		terrainSpeed: 120,
-		terrainDamage: 5,
-		terrainPoints: 100,
+		terrainDamage: 10,
+		terrainPoints: 500,
 
 		// Skybox
 		skyboxDefaultPosition: [0, -200, 0],

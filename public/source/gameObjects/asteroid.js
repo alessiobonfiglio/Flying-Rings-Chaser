@@ -9,14 +9,16 @@ class Asteroid extends GameObject {
 	death = new Event();
 	static shaderClass = new DefaultShaderClass();
 	#gameSettings;
+	#isBackground;
 
 	speed = 1;
 	rotationSpeed = [1, 1, 1];
 	health;
 
 	// Initialization
-	constructor() {
+	constructor(isBackground) {
 		super();
+		this.#isBackground = isBackground;
 		this.collider = new SphericalCollider();
 	}
 
@@ -25,10 +27,14 @@ class Asteroid extends GameObject {
 		this.#gameSettings = gameSettings;
 		this.health = gameSettings.asteroidHealth;
 
-		const x = MathUtils.getRandomInRange(-gameSettings.maxHalfX, gameSettings.maxHalfX);
-		const y = MathUtils.getRandomInRange(-gameSettings.maxHalfY + gameSettings.liftGameObjectsOffset, gameSettings.maxHalfY);
-		const z = MathUtils.getRandomInRange(gameSettings.maxZ * 2 / 3, gameSettings.maxZ);
-		this.position = [x, y, z];
+		if (this.#isBackground) {
+			this.position = this.#setupBackgroundPosition(gameSettings);
+		} else {
+			const x = MathUtils.getRandomInRange(-gameSettings.maxHalfX, gameSettings.maxHalfX);
+			const y = MathUtils.getRandomInRange(-gameSettings.maxHalfY + gameSettings.liftGameObjectsOffset, gameSettings.maxHalfY);
+			const z = MathUtils.getRandomInRange(gameSettings.maxZ * 2 / 3, gameSettings.maxZ * 5 / 3);
+			this.position = [x, y, z];
+		}
 
 		const rx = MathUtils.getRandomInRange(0, 360);
 		const ry = MathUtils.getRandomInRange(0, 360);
@@ -42,6 +48,26 @@ class Asteroid extends GameObject {
 		const rsy = MathUtils.getRandomInRange(gameSettings.asteroidRotationSpeedRange[0], gameSettings.asteroidRotationSpeedRange[1]);
 		const rsz = MathUtils.getRandomInRange(gameSettings.asteroidRotationSpeedRange[0], gameSettings.asteroidRotationSpeedRange[1]);
 		this.rotationSpeed = [rsx, rsy, rsz];
+	}
+
+	#setupBackgroundPosition(gameSettings) {
+		const rand = Math.random();
+		let x, y;
+		if (rand < 2 / 8) {
+			// Left side of the box
+			x = MathUtils.getRandomInRange(-gameSettings.maxHalfX * 2, -gameSettings.maxHalfX);
+			y = MathUtils.getRandomInRange(-gameSettings.maxHalfY + gameSettings.liftGameObjectsOffset, gameSettings.maxHalfY);
+		} else if (rand < 4 / 8) {
+			// Right side of the box
+			x = MathUtils.getRandomInRange(gameSettings.maxHalfX, gameSettings.maxHalfX * 2);
+			y = MathUtils.getRandomInRange(-gameSettings.maxHalfY + gameSettings.liftGameObjectsOffset, gameSettings.maxHalfY);
+		} else {
+			// Top side of the box
+			x = MathUtils.getRandomInRange(-gameSettings.maxHalfX * 2, gameSettings.maxHalfX * 2);
+			y = MathUtils.getRandomInRange(gameSettings.maxHalfY, gameSettings.maxHalfY * 2);
+		}
+		const z = MathUtils.getRandomInRange(gameSettings.maxZ * 2 / 3, gameSettings.maxZ * 5 / 3);
+		return [x, y, z];
 	}
 
 	// game events handlers

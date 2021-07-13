@@ -32,6 +32,7 @@ class GameEngine {
 	#cockpitScreen;
 	#terrains = [];
 	#asteroids = [];
+	#backgroundAsteroids = [];
 	#rings = [];
 	#lasers = [];
 	#terrainCollider;
@@ -65,6 +66,7 @@ class GameEngine {
 		this.#terrainCollider = this.#instantiateTerrainCollider();
 		this.#instantiate(this.#cockpitScreen);
 		this.#webGlManager.camera.initialize(this.#cockpit);
+		this.#createBackgroundAsteroids();
 
 		// must be done like this to keep a reference of 'this'
 		this.#wrapperCallback = function () {
@@ -225,14 +227,24 @@ class GameEngine {
 		}
 	}
 
-	#getAsteroid(index) {
+	#createBackgroundAsteroids() {
+		for (let i = 0; i < this.#gameSettings.numberOfBackgroundAsteroids; i++) {
+			const ast = this.#getAsteroid(i, true);
+			ast.initialize(this.#gameSettings);
+
+			this.#instantiateAsteroid(ast, true);
+			this.#backgroundAsteroids.push(ast);
+		}
+	}
+
+	#getAsteroid(index, isBackground = false) {
 		switch (index % 3) {
 			case 0:
-				return new BrownAsteroid();
+				return new BrownAsteroid(isBackground);
 			case 1:
-				return new GreyAsteroid();
+				return new GreyAsteroid(isBackground);
 			default:
-				return new MetalAsteroid();
+				return new MetalAsteroid(isBackground);
 		}
 	}
 
@@ -285,7 +297,8 @@ class GameEngine {
 
 	#updateGameObjects() {
 		// cockpitScreen must be after cockpit
-		let gameObjectList = [this.#asteroids, this.#rings, this.#lasers, [this.#cockpit], [this.#cockpitScreen], this.#terrains, [this.#webGlManager.skyboxGameObject], this.#explosions].flat();
+		let gameObjectList = [this.#asteroids, this.#backgroundAsteroids, this.#rings, this.#lasers,
+			[this.#cockpit], [this.#cockpitScreen], this.#terrains, [this.#webGlManager.skyboxGameObject], this.#explosions].flat();
 		for (let gameObject of gameObjectList) {
 			if (gameObject.update) {
 				gameObject.update(this.#frameCount, this.#boostFactor);
@@ -307,9 +320,12 @@ class GameEngine {
 		return ring;
 	}
 
-	#instantiateAsteroid(asteroid) {
+	#instantiateAsteroid(asteroid, isBackground = false) {
 		this.#instantiate(asteroid);
-		asteroid.destroyed.subscribe(ast => this.#removeItem(this.#asteroids, ast));
+		if (isBackground)
+			asteroid.destroyed.subscribe(ast => this.#removeItem(this.#backgroundAsteroids, ast));
+		else
+			asteroid.destroyed.subscribe(ast => this.#removeItem(this.#asteroids, ast));
 		asteroid.death.subscribe(ast => this.#createExplosion(ast));
 		return asteroid;
 	}
