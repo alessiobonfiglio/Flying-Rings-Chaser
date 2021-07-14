@@ -2,13 +2,13 @@ import { default as GameObject } from "./gameObject.js";
 import { DefaultShaderClass } from "../../shaders/shaderClasses.js";
 import { default as MathUtils } from "../math_utils.js";
 import Animations from "../utils/animations.js";
+import ParticlesEmitter from "./particlesEmitter.js";
 
 class Explosion extends GameObject {
 	static objFilename = "resources/cube/cube.obj";
 	static textureFilename = "resources/cube/crate.png";
 	static shaderClass = new DefaultShaderClass();
 	static #centerOfGravity
-	static #colliderRadius
 	_materialColor = [0.5, 0.5, 0.5];
 
 	position = [0, -1, 4];
@@ -17,6 +17,8 @@ class Explosion extends GameObject {
 	scale = 5;
 	isVisible = false;    	
     #gameSettings;
+	#particleEmitter;
+	static #colliderRadius;
 
 	// Initialization
 	constructor(gameSettings) {
@@ -39,18 +41,15 @@ class Explosion extends GameObject {
     update() {
 		super.update();
         // pos(t + deltaT) = pos(t) + velocity * deltaT
-        this.position = MathUtils.sum(this.position, MathUtils.mul(this.#gameSettings.deltaT, this.velocity));		
+        this.center = MathUtils.sum(this.center, MathUtils.mul(this.#gameSettings.deltaT, this.velocity));		
+		if(this.#particleEmitter)
+			this.#particleEmitter.center = this.center;
 	}	
 
     // Public
     async explode() {
-		const startScale = this.scale;
-		this.scale = 0;	
-        this.isVisible = true;        
-		await this.scaleTo(startScale);
-        console.log("Exploded");
-		await Animations.delay(2);
-		await this.scaleTo(0);
+		this.#particleEmitter = new ParticlesEmitter();
+		await this.#particleEmitter.emit();
 		this.destroy();
     }
 }

@@ -7,6 +7,7 @@ class GameObject // should be an abstract class if js allows that
 {
 	// events
 	destroyed = new Event();	
+	static instantiateInEngine;  // = obj => engine.instatiate(obj). Set by engine
 
 	// variables
 	position = [0, 0, 0]; //pivot in world coordinates
@@ -14,6 +15,7 @@ class GameObject // should be an abstract class if js allows that
 	orientation = [0, 0, 0]; // [rx, ry, rz]
 	collider;
 	isVisible = true;	
+	isDestroyed = false;
 
 
 	// Initialization
@@ -95,6 +97,11 @@ class GameObject // should be an abstract class if js allows that
 
 	destroy() {
 		this.destroyed.invoke(this);
+		this.isDestroyed = true;
+	}
+
+	instatiate() {
+		GameObject.instantiateInEngine(this);		
 	}
 
 
@@ -104,6 +111,10 @@ class GameObject // should be an abstract class if js allows that
 
 	async rotateTo(rotation, duration = 0.2) {
 		return Animations.lerp3(rot => this.orientation = rot, duration, this.orientation, rotation);
+	}
+
+	async moveTo(position, duration = 0.2) {
+		return Animations.lerp(pos => this.position = pos, duration, this.position, position);		
 	}
 }
 

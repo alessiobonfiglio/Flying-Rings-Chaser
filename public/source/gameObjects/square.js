@@ -3,27 +3,12 @@ import GameObject from "./gameObject.js";
 
 class Square extends GameObject{
     static shaderClass = new DefaultShaderClass();
+    static objFilename = "resources/square/square.obj";
     static textureFilename = "resources/cube/crate.png";
-    scale = 3;
+    orientation = [0,-90,90];
+    scale = 6;
 
-
-    static meshGenerator(gameSettings) {
-        const vert = [
-            -1,1,0,
-            -1,-1,0, 
-            1, -1, 0,
-            1, 1, 0
-        ];
-        const uv = 
-        [
-            0,1,
-            0,0, 
-            1,0,
-            1,1
-        ];
-        const ind = [0,1,2, 2,3,0];        
-        return {indices: ind, vertices: vert, textures: uv}
-    }
+    position = [0,0,30]
 }
 
 export default Square;

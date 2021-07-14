@@ -58,9 +58,11 @@ const math_utils = {
 		return Math.min(Math.max(num, min), max);
 	},
 
-	randomVersor() {
-		return this.normalize([Math.random(), 0, Math.random()]);
+	randomVersor() {		
+		return this.normalize([this.getRandomInRange(-1, 1), this.getRandomInRange(-1, 1), this.getRandomInRange(-1, 1)]);
 	}
+
+
 }
 
 export default math_utils;

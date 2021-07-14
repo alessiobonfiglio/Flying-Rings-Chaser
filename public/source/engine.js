@@ -12,6 +12,7 @@ import {default as Skybox} from "./skybox.js";
 import {default as CockpitScreen} from "./gameObjects/cockpitScreen.js";
 import Square from "./gameObjects/square.js";
 import Animations from "./utils/animations.js";
+import GameObject from "./gameObjects/gameObject.js";
 
 class GameEngine {
 	static isPlaying = false;
@@ -52,6 +53,12 @@ class GameEngine {
 	setup() {
 		document.getElementById("start-button").onclick = this.#start_game(this);
 		document.getElementById("end-button").onclick = this.#end_game(this);
+		GameObject.instantiateInEngine = gameObject =>
+		{
+			console.log("instatiating ", gameObject)
+			this.#instantiate(gameObject);
+		} 
+
 		this.#webGlManager.camera = new Camera([0, 0, 0], 0, -180);
 
 		this.#webGlManager.skyboxGameObject = new Skybox(this.#gameSettings);
@@ -60,8 +67,7 @@ class GameEngine {
 		this.#createLasers();
 		this.#createTerrainChunks();
 		this.#createCockpit();
-		this.#instantiate(new Square());
-
+		
 		this.#cockpitScreen = new CockpitScreen(this.#gameSettings, this.#cockpit);
 		this.#terrainCollider = this.#instantiateTerrainCollider();
 		this.#instantiate(this.#cockpitScreen);
