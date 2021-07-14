@@ -10,9 +10,9 @@ import {default as Cockpit} from "./gameObjects/cockpit.js";
 import {default as TerrainCollider} from "./gameObjects/terrainCollider.js";
 import {default as Skybox} from "./skybox.js";
 import {default as CockpitScreen} from "./gameObjects/cockpitScreen.js";
-import Square from "./gameObjects/square.js";
-import Animations from "./utils/animations.js";
-import GameObject from "./gameObjects/gameObject.js";
+import {default as  Animations} from "./utils/animations.js";
+import {default as  GameObject} from "./gameObjects/gameObject.js";
+import {default as  CancellationToken} from "./utils/cancellationToken.js";
 
 class GameEngine {
 	static isPlaying = false;
@@ -39,7 +39,8 @@ class GameEngine {
 	#terrainCollider;
 	#explosions = [];
 
-	#boostFactor = 1.0;
+	boostFactor = 1.0;
+	#boostCancellationToken = new CancellationToken();
 
 	constructor(webGlManager, window, gameSettings) {
 		this.#webGlManager = webGlManager;
@@ -63,7 +64,7 @@ class GameEngine {
 		this.#createLasers();
 		this.#createTerrainChunks();
 		this.#createCockpit();
-		
+
 		this.#cockpitScreen = new CockpitScreen(this.#gameSettings, this.#cockpit);
 		this.#terrainCollider = this.#instantiateTerrainCollider();
 		this.#instantiate(this.#cockpitScreen);
@@ -209,16 +210,23 @@ class GameEngine {
 		const totBoostTime = speedUpTime + maintainingTime + slowDownTime;
 		this.#cockpit.ringHit.subscribe(_ => this.#webGlManager.camera.boost(speedUpTime, maintainingTime, slowDownTime));
 		this.#cockpit.ringHit.subscribe(_ => this.activateSpeedBoost(totBoostTime));
-		this.#cockpit.asteroidHit.subscribe(_ => this.#webGlManager.camera.tilt());		
+		this.#cockpit.asteroidHit.subscribe(_ => this.#webGlManager.camera.tilt());
 
 		this.#cockpit.initialize();
 		this.#instantiate(this.#cockpit);
 	}
 
 	async activateSpeedBoost(time) {
-		this.#boostFactor = this.#gameSettings.boostFactor;
-		await Animations.delay(time);
-		this.#boostFactor = 1.0;
+		// reset boost animation if any already running
+		this.#boostCancellationToken.abort();
+		const cancellationToken = new CancellationToken();
+		this.#boostCancellationToken = cancellationToken;
+
+		const cancelCondition = () => cancellationToken.isAborted;
+
+		await Animations.lerp(s => this.boostFactor = s, 0, 1.0, this.#gameSettings.boostFactor, cancelCondition);
+		await Animations.delay(time, cancelCondition);
+		await Animations.lerp(s => this.boostFactor = s, 0, this.#gameSettings.boostFactor, 1.0, cancelCondition);
 	}
 
 	createAsteroids() {
@@ -305,7 +313,7 @@ class GameEngine {
 			[this.#cockpit], [this.#cockpitScreen], this.#terrains, [this.#webGlManager.skyboxGameObject], this.#explosions].flat();
 		for (const gameObject of gameObjectList) {
 			if (gameObject.update) {
-				gameObject.update(this.#frameCount, this.#boostFactor);
+				gameObject.update(this.#frameCount, this.boostFactor);
 			}
 		}
 		this.#webGlManager.camera.update();
@@ -334,7 +342,7 @@ class GameEngine {
 		return asteroid;
 	}
 
-	async #createExplosion(asteroid, hitPoint) {		
+	async #createExplosion(asteroid, hitPoint) {
 		const explosion = new Explosion(this.#gameSettings);
 		explosion.velocity = [0, 0, -asteroid.speed];
 		explosion.center = asteroid.center;

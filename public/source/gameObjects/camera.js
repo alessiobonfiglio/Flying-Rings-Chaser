@@ -3,7 +3,6 @@ import {default as MathUtils} from "../math_utils.js"
 import GameObject from "./gameObject.js";
 import CancellationToken from "../utils/cancellationToken.js";
 import Animations from "../utils/animations.js";
-import noise from "../utils/noise.js"
 
 
 class Camera extends GameObject {
@@ -53,7 +52,7 @@ class Camera extends GameObject {
 			Animations.lerp(z => this.#zPos = z, speedUpTime, this.#zPos, endZ, cancelCondition)
 		]);
 
-		await Animations.delay(maintainingTime);
+		await Animations.delay(maintainingTime, cancelCondition);
 
 		await Promise.all([
 			Animations.lerp(fov => this.fov = fov, slowDownTime, this.fov, this.#startFov, cancelCondition),
