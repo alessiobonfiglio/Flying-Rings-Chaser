@@ -5,6 +5,7 @@ import Animations from "../utils/animations.js";
 import ParticlesEmitter from "./particlesEmitter.js";
 import Square from "./square.js";
 import Ring from "./ring.js";
+import BrownAsteroid from "./brownAsteroid.js";
 
 class Explosion extends GameObject {
 	static objFilename = "resources/cube/cube.obj";
@@ -51,7 +52,15 @@ class Explosion extends GameObject {
     // Public
     async explode() {
 		this.#particleEmitter = new ParticlesEmitter();
-		await this.#particleEmitter.emit(() => new Ring());
+		const newParticle = () => {
+			var ret = new BrownAsteroid();
+			ret.scale = MathUtils.getRandomInRange(0.006, 0.03);
+			return ret; 
+		}
+		await this.#particleEmitter.emit(
+			newParticle, 
+			asteroid => asteroid.orientation = MathUtils.sum(asteroid.orientation, MathUtils.randomVectorInRange(1,2))
+		);
 		this.destroy();
     }
 }

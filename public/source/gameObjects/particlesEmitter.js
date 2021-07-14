@@ -4,18 +4,18 @@ import Square from "./square.js";
 
 class ParticlesEmitter {
     center = [0,0,0];        
-    particlesSpeed = 50;
+    particlesSpeed = 25;
     particleDeltaPos = [0,0,0];
     timeBeforeDestroy = 5;     
     totParticles = 100; 
         
 
 
-    emit(objBuilder) {
+    emit(objBuilder, onUpdate) {
         let particles = [];        
         for(let i=0; i < this.totParticles; i++)
             particles.push(this.#createParticle(objBuilder));   
-        return Promise.all(particles.map(particle => this.#handleParticle(particle)));
+        return Promise.all(particles.map(particle => this.#handleParticle(particle, onUpdate)));
     }
 
     #createParticle(objBuilder) {
@@ -24,17 +24,19 @@ class ParticlesEmitter {
         return particle;
     }
 
-    async #handleParticle(particle) {
-        let direction = MathUtils.randomVersor();        
-        console.log(direction)
-        await this.#moveParticle(particle, direction);
+    async #handleParticle(particle, onUpdate) {
+        let direction = MathUtils.randomVersor();                
+        await this.#moveParticle(particle, direction, onUpdate);
         particle.destroy();        
     } 
 
-    async #moveParticle(particle, direction) {       
+    async #moveParticle(particle, direction, onUpdate) {       
         // deltaPos = vt * dir 
         const deltaPos = t => MathUtils.mul(t * this.particlesSpeed, direction);    
-        await Animations.lerp(t => particle.center = MathUtils.sum(this.center, deltaPos(t)), this.timeBeforeDestroy , 0, this.timeBeforeDestroy);
+        await Animations.lerp(t => {
+            particle.center = MathUtils.sum(this.center, deltaPos(t))
+            onUpdate(particle);
+        }, this.timeBeforeDestroy , 0, this.timeBeforeDestroy);
     }
     
 }

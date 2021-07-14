@@ -56,12 +56,15 @@ const math_utils = {
 	
 	clamp(num, min, max) {
 		return Math.min(Math.max(num, min), max);
-	},
+	},	
 
 	randomVersor() {		
-		return this.normalize([this.getRandomInRange(-1, 1), this.getRandomInRange(-1, 1), this.getRandomInRange(-1, 1)]);
-	}
+		return this.randomVectorInRange(-1,1);
+	},
 
+	randomVectorInRange(min, max) {
+		return [this.getRandomInRange(min, max), this.getRandomInRange(min, max), this.getRandomInRange(min, max)];
+	}
 
 }
 
