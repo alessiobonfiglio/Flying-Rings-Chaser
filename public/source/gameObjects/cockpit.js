@@ -153,6 +153,12 @@ class Cockpit extends GameObject {
 		this.asteroidHit.invoke(this);
 	}
 
+	onLaserCollided(laser) {
+		// Add points
+		this.#points += this.#gameSettings.laserPoints;
+		this.#pointsDisplay.textContent = parseInt(this.#points).toString().padStart(8, "0");
+	}
+
 	onGroundCollided() {
 		console.log("Cockpit: ground hit");
 		// Reduce health

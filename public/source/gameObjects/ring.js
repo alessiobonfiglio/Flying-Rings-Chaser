@@ -30,9 +30,13 @@ class Ring extends GameObject {
 	initialize(gameSettings) {
 		this.#gameSettings = gameSettings;
 
-		const x = MathUtils.getRandomInRange(-gameSettings.maxHalfX, gameSettings.maxHalfX);
-		const y = MathUtils.getRandomInRange(-gameSettings.maxHalfY + gameSettings.liftGameObjectsOffset, gameSettings.maxHalfY);
-		const z = Math.max(gameSettings.maxZ * 2 / 3, Ring.lastRing.position[2] + gameSettings.minRingDistance);
+		let x, y;
+		const z = Ring.lastRing.position[2] + gameSettings.exactRingDistanceZ;
+		do {
+			x = MathUtils.getRandomInRange(-gameSettings.maxHalfX, gameSettings.maxHalfX);
+			y = MathUtils.getRandomInRange(-gameSettings.maxHalfY + gameSettings.liftGameObjectsOffset, gameSettings.maxHalfY);
+		} while (MathUtils.distance(Ring.lastRing.position, [x, y, z]) > gameSettings.maxRingDistance);
+
 		this.position = [x, y, z];
 		Ring.lastRing = this;
 

@@ -139,7 +139,7 @@ async function init() {
 
 		// Boost
 		boostFactor: 1.1,
-		boostDuration: 1.3,
+		boostDuration: 2.8,
 
 		// Cockpit
 		cockpitSpeed: 80,
@@ -159,7 +159,8 @@ async function init() {
 
 		// Rings
 		numberOfRings: 5,
-		minRingDistance: 200,
+		maxRingDistance: 260,
+		exactRingDistanceZ: 180,
 		ringScaleRange: [12, 12],
 		ringSpeedRange: [60, 60],
 		ringPoints: 1000,
@@ -169,6 +170,7 @@ async function init() {
 		laserSpeed: 150,
 		laserReloadTime: 1,
 		laserCooldown: 0.5,
+		laserPoints: 100,
 
 		// Terrain
 		terrainChunkSize: 500,
