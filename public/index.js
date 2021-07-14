@@ -143,6 +143,8 @@ async function init() {
 
 		// Cockpit
 		cockpitSpeed: 80,
+		oscillationSpeed: 15,
+		maxOscillation: 7,
 		pointsPerSecond: 80,
 		damagePerSecond: 2,
 		cockpitScreenAnimationSpeed: 3,

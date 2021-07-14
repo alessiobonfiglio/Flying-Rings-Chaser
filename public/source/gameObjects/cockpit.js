@@ -28,8 +28,7 @@ class Cockpit extends GameObject {
 
 	position;
 	scale = 2;
-	orientation = [0, 180, 0];
-	deltaSpeed;
+	orientation;
 	up = 0;
 	down = 0;
 	left = 0;
@@ -44,7 +43,6 @@ class Cockpit extends GameObject {
 		this.#gameSettings = gameSettings;
 		this.#laserPool = laserObjects;
 
-		this.deltaSpeed = gameSettings.cockpitSpeed;
 		this.#healthDisplay = document.getElementById("health");
 		this.#pointsDisplay = document.getElementById("points");
 		this.#lasers = document.getElementsByClassName("laser");
@@ -66,6 +64,7 @@ class Cockpit extends GameObject {
 	initialize() {
 		// Reset cockpit
 		this.position = [0, 0, 0];
+		this.orientation = [0, 0, 0];
 		this.#health = 100;
 		this.#points = 0;
 
@@ -87,13 +86,28 @@ class Cockpit extends GameObject {
 		this.collider.center[2] += 2;
 
 		// Move cockpit
-		const horizontal = (this.left - this.right) * this.#gameSettings.deltaT;
-		const vertical = (this.up - this.down) * this.#gameSettings.deltaT;
-		this.position = MathUtils.sum(this.position, [horizontal, vertical, 0]);
+		this.position[0] += (this.left - this.right) * this.#gameSettings.cockpitSpeed * this.#gameSettings.deltaT;
+		this.position[1] += (this.up - this.down) * this.#gameSettings.cockpitSpeed * this.#gameSettings.deltaT;
 
 		// Clamp position to borders
-		this.position[0] = Math.min(Math.max(this.position[0], -this.#gameSettings.maxHalfX), this.#gameSettings.maxHalfX);
-		this.position[1] = Math.min(Math.max(this.position[1], -this.#gameSettings.maxHalfY), this.#gameSettings.maxHalfY);
+		this.position[0] = MathUtils.clamp(this.position[0], -this.#gameSettings.maxHalfX, this.#gameSettings.maxHalfX);
+		this.position[1] = MathUtils.clamp(this.position[1], -this.#gameSettings.maxHalfY, this.#gameSettings.maxHalfY);
+
+		console.log(this.orientation);
+		// Cockpit oscillations
+		if (this.down - this.up != 0)
+			this.orientation[0] += (this.down - this.up) * this.#gameSettings.oscillationSpeed * this.#gameSettings.deltaT;
+		else if (Math.abs(this.orientation[0]) > 1e-12)
+			this.orientation[0] -= Math.sign(this.orientation[0]) * this.#gameSettings.oscillationSpeed * this.#gameSettings.deltaT;
+		if (this.right - this.left != 0)
+			this.orientation[1] += (this.left - this.right) * this.#gameSettings.oscillationSpeed * this.#gameSettings.deltaT;
+		else if (Math.abs(this.orientation[1]) > 1e-12)
+			this.orientation[1] -= Math.sign(this.orientation[1]) * this.#gameSettings.oscillationSpeed * this.#gameSettings.deltaT;
+
+		// Clamp oscillation
+		this.orientation[0] = MathUtils.clamp(this.orientation[0], -this.#gameSettings.maxOscillation, this.#gameSettings.maxOscillation);
+		this.orientation[1] = MathUtils.clamp(this.orientation[1], -this.#gameSettings.maxOscillation, this.#gameSettings.maxOscillation);
+		this.orientation[2] = this.orientation[1];
 
 		// Add points
 		this.#points += this.#gameSettings.pointsPerSecond * this.#gameSettings.deltaT;
@@ -191,40 +205,42 @@ class Cockpit extends GameObject {
 
 	#keyFunctionDown(cockpit) {
 		return function (e) {
-			if (e.keyCode === 87) {	// W
-				cockpit.up = cockpit.deltaSpeed;
-			}
-			if (e.keyCode === 83) {	// S
-				cockpit.down = cockpit.deltaSpeed;
-			}
-			if (e.keyCode === 65) {	// A
-				cockpit.left = cockpit.deltaSpeed;
-			}
-			if (e.keyCode === 68) {	// D
-				cockpit.right = cockpit.deltaSpeed;
-			}
-			if (e.keyCode === 32) {	// Space
-				cockpit.isShooting = true;
+			switch(e.keyCode) {
+				case 87: // W
+					cockpit.up = 1;
+					break;
+				case 83: // S
+					cockpit.down = 1;
+					break;
+				case 65: // A
+					cockpit.left = 1;
+					break;
+				case 68: // D
+					cockpit.right = 1;
+					break;
+				case 32: // Space
+					cockpit.isShooting = true;
 			}
 		}
 	}
 
 	#keyFunctionUp(cockpit) {
 		return function (e) {
-			if (e.keyCode === 87) {	// W
-				cockpit.up = 0;
-			}
-			if (e.keyCode === 83) {	// S
-				cockpit.down = 0;
-			}
-			if (e.keyCode === 65) {	// A
-				cockpit.left = 0;
-			}
-			if (e.keyCode === 68) {	// D
-				cockpit.right = 0;
-			}
-			if (e.keyCode === 32) {	// Space
-				cockpit.isShooting = false;
+			switch(e.keyCode) {
+				case 87: // W
+					cockpit.up = 0;
+					break;
+				case 83: // S
+					cockpit.down = 0;
+					break;
+				case 65: // A
+					cockpit.left = 0;
+					break;
+				case 68: // D
+					cockpit.right = 0;
+					break;
+				case 32: // Space
+					cockpit.isShooting = false;
 			}
 		}
 	}

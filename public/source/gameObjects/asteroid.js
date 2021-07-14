@@ -51,21 +51,14 @@ class Asteroid extends GameObject {
 	}
 
 	#setupBackgroundPosition(gameSettings) {
-		const rand = Math.random();
+		const padding = 5;
+
 		let x, y;
-		if (rand < 2 / 8) {
-			// Left side of the box
-			x = MathUtils.getRandomInRange(-gameSettings.maxHalfX * 2, -gameSettings.maxHalfX);
-			y = MathUtils.getRandomInRange(-gameSettings.maxHalfY + gameSettings.liftGameObjectsOffset, gameSettings.maxHalfY);
-		} else if (rand < 4 / 8) {
-			// Right side of the box
-			x = MathUtils.getRandomInRange(gameSettings.maxHalfX, gameSettings.maxHalfX * 2);
-			y = MathUtils.getRandomInRange(-gameSettings.maxHalfY + gameSettings.liftGameObjectsOffset, gameSettings.maxHalfY);
-		} else {
-			// Top side of the box
+		do {
 			x = MathUtils.getRandomInRange(-gameSettings.maxHalfX * 2, gameSettings.maxHalfX * 2);
-			y = MathUtils.getRandomInRange(gameSettings.maxHalfY, gameSettings.maxHalfY * 2);
-		}
+			y = MathUtils.getRandomInRange(-gameSettings.maxHalfY + gameSettings.liftGameObjectsOffset, gameSettings.maxHalfY * 2);
+		} while (x > -gameSettings.maxHalfX - padding && x < gameSettings.maxHalfX + padding && y < gameSettings.maxHalfY + padding);
+
 		const z = MathUtils.getRandomInRange(gameSettings.maxZ * 2 / 3, gameSettings.maxZ * 5 / 3);
 		return [x, y, z];
 	}
