@@ -138,7 +138,7 @@ async function init() {
 		liftGameObjectsOffset: 5.0,
 
 		// Boost
-		boostFactor: 1.1,
+		boostFactor: 1.5,
 		boostDuration: 2.8,
 
 		// Cockpit
