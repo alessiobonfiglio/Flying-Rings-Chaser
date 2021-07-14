@@ -16,8 +16,7 @@ class Camera extends GameObject {
 	#startFov = 90;
 
 	fov;
-	#animationCancellationToken = new CancellationToken();
-	#animatingPosition = false;
+	#animationCancellationToken = new CancellationToken();	
 
 	constructor(position, horizontalAngle, verticalAngle) {
 		super();
@@ -37,8 +36,7 @@ class Camera extends GameObject {
 	}
 
 	update() {
-		if(!this.#animatingPosition)
-			this.position = this.#computeCurrentPosition();
+		this.position = this.#computeCurrentPosition();
 	}	
 
 	async boost(speedUpTime, maintainingTime, slowDownTime) {
@@ -65,7 +63,7 @@ class Camera extends GameObject {
 
 
 	async tilt() {
-		const animationLength = MathUtils.getRandomInRange(3, 2);
+		const animationLength = MathUtils.getRandomInRange(0.1, 0.2);
 
 		const fovAnimation = async () =>  {
 			this.#animationCancellationToken.abort();
@@ -73,7 +71,7 @@ class Camera extends GameObject {
 			this.#animationCancellationToken = cancellationToken;
 
 			const cancelCondition = () => cancellationToken.isAborted;
-			const [end, endZ] = [85, this.#startZPos * 1.1];
+			const [end, endZ] = [85, this.#startZPos * 1.03];
 			await Promise.all([
 				Animations.lerp(fov => this.fov = fov, 3*animationLength, this.fov, end, cancelCondition),
 				Animations.lerp(z => this.#zPos = z, 3*animationLength, this.#zPos, endZ, cancelCondition)
@@ -94,24 +92,7 @@ class Camera extends GameObject {
 			await Animations.lerp(angle => this.verticalAngle = angle, animationLength, this.verticalAngle, startAngle);		
 		}
 
-
-		const tiltAnimation = async () => {
-			this.#animatingPosition = true;
-			const startPos = this.position;			
-			const [startAngle, endAngle] = [0,2 * Math.PI];									
-			const curNoiseX = angle => noise.simplex2(Math.cos(angle), 2* Math.sin(angle)) - 0.5;
-			const curNoiseY = angle => noise.simplex2(2 * Math.cos(angle), Math.sin(angle)) - 0.5;
-			
-			await Promise.all([
-				
-				Animations.lerp(angle => this.position = MathUtils.sum(this.#computeCurrentPosition(), MathUtils.mul(0.1, [curNoiseX(angle), curNoiseY(angle), 0])),
-								animationLength, startAngle, endAngle),
-			]);
-			
-			this.#animatingPosition = false;
-		}		
-
-		await Promise.all([tiltAnimation(), fovAnimation()]);
+		await Promise.all([angleAnimation(), fovAnimation()]);
 	}
 
 	#computeCurrentPosition() {
