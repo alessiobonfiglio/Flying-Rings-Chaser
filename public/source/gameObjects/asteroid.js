@@ -88,8 +88,9 @@ class Asteroid extends GameObject {
 	}
 
 	onSpaceshipCollided(spaceship) {
+		this.position[2] -= spaceship.collider.scaledRadius*6;
+		this.#onAsteroidDeath(spaceship.center);
 		this.initialize(this.#gameSettings);
-		this.#onAsteroidDeath(MathUtils.sum(spaceship.center, [0,0,20]));
 	}
 
 	onLaserCollided(laser) {
