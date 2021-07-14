@@ -42,8 +42,9 @@ class Animations {
 	}
 
     
-	static async delay(duration){
-		for(; duration >= 0; duration -= await this.nextFrame)
+	static async delay(duration, cancelCondition){
+		cancelCondition ??= (() => false);
+		for(; duration >= 0 && !cancelCondition(); duration -= await this.nextFrame)
 			;
 		
 	}

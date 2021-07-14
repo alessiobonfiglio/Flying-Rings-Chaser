@@ -57,6 +57,7 @@ class Explosion extends GameObject {
 
     // Public
     async explode(asteroid, hitPosition) {
+		console.log("Explode")
 		this.#particleEmitter = new ParticlesEmitter();
 		
 		const newParticle = () => {

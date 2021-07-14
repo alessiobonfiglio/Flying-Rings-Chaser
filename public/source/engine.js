@@ -53,11 +53,7 @@ class GameEngine {
 	setup() {
 		document.getElementById("start-button").onclick = this.#start_game(this);
 		document.getElementById("end-button").onclick = this.#end_game(this);
-		GameObject.instantiateInEngine = gameObject =>
-		{
-			console.log("instatiating ", gameObject)
-			this.#instantiate(gameObject);
-		} 
+		GameObject.instantiateInEngine = gameObject => this.#instantiate(gameObject);
 
 		this.#webGlManager.camera = new Camera([0, 0, 0], 0, -180);
 
@@ -213,7 +209,7 @@ class GameEngine {
 		const totBoostTime = speedUpTime + maintainingTime + slowDownTime;
 		this.#cockpit.ringHit.subscribe(_ => this.#webGlManager.camera.boost(speedUpTime, maintainingTime, slowDownTime));
 		this.#cockpit.ringHit.subscribe(_ => this.activateSpeedBoost(totBoostTime));
-		this.#cockpit.asteroidHit.subscribe(_ => this.#webGlManager.camera.tilt());
+		this.#cockpit.asteroidHit.subscribe(_ => this.#webGlManager.camera.tilt());		
 
 		this.#cockpit.initialize();
 		this.#instantiate(this.#cockpit);
@@ -334,19 +330,18 @@ class GameEngine {
 			asteroid.destroyed.subscribe(ast => this.#removeItem(this.#backgroundAsteroids, ast));
 		else
 			asteroid.destroyed.subscribe(ast => this.#removeItem(this.#asteroids, ast));
-		asteroid.death.subscribe((ast, laser) => this.#createExplosion(ast, laser));
+		asteroid.death.subscribe((ast, hitPoint) => this.#createExplosion(ast, hitPoint));
 		return asteroid;
 	}
 
-	async #createExplosion(asteroid, laser) {
-		console.log(laser)
+	async #createExplosion(asteroid, hitPoint) {		
 		const explosion = new Explosion(this.#gameSettings);
 		explosion.velocity = [0, 0, -asteroid.speed];
 		explosion.center = asteroid.center;
 		explosion.destroyed.subscribe(exp => this.#removeItem(this.#explosions, exp))
 		this.#explosions.push(explosion);
 		this.#instantiate(explosion);
-		await explosion.explode(asteroid, laser.center);
+		await explosion.explode(asteroid, hitPoint);
 	}
 
 	#instantiateTerrainCollider() {

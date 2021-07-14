@@ -89,19 +89,19 @@ class Asteroid extends GameObject {
 
 	onSpaceshipCollided(spaceship) {
 		this.initialize(this.#gameSettings);
+		this.#onAsteroidDeath(MathUtils.sum(spaceship.center, [0,0,20]));
 	}
 
 	onLaserCollided(laser) {
 		console.log("Asteroid: laser hit");
 		this.health--;
 		if (this.health <= 0)
-			this.#onAsteroidDeath(laser);
+			this.#onAsteroidDeath(laser.center);
 	}
 
 
-	#onAsteroidDeath(laser) {
-		console.log(laser)
-		this.death.invoke(this, laser);
+	#onAsteroidDeath(hitCenter) {
+		this.death.invoke(this, hitCenter);
 
 		// initialization should be called after the event handling
 		this.initialize(this.#gameSettings);
