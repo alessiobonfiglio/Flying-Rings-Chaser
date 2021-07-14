@@ -3,6 +3,7 @@ import { default as MathUtils } from "../math_utils.js"
 import GameObject from "./gameObject.js";
 import CancellationToken from "../utils/cancellationToken.js";
 import Animations from "../utils/animations.js";
+import noise from "../utils/noise.js"
 
 
 class Camera extends GameObject {
@@ -16,6 +17,7 @@ class Camera extends GameObject {
 
 	fov;
 	#animationCancellationToken = new CancellationToken();
+	#animatingPosition = false;
 
 	constructor(position, horizontalAngle, verticalAngle) {
 		super();
@@ -35,8 +37,9 @@ class Camera extends GameObject {
 	}
 
 	update() {
-		this.position = MathUtils.sum(this.#cockpit.position, [0, -0.125, -this.#zPos]);
-	}
+		if(!this.#animatingPosition)
+			this.position = this.#computeCurrentPosition();
+	}	
 
 	async boost(speedUpTime, maintainingTime, slowDownTime) {
 		// Aborting previous animation if any
@@ -62,7 +65,7 @@ class Camera extends GameObject {
 
 
 	async tilt() {
-		const animationLength = MathUtils.getRandomInRange(0.1, 0.25);
+		const animationLength = MathUtils.getRandomInRange(3, 2);
 
 		const fovAnimation = async () =>  {
 			this.#animationCancellationToken.abort();
@@ -82,7 +85,7 @@ class Camera extends GameObject {
 			]);
 		}
 
-		const tiltAnimation = async () => {
+		const angleAnimation = async () => {
 			const startAngle = this.verticalAngle;
 			const deltaRotation = 2+ MathUtils.getRandomInRange(-2, 2);
 
@@ -91,7 +94,28 @@ class Camera extends GameObject {
 			await Animations.lerp(angle => this.verticalAngle = angle, animationLength, this.verticalAngle, startAngle);		
 		}
 
-		await Promise.all([fovAnimation(), tiltAnimation()]);
+
+		const tiltAnimation = async () => {
+			this.#animatingPosition = true;
+			const startPos = this.position;			
+			const [startAngle, endAngle] = [0,2 * Math.PI];									
+			const curNoiseX = angle => noise.simplex2(Math.cos(angle), 2* Math.sin(angle)) - 0.5;
+			const curNoiseY = angle => noise.simplex2(2 * Math.cos(angle), Math.sin(angle)) - 0.5;
+			
+			await Promise.all([
+				
+				Animations.lerp(angle => this.position = MathUtils.sum(this.#computeCurrentPosition(), MathUtils.mul(0.1, [curNoiseX(angle), curNoiseY(angle), 0])),
+								animationLength, startAngle, endAngle),
+			]);
+			
+			this.#animatingPosition = false;
+		}		
+
+		await Promise.all([tiltAnimation(), fovAnimation()]);
+	}
+
+	#computeCurrentPosition() {
+		return MathUtils.sum(this.#cockpit.position, [0, -0.125, -this.#zPos]);
 	}
 }
 
