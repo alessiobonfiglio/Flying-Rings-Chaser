@@ -137,7 +137,7 @@ async function init() {
 
 		// Boost
 		boostFactor: 1.1,
-		boostDuration: 1.3,
+		boostDuration: 2.8,
 
 		// Cockpit
 		cockpitSpeed: 80,
