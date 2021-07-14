@@ -1,5 +1,5 @@
 import {default as utils} from "../utils.js"
-import { default as MathUtils } from "../math_utils.js"
+import {default as MathUtils} from "../math_utils.js"
 import GameObject from "./gameObject.js";
 import CancellationToken from "../utils/cancellationToken.js";
 import Animations from "../utils/animations.js";
@@ -22,7 +22,7 @@ class Camera extends GameObject {
 		super();
 		this.position = position;
 		this.horizontalAngle = horizontalAngle;
-		this.verticalAngle = verticalAngle;		
+		this.verticalAngle = verticalAngle;
 		this.#zPos = this.#startZPos;
 		this.fov = this.#startFov;
 	}
@@ -65,7 +65,7 @@ class Camera extends GameObject {
 	async tilt() {
 		const animationLength = MathUtils.getRandomInRange(0.1, 0.2);
 
-		const fovAnimation = async () =>  {
+		const fovAnimation = async () => {
 			this.#animationCancellationToken.abort();
 			const cancellationToken = new CancellationToken();
 			this.#animationCancellationToken = cancellationToken;
@@ -73,23 +73,23 @@ class Camera extends GameObject {
 			const cancelCondition = () => cancellationToken.isAborted;
 			const [end, endZ] = [85, this.#startZPos * 1.03];
 			await Promise.all([
-				Animations.lerp(fov => this.fov = fov, 3*animationLength, this.fov, end, cancelCondition),
-				Animations.lerp(z => this.#zPos = z, 3*animationLength, this.#zPos, endZ, cancelCondition)
+				Animations.lerp(fov => this.fov = fov, 3 * animationLength, this.fov, end, cancelCondition),
+				Animations.lerp(z => this.#zPos = z, 3 * animationLength, this.#zPos, endZ, cancelCondition)
 			]);
-			
+
 			await Promise.all([
-				Animations.lerp(fov => this.fov = fov, 1*animationLength, this.fov, this.#startFov, cancelCondition),
-				Animations.lerp(z => this.#zPos = z, 1*animationLength, this.#zPos, this.#startZPos, cancelCondition)
+				Animations.lerp(fov => this.fov = fov, 1 * animationLength, this.fov, this.#startFov, cancelCondition),
+				Animations.lerp(z => this.#zPos = z, 1 * animationLength, this.#zPos, this.#startZPos, cancelCondition)
 			]);
 		}
 
 		const angleAnimation = async () => {
 			const startAngle = this.verticalAngle;
-			const deltaRotation = 2+ MathUtils.getRandomInRange(-2, 2);
+			const deltaRotation = 2 + MathUtils.getRandomInRange(-2, 2);
 
 			await Animations.lerp(angle => this.verticalAngle = angle, animationLength, this.verticalAngle, startAngle + deltaRotation);
-			await Animations.lerp(angle => this.verticalAngle = angle, 2* animationLength, this.verticalAngle, startAngle - deltaRotation);
-			await Animations.lerp(angle => this.verticalAngle = angle, animationLength, this.verticalAngle, startAngle);		
+			await Animations.lerp(angle => this.verticalAngle = angle, 2 * animationLength, this.verticalAngle, startAngle - deltaRotation);
+			await Animations.lerp(angle => this.verticalAngle = angle, animationLength, this.verticalAngle, startAngle);
 		}
 
 		await Promise.all([angleAnimation(), fovAnimation()]);
