@@ -3,6 +3,8 @@ import { DefaultShaderClass } from "../../shaders/shaderClasses.js";
 import { default as MathUtils } from "../math_utils.js";
 import Animations from "../utils/animations.js";
 import ParticlesEmitter from "./particlesEmitter.js";
+import Square from "./square.js";
+import Ring from "./ring.js";
 
 class Explosion extends GameObject {
 	static objFilename = "resources/cube/cube.obj";
@@ -49,7 +51,7 @@ class Explosion extends GameObject {
     // Public
     async explode() {
 		this.#particleEmitter = new ParticlesEmitter();
-		await this.#particleEmitter.emit();
+		await this.#particleEmitter.emit(() => new Ring());
 		this.destroy();
     }
 }

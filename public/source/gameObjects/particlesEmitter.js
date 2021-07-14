@@ -7,18 +7,19 @@ class ParticlesEmitter {
     particlesSpeed = 50;
     particleDeltaPos = [0,0,0];
     timeBeforeDestroy = 5;     
-    totParticles = 100;  
+    totParticles = 100; 
+        
 
 
-    emit() {
+    emit(objBuilder) {
         let particles = [];        
         for(let i=0; i < this.totParticles; i++)
-            particles.push(this.#createParticle());   
+            particles.push(this.#createParticle(objBuilder));   
         return Promise.all(particles.map(particle => this.#handleParticle(particle)));
     }
 
-    #createParticle() {
-        let particle = new Square();        
+    #createParticle(objBuilder) {
+        let particle = objBuilder();        
         particle.instatiate();        
         return particle;
     }
