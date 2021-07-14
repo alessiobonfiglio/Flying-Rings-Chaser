@@ -113,6 +113,7 @@ class Ring extends GameObject {
 		// await this.#collapseRing(spaceship);
 		this.scale = startScale;
 		this.#collided = false;
+		await Animations.delay(500);
 		this.initialize(this.#gameSettings);
 	}
 
