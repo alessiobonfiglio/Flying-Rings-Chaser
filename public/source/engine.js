@@ -156,6 +156,7 @@ class GameEngine {
 			// lasers
 			for (const laser of this.#lasers) {
 				if (laser.isVisible && laser.collider.intersectWithSphere(asteroid.collider)) {
+					this.#cockpit.onLaserCollided(laser);
 					laser.onAsteroidCollided(asteroid);
 					asteroid.onLaserCollided(laser);
 				}
