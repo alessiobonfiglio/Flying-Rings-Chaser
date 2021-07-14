@@ -22,6 +22,7 @@ import {default as CockpitScreen} from "./source/gameObjects/cockpitScreen.js";
 import {default as Skybox} from "./source/skybox.js";
 import Explosion from "./source/gameObjects/explosion.js"
 import Square from "./source/gameObjects/square.js"
+import Sphere from "./source/gameObjects/sphere.js"
 
 
 async function setupGlObjects(glManager, gl, gameSettings) {
@@ -38,7 +39,8 @@ async function setupGlObjects(glManager, gl, gameSettings) {
 			Laser,
 			Terrain,
 			Explosion,
-			Square
+			Square,
+			Sphere
 		];
 
 	for (const objClass of classes) {

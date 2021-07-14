@@ -95,12 +95,13 @@ class Asteroid extends GameObject {
 		console.log("Asteroid: laser hit");
 		this.health--;
 		if (this.health <= 0)
-			this.#onAsteroidDeath();
+			this.#onAsteroidDeath(laser);
 	}
 
 
-	#onAsteroidDeath() {
-		this.death.invoke(this);
+	#onAsteroidDeath(laser) {
+		console.log(laser)
+		this.death.invoke(this, laser);
 
 		// initialization should be called after the event handling
 		this.initialize(this.#gameSettings);

@@ -5,9 +5,12 @@ class Event {
         this.#eventHandlers.push(handler);
     }
 
-    invoke(sender) {
+    invoke(sender, arg) {
         for (const handler of this.#eventHandlers)
-            handler(sender);
+            if(arg !== "undefined")
+                handler(sender, arg);
+            else 
+                handler(sender);
     }
 }
 

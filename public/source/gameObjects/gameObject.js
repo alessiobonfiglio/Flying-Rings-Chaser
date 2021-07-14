@@ -100,12 +100,12 @@ class GameObject // should be an abstract class if js allows that
 		this.isDestroyed = true;
 	}
 
-	instatiate() {
+	instantiate() {
 		GameObject.instantiateInEngine(this);		
 	}
 
 
-	async scaleTo(value, duration = 0.2) {
+	async scaleTo(value, duration = 0.2) {		
 		return Animations.lerp(scale => this.scale = scale, duration, this.scale, value);
 	} 
 

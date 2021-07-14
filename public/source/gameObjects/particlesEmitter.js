@@ -4,10 +4,10 @@ import Square from "./square.js";
 
 class ParticlesEmitter {
     center = [0,0,0];        
-    particlesSpeed = 25;
+    particlesSpeed = 55;
     particleDeltaPos = [0,0,0];
     timeBeforeDestroy = 5;     
-    totParticles = 100; 
+    totParticles = 50; 
         
 
 
@@ -20,7 +20,7 @@ class ParticlesEmitter {
 
     #createParticle(objBuilder) {
         let particle = objBuilder();        
-        particle.instatiate();        
+        particle.instantiate();        
         return particle;
     }
 
@@ -30,11 +30,12 @@ class ParticlesEmitter {
         particle.destroy();        
     } 
 
-    async #moveParticle(particle, direction, onUpdate) {       
+    async #moveParticle(particle, direction, onUpdate) {     
+        const realSpeed = this.particlesSpeed * MathUtils.getRandomInRange(0.6,1.3);  
         // deltaPos = vt * dir 
-        const deltaPos = t => MathUtils.mul(t * this.particlesSpeed, direction);    
+        const deltaPos = t => MathUtils.mul(t * realSpeed, direction);    
         await Animations.lerp(t => {
-            particle.center = MathUtils.sum(this.center, deltaPos(t))
+            particle.center = MathUtils.sum(this.center, deltaPos(Math.log(t + 1)));
             onUpdate(particle);
         }, this.timeBeforeDestroy , 0, this.timeBeforeDestroy);
     }

@@ -333,18 +333,19 @@ class GameEngine {
 			asteroid.destroyed.subscribe(ast => this.#removeItem(this.#backgroundAsteroids, ast));
 		else
 			asteroid.destroyed.subscribe(ast => this.#removeItem(this.#asteroids, ast));
-		asteroid.death.subscribe(ast => this.#createExplosion(ast));
+		asteroid.death.subscribe((ast, laser) => this.#createExplosion(ast, laser));
 		return asteroid;
 	}
 
-	#createExplosion(asteroid) {
+	async #createExplosion(asteroid, laser) {
+		console.log(laser)
 		const explosion = new Explosion(this.#gameSettings);
 		explosion.velocity = [0, 0, -asteroid.speed];
 		explosion.center = asteroid.center;
 		explosion.destroyed.subscribe(exp => this.#removeItem(this.#explosions, exp))
 		this.#explosions.push(explosion);
 		this.#instantiate(explosion);
-		explosion.explode();
+		await explosion.explode(asteroid, laser.center);
 	}
 
 	#instantiateTerrainCollider() {
