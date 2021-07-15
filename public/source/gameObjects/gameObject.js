@@ -91,10 +91,6 @@ class GameObject // should be an abstract class if js allows that
 		return utils.MakeWorld(this.position[0], this.position[1], this.position[2], this.orientation[0], this.orientation[1], this.orientation[2], this.scale);
 	}
 
-	localToWorld(local) {
-		return MathUtils.multiplyMatrixVector(this.worldMatrix(), local);
-	}
-
 	destroy() {
 		this.destroyed.invoke(this);
 		this.isDestroyed = true;

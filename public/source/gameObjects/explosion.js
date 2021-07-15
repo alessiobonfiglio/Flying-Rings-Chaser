@@ -1,26 +1,21 @@
-import { default as GameObject } from "./gameObject.js";
-import { DefaultShaderClass } from "../../shaders/shaderClasses.js";
-import { default as MathUtils } from "../math_utils.js";
-import Animations from "../utils/animations.js";
+import {default as GameObject} from "./gameObject.js";
+import {DefaultShaderClass} from "../../shaders/shaderClasses.js";
+import {default as MathUtils} from "../math_utils.js";
 import ParticlesEmitter from "./particlesEmitter.js";
-import Square from "./square.js";
-import Ring from "./ring.js";
-import BrownAsteroid from "./brownAsteroid.js";
-import Sphere from "./sphere.js";
 
 class Explosion extends GameObject {
 	static objFilename = "resources/cube/cube.obj";
 	static textureFilename = "resources/cube/crate.png";
 	static shaderClass = new DefaultShaderClass();
 	static #centerOfGravity
-	_materialColor = [0.5, 0.5, 0.5];	
+	_materialColor = [0.5, 0.5, 0.5];
 
 	position = [0, -1, 4];
 	orientation = [180, 0, 0];
-	velocity = [0,0,0];
+	velocity = [0, 0, 0];
 	scale = 5;
-	isVisible = false;    	
-    #gameSettings;
+	isVisible = false;
+	#gameSettings;
 	#particleEmitter;
 	#sphere;
 	#hitMinusCenter;
@@ -30,7 +25,7 @@ class Explosion extends GameObject {
 	// Initialization
 	constructor(gameSettings) {
 		super();
-        this.#gameSettings = gameSettings;
+		this.#gameSettings = gameSettings;
 	}
 
 	static loadInfoFromObjModel(objModel) {
@@ -44,37 +39,42 @@ class Explosion extends GameObject {
 	}
 
 
-    // Engine Events
-    update() {
+	// Engine Events
+	update() {
 		super.update();
-        // pos(t + deltaT) = pos(t) + velocity * deltaT
-        this.center = MathUtils.sum(this.center, MathUtils.mul(this.#gameSettings.deltaT, this.velocity));		
-		if(this.#particleEmitter)
+		// pos(t + deltaT) = pos(t) + velocity * deltaT
+		this.center = MathUtils.sum(this.center, MathUtils.mul(this.#gameSettings.deltaT, this.velocity));
+		if (this.#particleEmitter)
 			this.#particleEmitter.center = this.center;
-		if(this.#sphere)
+		if (this.#sphere)
 			this.#sphere.center = MathUtils.sum(this.center, this.#hitMinusCenter);
-	}	
+	}
 
-    // Public
-    async explode(asteroid, hitPosition) {
+	// Public
+	async explode(asteroid, hitPosition, gameSettings) {
 		console.log("Explode")
 		this.#particleEmitter = new ParticlesEmitter();
-		
+
 		const newParticle = () => {
-			var ret = new asteroid.constructor();
+			const ret = new asteroid.constructor();
 			ret.scale = asteroid.scale * MathUtils.getRandomInRange(0.1, 0.25);
-			return ret; 	
+			const rx = MathUtils.getRandomInRange(0, 2 * Math.PI);
+			const ry = MathUtils.getRandomInRange(0, 2 * Math.PI);
+			const rz = MathUtils.getRandomInRange(0, 2 * Math.PI);
+			ret.rotationQuaternion = Quaternion.fromEuler(rx, ry, rz, "XYZ");
+			return ret;
 		}
 		const particles = this.#particleEmitter.emit(
-			newParticle, 
+			newParticle,
 			ast => {
-				ast.orientation = MathUtils.sum(ast.orientation, MathUtils.randomVectorInRange(1,2))
-				ast.center = MathUtils.sum(ast.center, [0,0,30]);				
-			} 
-		);				
+				ast.rotationSpeed = MathUtils.randomVectorInRange(0, 90);
+				ast.center = MathUtils.sum(ast.center, [0, 0, 30]);
+				ast.rotateForward(this.#gameSettings);
+			}
+		);
 		await Promise.all([particles]);
 		this.destroy();
-    }
+	}
 }
 
 export default Explosion;

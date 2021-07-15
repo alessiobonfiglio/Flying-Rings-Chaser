@@ -1,8 +1,9 @@
 import {default as GameObject} from "./gameObject.js";
 import {DefaultShaderClass} from "../../shaders/shaderClasses.js";
-import {default as MathUtils} from "../math_utils.js";
+import math_utils, {default as MathUtils} from "../math_utils.js";
 import {default as SphericalCollider} from "../colliders/sphericalCollider.js";
 import {default as Event} from "../utils/event.js";
+import {default as utils} from "../utils.js";
 
 // Abstract class, must be extended with object file and texture
 class Asteroid extends GameObject {
@@ -10,6 +11,8 @@ class Asteroid extends GameObject {
 	static shaderClass = new DefaultShaderClass();
 	#gameSettings;
 	#isBackground;
+
+	rotationQuaternion = new Quaternion();
 
 	speed = 1;
 	rotationSpeed = [1, 1, 1];
@@ -36,10 +39,10 @@ class Asteroid extends GameObject {
 			this.position = [x, y, z];
 		}
 
-		const rx = MathUtils.getRandomInRange(0, 360);
-		const ry = MathUtils.getRandomInRange(0, 360);
-		const rz = MathUtils.getRandomInRange(0, 360);
-		this.orientation = [rx, ry, rz];
+		const rx = MathUtils.getRandomInRange(0, 2 * Math.PI);
+		const ry = MathUtils.getRandomInRange(0, 2 * Math.PI);
+		const rz = MathUtils.getRandomInRange(0, 2 * Math.PI);
+		this.rotationQuaternion = Quaternion.fromEuler(rx, ry, rz, "XYZ");
 
 		this.scale = MathUtils.getRandomInRange(gameSettings.asteroidScaleRange[0], gameSettings.asteroidScaleRange[1]);
 		this.speed = MathUtils.getRandomInRange(gameSettings.asteroidSpeedRange[0], gameSettings.asteroidSpeedRange[1]);
@@ -75,13 +78,29 @@ class Asteroid extends GameObject {
 			this.initialize(gameSettings);
 			return;
 		}
-		this.orientation[0] += (this.rotationSpeed[0] * gameSettings.deltaT) % 360;
-		this.orientation[1] += (this.rotationSpeed[1] * gameSettings.deltaT) % 360;
-		this.orientation[2] += (this.rotationSpeed[2] * gameSettings.deltaT) % 360;
+		this.rotateForward(gameSettings);
+	}
+
+	rotateForward(gameSettings) {
+		const drx = (this.rotationSpeed[0] * gameSettings.deltaT) % 360;
+		const dry = (this.rotationSpeed[1] * gameSettings.deltaT) % 360;
+		const drz = (this.rotationSpeed[2] * gameSettings.deltaT) % 360;
+
+		const deltaQ = Quaternion.fromEuler(utils.degToRad(drx), utils.degToRad(dry), utils.degToRad(drz), "XYZ");
+
+		this.rotationQuaternion = deltaQ.mul(this.rotationQuaternion);
+	}
+
+	worldMatrix() {
+		const translMatrix = utils.MakeTranslateMatrix(this.position[0], this.position[1], this.position[2]);
+		const rotMatrix = this.rotationQuaternion.toMatrix4();
+		const scaleMatrix = utils.MakeScaleMatrix(this.scale);
+
+		return math_utils.multiplyAllMatrices(translMatrix, rotMatrix, scaleMatrix);
 	}
 
 	onSpaceshipCollided(spaceship) {
-		this.position[2] -= spaceship.collider.scaledRadius*6;
+		this.position[2] -= spaceship.collider.scaledRadius * 6;
 		this.#onAsteroidDeath(spaceship.center);
 		this.initialize(this.#gameSettings);
 	}
