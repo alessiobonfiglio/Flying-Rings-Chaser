@@ -53,12 +53,10 @@ class Laser extends GameObject {
 	}
 
 	#moveForward(gameSettings) {
-		console.log(this.orientation);
-		const v = utils.orietationToVersor(this.orientation[0], -this.orientation[1]);
-		console.log(v);
+		const v = utils.orientationToVersor(this.orientation[0] - 180, -this.orientation[1]);
 		const deltaPos = MathUtils.mul(this.speed * gameSettings.deltaT, v);
 		this.position = MathUtils.sum(this.position, deltaPos);
-		//this.position[2] +=;
+
 		// Make it go beyond gameSettings.maxZ because of the light it irradiates
 		if (this.position[2] > gameSettings.maxZ * 1.5)
 			this.isVisible = false;
@@ -66,8 +64,7 @@ class Laser extends GameObject {
 
 	shoot(cockpitPosition, cockpitOrientation) {
 		this.position = MathUtils.sum(cockpitPosition, [0, -1, 4]);
-		this.orientation = cockpitOrientation.slice();
-		//this.orientation = m
+		this.orientation = MathUtils.sum(cockpitOrientation, [180, 0, 0]);
 		this.isVisible = true;
 	}
 

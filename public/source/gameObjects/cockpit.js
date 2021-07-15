@@ -96,16 +96,24 @@ class Cockpit extends GameObject {
 		// Cockpit oscillations
 		if (this.down - this.up !== 0)
 			this.orientation[0] += (this.down - this.up) * this.#gameSettings.oscillationSpeed[0] * this.#gameSettings.deltaT;
-		else if (Math.abs(this.orientation[0]) > 1e-12)
-			this.orientation[0] -= Math.sign(this.orientation[0]) * this.#gameSettings.oscillationSpeed[0] * this.#gameSettings.deltaT;
-		if (this.right - this.left !== 0) {
+		else if (this.orientation[0] > 0)
+			this.orientation[0] = Math.max(0, this.orientation[0] - this.#gameSettings.oscillationSpeed[0] * this.#gameSettings.deltaT);
+		else if (this.orientation[0] < 0)
+			this.orientation[0] = Math.min(0, this.orientation[0] + this.#gameSettings.oscillationSpeed[0] * this.#gameSettings.deltaT);
+
+		if (this.right - this.left !== 0)
 			this.orientation[1] -= (this.left - this.right) * this.#gameSettings.oscillationSpeed[1] * this.#gameSettings.deltaT;
+		else if (this.orientation[1] > 0)
+			this.orientation[1] = Math.max(0, this.orientation[1] - this.#gameSettings.oscillationSpeed[1] * this.#gameSettings.deltaT);
+		else if (this.orientation[1] < 0)
+			this.orientation[1] = Math.min(0, this.orientation[1] + this.#gameSettings.oscillationSpeed[1] * this.#gameSettings.deltaT);
+
+		if (this.right - this.left !== 0)
 			this.orientation[2] += (this.left - this.right) * this.#gameSettings.oscillationSpeed[2] * this.#gameSettings.deltaT;
-		}
-		else if (Math.abs(this.orientation[1]) > 1e-12) {
-			this.orientation[1] -= Math.sign(this.orientation[1]) * this.#gameSettings.oscillationSpeed[1] * this.#gameSettings.deltaT;
-			this.orientation[2] -= Math.sign(this.orientation[2]) * this.#gameSettings.oscillationSpeed[2] * this.#gameSettings.deltaT;
-		}
+		else if (this.orientation[2] > 0)
+			this.orientation[2] = Math.max(0, this.orientation[2] - this.#gameSettings.oscillationSpeed[2] * this.#gameSettings.deltaT);
+		else if (this.orientation[2] < 0)
+			this.orientation[2] = Math.min(0, this.orientation[2] + this.#gameSettings.oscillationSpeed[2] * this.#gameSettings.deltaT);
 
 		// Clamp oscillation
 		this.orientation[0] = MathUtils.clamp(this.orientation[0], -this.#gameSettings.maxOscillation[0], this.#gameSettings.maxOscillation[0]);
