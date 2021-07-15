@@ -623,7 +623,7 @@ const utils = {
 		return out;
 	},
 
-	orietationToVersor: function (rx, ry) {
+	orientationToVersor: function (rx, ry) {
 		const elev = this.degToRad(rx);
 		const ang = this.degToRad(ry);
 		const x = Math.sin(ang);
