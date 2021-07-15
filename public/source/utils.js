@@ -669,24 +669,16 @@ const utils = {
 		return out;
 	},
 
-	MakeView: function (cx, cy, cz, elev, ang) {
+	MakeView: function (cx, cy, cz, elev, ang, roll) {
 		// Creates in {out} a view matrix. The camera is centered in ({cx}, {cy}, {cz}).
 		// It looks {ang} degrees on y axis, and {elev} degrees on the x axis.
 
-		let T = [];
-		let Rx = [];
-		let Ry = [];
-		let tmp = [];
-		let out = [];
+		const T = this.MakeTranslateMatrix(-cx, -cy, -cz);
+		const Rx = this.MakeRotateXMatrix(-elev);
+		const Ry = this.MakeRotateYMatrix(-ang);
+		const Rz = this.MakeRotateZMatrix(-roll);
 
-		T = this.MakeTranslateMatrix(-cx, -cy, -cz);
-		Rx = this.MakeRotateXMatrix(-elev);
-		Ry = this.MakeRotateYMatrix(-ang);
-
-		tmp = this.multiplyMatrices(Ry, T);
-		out = this.multiplyMatrices(Rx, tmp);
-
-		return out;
+		return this.multiplyAllMatrices(Rz, Rx, Ry, T);
 	},
 
 	MakePerspective: function (fovy, a, n, f) {

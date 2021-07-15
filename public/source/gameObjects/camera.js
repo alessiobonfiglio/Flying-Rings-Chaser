@@ -6,37 +6,44 @@ import Animations from "../utils/animations.js";
 
 
 class Camera extends GameObject {
-	position = [0, 0, 0];
-	horizontalAngle;
-	verticalAngle;
+	#gameSettings;
 	#cockpit;
 	#zPos;
+	#horizontalAngle;
+	#verticalAngle;
+	#rollAngle;
 	#startZPos = 0.65;
 	#startFov = 90;
 
 	fov;
 	#animationCancellationToken = new CancellationToken();	
 
-	constructor(position, horizontalAngle, verticalAngle) {
+	constructor(position, horizontalAngle, verticalAngle, rollAngle) {
 		super();
 		this.position = position;
-		this.horizontalAngle = horizontalAngle;
-		this.verticalAngle = verticalAngle;
+		this.orientation = [horizontalAngle, verticalAngle, rollAngle];
+		this.#horizontalAngle = horizontalAngle;
+		this.#verticalAngle = verticalAngle;
+		this.#rollAngle = rollAngle;
 		this.#zPos = this.#startZPos;
 		this.fov = this.#startFov;
 	}
 
-	initialize(cockpit) {
+	initialize(cockpit, gameSettings) {
 		this.#cockpit = cockpit;
+		this.#gameSettings = gameSettings;
 	}
 
 	viewMatrix() {
-		return utils.MakeView(this.position[0], this.position[1], this.position[2], this.horizontalAngle, this.verticalAngle);
+		return utils.MakeView(this.position[0], this.position[1], this.position[2], -this.orientation[0], this.orientation[1], this.orientation[2]);
 	}
 
 	update() {
-		this.position = this.#computeCurrentPosition();
-	}	
+		this.position = MathUtils.sum(this.#cockpit.position, [0, -0.125, -this.#zPos]);
+		this.orientation[0] = this.#cockpit.orientation[0] * this.#gameSettings.cameraOscillationReduction[0] + this.#horizontalAngle;
+		this.orientation[1] = this.#cockpit.orientation[1] * this.#gameSettings.cameraOscillationReduction[1] + this.#verticalAngle;
+		this.orientation[2] = this.#cockpit.orientation[2] * this.#gameSettings.cameraOscillationReduction[2] + this.#rollAngle;
+	}
 
 	async boost(speedUpTime, maintainingTime, slowDownTime) {
 		// Aborting previous animation if any
@@ -83,19 +90,15 @@ class Camera extends GameObject {
 		}
 
 		const angleAnimation = async () => {
-			const startAngle = this.verticalAngle;
+			const startAngle = this.#verticalAngle;
 			const deltaRotation = 2 + MathUtils.getRandomInRange(-2, 2);
 
-			await Animations.lerp(angle => this.verticalAngle = angle, animationLength, this.verticalAngle, startAngle + deltaRotation);
-			await Animations.lerp(angle => this.verticalAngle = angle, 2 * animationLength, this.verticalAngle, startAngle - deltaRotation);
-			await Animations.lerp(angle => this.verticalAngle = angle, animationLength, this.verticalAngle, startAngle);
+			await Animations.lerp(angle => this.#verticalAngle = angle, animationLength, this.#verticalAngle, startAngle + deltaRotation);
+			await Animations.lerp(angle => this.#verticalAngle = angle, 2 * animationLength, this.#verticalAngle, startAngle - deltaRotation);
+			await Animations.lerp(angle => this.#verticalAngle = angle, animationLength, this.#verticalAngle, startAngle);
 		}
 
 		await Promise.all([angleAnimation(), fovAnimation()]);
-	}
-
-	#computeCurrentPosition() {
-		return MathUtils.sum(this.#cockpit.position, [0, -0.125, -this.#zPos]);
 	}
 }
 

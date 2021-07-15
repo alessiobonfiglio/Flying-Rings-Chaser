@@ -7,7 +7,7 @@ class GameObject // should be an abstract class if js allows that
 {
 	// events
 	destroyed = new Event();	
-	static instantiateInEngine;  // = obj => engine.instatiate(obj). Set by engine
+	static instantiateInEngine;  // = obj => engine.instantiate(obj). Set by engine
 
 	// variables
 	position = [0, 0, 0]; //pivot in world coordinates

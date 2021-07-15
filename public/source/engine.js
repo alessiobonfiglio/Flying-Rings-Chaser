@@ -56,7 +56,7 @@ class GameEngine {
 		document.getElementById("end-button").onclick = this.#end_game(this);
 		GameObject.instantiateInEngine = gameObject => this.#instantiate(gameObject);
 
-		this.#webGlManager.camera = new Camera([0, 0, 0], 0, -180);
+		this.#webGlManager.camera = new Camera([0, 0, 0], 0, 180, 0);
 
 		this.#webGlManager.skyboxGameObject = new Skybox(this.#gameSettings);
 
@@ -68,7 +68,7 @@ class GameEngine {
 		this.#cockpitScreen = new CockpitScreen(this.#gameSettings, this.#cockpit);
 		this.#terrainCollider = this.#instantiateTerrainCollider();
 		this.#instantiate(this.#cockpitScreen);
-		this.#webGlManager.camera.initialize(this.#cockpit);
+		this.#webGlManager.camera.initialize(this.#cockpit, this.#gameSettings);
 		this.#createBackgroundAsteroids();
 
 		// must be done like this to keep a reference of 'this'
@@ -115,8 +115,6 @@ class GameEngine {
 		// do things here
 		this.#updateGameObjects();
 
-		//this.#webGlManager.camera.verticalAngle++;
-		//console.log(this.#webGlManager.camera.verticalAngle%360);
 		this.#checkCollisions();
 		this.#updateLights();
 		this.#webGlManager.draw();
