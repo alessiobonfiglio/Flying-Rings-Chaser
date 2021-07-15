@@ -15,7 +15,7 @@ class Asteroid extends GameObject {
 	rotationQuaternion = new Quaternion();
 
 	speed = 1;
-	rotationSpeed = [1, 1, 1];
+	rotationSpeed = new Quaternion();
 	health;
 
 	// Initialization
@@ -50,7 +50,10 @@ class Asteroid extends GameObject {
 		const rsx = MathUtils.getRandomInRange(gameSettings.asteroidRotationSpeedRange[0], gameSettings.asteroidRotationSpeedRange[1]);
 		const rsy = MathUtils.getRandomInRange(gameSettings.asteroidRotationSpeedRange[0], gameSettings.asteroidRotationSpeedRange[1]);
 		const rsz = MathUtils.getRandomInRange(gameSettings.asteroidRotationSpeedRange[0], gameSettings.asteroidRotationSpeedRange[1]);
-		this.rotationSpeed = [rsx, rsy, rsz];
+		const drx = (rsx * gameSettings.deltaT) % 360;
+		const dry = (rsy * gameSettings.deltaT) % 360;
+		const drz = (rsz * gameSettings.deltaT) % 360;
+		this.rotationSpeed = Quaternion.fromEuler(utils.degToRad(drx), utils.degToRad(dry), utils.degToRad(drz), "XYZ");
 	}
 
 	#setupBackgroundPosition(gameSettings) {
@@ -78,17 +81,11 @@ class Asteroid extends GameObject {
 			this.initialize(gameSettings);
 			return;
 		}
-		this.rotateForward(gameSettings);
+		this.rotateForward();
 	}
 
-	rotateForward(gameSettings) {
-		const drx = (this.rotationSpeed[0] * gameSettings.deltaT) % 360;
-		const dry = (this.rotationSpeed[1] * gameSettings.deltaT) % 360;
-		const drz = (this.rotationSpeed[2] * gameSettings.deltaT) % 360;
-
-		const deltaQ = Quaternion.fromEuler(utils.degToRad(drx), utils.degToRad(dry), utils.degToRad(drz), "XYZ");
-
-		this.rotationQuaternion = deltaQ.mul(this.rotationQuaternion);
+	rotateForward() {
+		this.rotationQuaternion = this.rotationSpeed.mul(this.rotationQuaternion);
 	}
 
 	worldMatrix() {
