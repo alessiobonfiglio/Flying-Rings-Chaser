@@ -54,7 +54,7 @@ class Laser extends GameObject {
 
 	#moveForward(gameSettings) {
 		console.log(this.orientation);
-		const v = utils.orietationToVersor(this.orientation[0], this.orientation[1]);
+		const v = utils.orietationToVersor(this.orientation[0], -this.orientation[1]);
 		console.log(v);
 		const deltaPos = MathUtils.mul(this.speed * gameSettings.deltaT, v);
 		this.position = MathUtils.sum(this.position, deltaPos);
