@@ -16,6 +16,9 @@ class SemispaceCollider extends Collider {
     }
 
     intersectWithSphere(sphericalCollider) {
+        if(!this.isEnabled)
+			return false;
+            
         const Pc = this.center;        
         const n = this.currentNormal;
         const c = sphericalCollider.center;

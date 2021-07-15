@@ -28,6 +28,9 @@ class CircleCollider extends Collider{
 
 
     isInside(point) {
+        if(!this.isEnabled)
+			return false;
+            
         // check if is too far from the plane that contains the circle
         const deltaPos = MathUtils.sub(point, this.center);
         const dot = MathUtils.dot(deltaPos, this.currentNormal);

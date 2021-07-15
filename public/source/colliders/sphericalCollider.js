@@ -10,11 +10,16 @@ class SphericalCollider extends Collider {
 
 
 	isInside(point) {
+		if(!this.isEnabled)
+			return false;
 		return MathUtils.distance(point, this.center) <= this.scaledRadius;
 	}
 
 
 	intersectWithCircle(circleCollider) {
+		if(!this.isEnabled)
+			return false;
+
 		// Fast check (sufficient condition). far colliders
 		if (MathUtils.distance(this.center, circleCollider.center) > this.scaledRadius + circleCollider.scaledRadius)
 			return false;
@@ -52,11 +57,15 @@ class SphericalCollider extends Collider {
 
 
 	intersectWithSphere(sphericalCollider) {
+		if(!this.isEnabled)
+			return false;
 		return MathUtils.distance(this.center, sphericalCollider.center) <= this.scaledRadius + sphericalCollider.scaledRadius;
 	}
 
 
 	intersectWithBox(boxCollider) {
+		if(!this.isEnabled)
+			return false;
 		const max = MathUtils.sum(boxCollider.position, boxCollider.size);
 		const min = MathUtils.sub(boxCollider.position, boxCollider.size);
 		// get box closest point to sphere center by clamping
