@@ -93,7 +93,6 @@ class Cockpit extends GameObject {
 		this.position[0] = MathUtils.clamp(this.position[0], -this.#gameSettings.maxHalfX, this.#gameSettings.maxHalfX);
 		this.position[1] = MathUtils.clamp(this.position[1], -this.#gameSettings.maxHalfY, this.#gameSettings.maxHalfY);
 
-		console.log(this.orientation);
 		// Cockpit oscillations
 		if (this.down - this.up !== 0)
 			this.orientation[0] += (this.down - this.up) * this.#gameSettings.oscillationSpeedX * this.#gameSettings.deltaT;
@@ -101,17 +100,17 @@ class Cockpit extends GameObject {
 			this.orientation[0] -= Math.sign(this.orientation[0]) * this.#gameSettings.oscillationSpeedX * this.#gameSettings.deltaT;
 		if (this.right - this.left !== 0) {
 			this.orientation[1] += (this.left - this.right) * this.#gameSettings.oscillationSpeedY * this.#gameSettings.deltaT;
-			this.orientation[1] += (this.left - this.right) * this.#gameSettings.oscillationSpeedZ * this.#gameSettings.deltaT;
+			this.orientation[2] += (this.left - this.right) * this.#gameSettings.oscillationSpeedZ * this.#gameSettings.deltaT;
 		}
 		else if (Math.abs(this.orientation[1]) > 1e-12) {
 			this.orientation[1] -= Math.sign(this.orientation[1]) * this.#gameSettings.oscillationSpeedY * this.#gameSettings.deltaT;
-			this.orientation[1] -= Math.sign(this.orientation[1]) * this.#gameSettings.oscillationSpeedZ * this.#gameSettings.deltaT;
+			this.orientation[2] -= Math.sign(this.orientation[2]) * this.#gameSettings.oscillationSpeedZ * this.#gameSettings.deltaT;
 		}
 
 		// Clamp oscillation
 		this.orientation[0] = MathUtils.clamp(this.orientation[0], -this.#gameSettings.maxOscillationX, this.#gameSettings.maxOscillationX);
 		this.orientation[1] = MathUtils.clamp(this.orientation[1], -this.#gameSettings.maxOscillationY, this.#gameSettings.maxOscillationY);
-		this.orientation[2] = MathUtils.clamp(this.orientation[1], -this.#gameSettings.maxOscillationZ, this.#gameSettings.maxOscillationZ);
+		this.orientation[2] = MathUtils.clamp(this.orientation[2], -this.#gameSettings.maxOscillationZ, this.#gameSettings.maxOscillationZ);
 
 		// Add points
 		this.#points += this.#gameSettings.pointsPerSecond * this.#gameSettings.deltaT;
@@ -197,7 +196,7 @@ class Cockpit extends GameObject {
 		this.#canShoot = false;
 
 		// Shoot the first laser, then move it to the back of the list
-		this.#laserPool[0].shoot(this.position);
+		this.#laserPool[0].shoot(this.position, this.orientation);
 		this.#laserPool.push(this.#laserPool.shift());
 	}
 

@@ -3,6 +3,8 @@
 //Includes texture operations
 //Includes initInteraction() function
 
+import {default as math_utils} from "./math_utils.js";
+
 const utils = {
 
 	createAndCompileShaders: function (gl, shaderText) {
@@ -619,6 +621,16 @@ const utils = {
 		out[5] = sy;
 		out[10] = sz;
 		return out;
+	},
+
+	orietationToVersor: function (rx, ry) {
+		const elev = this.degToRad(rx);
+		const ang = this.degToRad(ry);
+		const x = Math.sin(ang);
+		const y = Math.sin(ang) * Math.sin(elev);
+		const z = Math.cos(elev);
+		const v = [x, y, z]
+		return math_utils.normalize(v);
 	},
 
 
