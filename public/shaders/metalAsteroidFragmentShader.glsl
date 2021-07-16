@@ -19,10 +19,12 @@ uniform sampler2D objectTexture;		// texture object
 const float maxLightDistance = 200.0;   // distance from that lights start to become weaker
 const float laserReduction = 0.2;		// reduction of the light intensity of the lasers
 
-const float SpecShine = 20.0;			// gamma factor for the bling specular
+const float SpecShine = 50.0;			// gamma factor for the bling specular
 
 const vec3 spaceshipLightColor = vec3(1.0, 1.0, 1.0);
 const vec3 laserLightColor = vec3(0.0, 0.0, 1.0);
+
+const vec3 specularColor = vec3(0.940, 0.923, 0.963);
 
 void main() {
 	vec3 nNormal = normalize(fsNormal);
@@ -40,8 +42,7 @@ void main() {
 	}
 
 	// compute the final color of the pixel
-	// (we use the texel color as both the diffuse and specular one)
-	vec3 color = texColor * (diffuseComponent + specularComponent);
+	vec3 color = texColor * diffuseComponent + specularColor * specularComponent;
 	color = clamp(color, 0.0, 1.0);
 	outColor = vec4(color , 1.0);
 }
