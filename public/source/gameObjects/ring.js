@@ -3,6 +3,7 @@ import {RingShaderClass} from "../../shaders/shaderClasses.js";
 import {default as CircleCollider} from "../colliders/circleCollider.js"
 import {default as MathUtils} from "../math_utils.js"
 import {default as Animations} from "../utils/animations.js"
+import ParticlesEmitter from "./particlesEmitter.js";
 
 class Ring extends GameObject {
 	static objFilename = "resources/ring/ring_smooth.obj";
@@ -15,6 +16,7 @@ class Ring extends GameObject {
 	_materialColor = [1, 215 / 255, 0];
 	#collided = false;
 	#spaceShip;
+	#ringsEmitter;
 
 	// Initialization
 	constructor() {
@@ -108,6 +110,7 @@ class Ring extends GameObject {
 			return;
 
 		this.#spaceShip = spaceship;
+		const ringExplosion = this.#ringExplosion();
 		this.#collided = true;
 		const startScale = this.scale;
 		// await this.#collapseRing(spaceship);
@@ -116,10 +119,29 @@ class Ring extends GameObject {
 		
 		console.log("disable");
 		this.collider.isEnabled = false;
-		await Animations.delay(0.1);		
+		await Animations.delay(0.1);				
 		this.collider.isEnabled = true;
-		console.log("enable");
-		this.initialize(this.#gameSettings);
+		this.initialize(this.#gameSettings);		
+	}
+
+	async #ringExplosion() {
+		this.#ringsEmitter = new ParticlesEmitter();
+		this.#ringsEmitter.totParticles = 10;
+		this.#ringsEmitter.particlesSpeed = 100;
+		this.#ringsEmitter.timeBeforeDestroy = 1;
+		this.#ringsEmitter.center = MathUtils.sum(this.#spaceShip.center, [0,0,10]);
+		const newRing = () => {
+			const ret = new Ring();
+			ret.scale = this.scale * MathUtils.getRandomInRange(0.06, 0.10);
+			ret.orientation = MathUtils.randomVectorInRange(0, 360);
+			return ret; 
+		}
+
+		await this.#ringsEmitter.emit(newRing,
+			ring =>  {
+				const rotation = MathUtils.randomVectorInRange(100, 200);
+				ring.orientation = MathUtils.sum(ring.orientation, MathUtils.mul(this.#gameSettings.deltaT, rotation));
+			});
 	}
 
 	async #collapseRing(spaceship) {

@@ -36,7 +36,8 @@ class ParticlesEmitter {
         const deltaPos = t => MathUtils.mul(t * realSpeed, direction);    
         await Animations.lerp(t => {
             particle.center = MathUtils.sum(this.center, deltaPos(Math.log(t + 1)));
-            onUpdate(particle);
+            if(onUpdate)
+                onUpdate(particle);
         }, this.timeBeforeDestroy , 0, this.timeBeforeDestroy);
     }
     
