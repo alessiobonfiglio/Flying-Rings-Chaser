@@ -2,6 +2,7 @@ import {default as GameObject} from "./gameObject.js";
 import {DefaultShaderClass} from "../../shaders/shaderClasses.js";
 import {default as MathUtils} from "../math_utils.js";
 import ParticlesEmitter from "./particlesEmitter.js";
+import {default as utils} from "../utils.js";
 
 class Explosion extends GameObject {
 	static objFilename = "resources/cube/cube.obj";
@@ -62,14 +63,20 @@ class Explosion extends GameObject {
 			const ry = MathUtils.getRandomInRange(0, 2 * Math.PI);
 			const rz = MathUtils.getRandomInRange(0, 2 * Math.PI);
 			ret.rotationQuaternion = Quaternion.fromEuler(rx, ry, rz, "XYZ");
+
+			const rs = MathUtils.randomVectorInRange(0, 90);
+			const drx = (rs[0] * this.#gameSettings.deltaT) % 360;
+			const dry = (rs[1] * this.#gameSettings.deltaT) % 360;
+			const drz = (rs[2] * this.#gameSettings.deltaT) % 360;
+			ret.rotationSpeed = Quaternion.fromEuler(utils.degToRad(drx), utils.degToRad(dry), utils.degToRad(drz), "XYZ");
+
 			return ret;
 		}
 		const particles = this.#particleEmitter.emit(
 			newParticle,
 			ast => {
-				ast.rotationSpeed = MathUtils.randomVectorInRange(0, 90);
 				ast.center = MathUtils.sum(ast.center, [0, 0, 30]);
-				ast.rotateForward(this.#gameSettings);
+				ast.rotateForward();
 			}
 		);
 		await Promise.all([particles]);
