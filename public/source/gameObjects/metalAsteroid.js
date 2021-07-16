@@ -1,9 +1,11 @@
-import { default as GameObject } from "./gameObject.js";
-import { default as Asteroid } from "./asteroid.js";
+import {default as GameObject} from "./gameObject.js";
+import {default as Asteroid} from "./asteroid.js";
+import {metalAsteroidShaderClass} from "../../shaders/shaderClasses.js";
 
 class MetalAsteroid extends Asteroid {
 	static objFilename = "resources/asteroids/metal_asteroid_n.obj";
 	static textureFilename = "resources/asteroids/metal.png";
+	static shaderClass = new metalAsteroidShaderClass();
 	static #colliderRadius;
 	static #centerOfGravity;
 

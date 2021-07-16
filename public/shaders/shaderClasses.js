@@ -7,6 +7,12 @@ class DefaultShaderClass extends ShaderClass {
 	static useTexture = true;
 }
 
+class metalAsteroidShaderClass extends ShaderClass {
+	static vertexShaderFilename = "shaders/metalAsteroidVertexShader.glsl";
+	static fragmentShaderFilename = "shaders/metalAsteroidFragmentShader.glsl";
+	static useTexture = true;
+}
+
 class RingShaderClass extends ShaderClass {
 	static vertexShaderFilename = "shaders/noTextureVertexShader.glsl";
 	static fragmentShaderFilename = "shaders/ringFragmentShader.glsl";
@@ -43,4 +49,4 @@ class NoTextureShaderClass extends ShaderClass {
 	static useTexture = false;
 }
 
-export {NoTextureShaderClass, DefaultShaderClass, RingShaderClass, TerrainShaderClass, CockpitShaderClass, CockpitScreenShaderClass, SkyboxShaderClass};
+export {NoTextureShaderClass, DefaultShaderClass, metalAsteroidShaderClass, RingShaderClass, TerrainShaderClass, CockpitShaderClass, CockpitScreenShaderClass, SkyboxShaderClass};

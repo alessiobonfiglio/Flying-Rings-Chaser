@@ -7,6 +7,7 @@ import {
 	CockpitScreenShaderClass,
 	CockpitShaderClass,
 	DefaultShaderClass,
+	metalAsteroidShaderClass,
 	RingShaderClass,
 	SkyboxShaderClass,
 	TerrainShaderClass
@@ -64,6 +65,7 @@ async function setupGlShaders(glManager) {
 	const info =
 		[
 			DefaultShaderClass,
+			metalAsteroidShaderClass,
 			RingShaderClass,
 			TerrainShaderClass,
 			CockpitShaderClass,
