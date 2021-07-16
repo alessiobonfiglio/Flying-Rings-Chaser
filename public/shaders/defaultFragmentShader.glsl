@@ -18,12 +18,8 @@ uniform sampler2D objectTexture;		// texture object
 const float maxLightDistance = 200.0;   // distance from that lights start to become weaker
 const float laserReduction = 0.2;		// reduction of the light intensity of the lasers
 
-
-vec3 clamp3(vec3 v) {
-	return vec3(clamp(v[0], 0.0, 1.0), clamp(v[1], 0.0, 1.0), clamp(v[2], 0.0, 1.0));
-}
-
-
+const vec3 spaceshipLightColor = vec3(1.0, 1.0, 1.0);
+const vec3 laserLightColor = vec3(0.0, 0.0, 1.0);
 
 void main() {
 	vec3 nNormal = normalize(fsNormal);
@@ -32,14 +28,14 @@ void main() {
 
 	// compute the lambert diffuse of each light source
 	float lightDistanceCoefficient = clamp(maxLightDistance*maxLightDistance/lightsDistances[0], 0.0, 1.0);
-	vec3 diffuseComponent = dot(lxs[0], nNormal) * float(lxsEnabled[0]) * lightDistanceCoefficient * vec3(1.0, 1.0, 1.0);
+	vec3 diffuseComponent = spaceshipLightColor * clamp(dot(lxs[0], nNormal), 0.0, 1.0) * float(lxsEnabled[0]) * lightDistanceCoefficient ;
 	for (int i = 1; i < LIGHTS_NUM; i++) {
 		lightDistanceCoefficient = clamp(maxLightDistance*maxLightDistance/lightsDistances[i], 0.0, 1.0);
-		diffuseComponent += dot(lxs[i], nNormal) * float(lxsEnabled[i]) * lightDistanceCoefficient * laserReduction * vec3(0,  0.0,1.0);
+		diffuseComponent += laserLightColor * clamp(dot(lxs[i], nNormal), 0.0, 1.0) * float(lxsEnabled[i]) * lightDistanceCoefficient * laserReduction;
 	}
 
+	// compute the final color of the pixel
 	vec3 color = texColor * diffuseComponent;
-	color = clamp3(color);
-	// compute the lambert diffuse color	
+	color = clamp(color, 0.0, 1.0);
 	outColor = vec4(color , 1.0);
 }
