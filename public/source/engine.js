@@ -173,7 +173,7 @@ class GameEngine {
 		const now = Date.now();
 		const delta = now - this.#then;
 
-		if (delta > this.#frameInterval) {
+		if (/*delta > this.#frameInterval*/ true) {
 
 			// Just `then = now` is not enough.
 			// Lets say we set fps at 10 which means
