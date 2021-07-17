@@ -3,6 +3,7 @@ import {default as utils} from "./utils.js";
 
 class Skybox extends GameObject {
 	#gameSettings;
+	#t = 0;
 
 	constructor(gameSettings) {
 		super();
@@ -51,9 +52,9 @@ class Skybox extends GameObject {
 
 	update(frameCount) {
 		super.update();
-		const t = frameCount * this.#gameSettings.skyboxOscillatingSpeed * this.#gameSettings.deltaT;
-		// take the fractional part of t, them map it from [0,1) to [-1,1] and then take the absolute value (so it oscillates from 1 to 0) and finally back to [-0.5,0.5]
-		const delta = Math.sin(t);
+		this.#t += this.#gameSettings.skyboxOscillatingSpeed * this.#gameSettings.deltaT;
+		// move the skybox up and down as a sinusoid
+		const delta = Math.sin(this.#t);
 		this.position[1] = this.#gameSettings.skyboxDefaultPosition[1] + delta * this.#gameSettings.skyboxTwoTimesMaxOscillation;
 	}
 
