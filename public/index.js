@@ -189,7 +189,7 @@ async function init() {
 		// Skybox
 		skyboxDefaultPosition: [0, -200, 0],
 		skyboxOscillatingSpeed: 0.6,
-		skyboxTwoTimesMaxOscillation: 10,
+		skyboxMaxOscillationAmplitude: 10,
 		skyboxParallaxFactor: 0.5, // between 1 and 0 (1->disabled)
 
 		get deltaT() {

@@ -54,7 +54,7 @@ class Skybox extends GameObject {
 		const t = frameCount * this.#gameSettings.skyboxOscillatingSpeed * this.#gameSettings.deltaT;
 		// move the skybox up and down as a sinusoid
 		const delta = Math.sin(t);
-		this.position[1] = this.#gameSettings.skyboxDefaultPosition[1] + delta * this.#gameSettings.skyboxTwoTimesMaxOscillation;
+		this.position[1] = this.#gameSettings.skyboxDefaultPosition[1] + delta * this.#gameSettings.skyboxMaxOscillationAmplitude;
 	}
 
 
