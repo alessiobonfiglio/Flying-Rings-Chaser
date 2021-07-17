@@ -24,6 +24,7 @@ import {default as Skybox} from "./source/skybox.js";
 import Explosion from "./source/gameObjects/explosion.js"
 import Square from "./source/gameObjects/square.js"
 import Sphere from "./source/gameObjects/sphere.js"
+import Animations from "./source/utils/animations.js"
 
 
 async function setupGlObjects(glManager, gl, gameSettings) {
@@ -129,8 +130,10 @@ async function init() {
 	// de-comment to enable webgl debug (with verbose logging of every function call)
 	//gl = WebGLDebugUtils.makeDebugContext(gl, undefined, logGLCall);
 
-	// create the setting of the game
-	const gameSetting = {
+	// create the setting of the game	
+
+	const gameSetting = {				
+
 		// Game engine
 		maxHalfX: 200,
 		maxHalfY: 70,
@@ -193,7 +196,8 @@ async function init() {
 		skyboxParallaxFactor: 0.5, // between 1 and 0 (1->disabled)
 
 		get deltaT() {
-			return this.gameSpeed / this.fpsLimit;
+			// return this.gameSpeed / this.fpsLimit;
+			return Animations.deltaT;
 		}
 	} //maybe load this from a json in the future?
 

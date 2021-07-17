@@ -1,7 +1,23 @@
 import MathUtils from "../math_utils.js";
 
 class Animations {
-    static nextFramePromise;
+
+	static #nextFramePromise;
+
+    static get nextFramePromise() {
+		return Animations.#nextFramePromise;
+	}
+
+	static set nextFramePromise(value) {
+		Animations.#nextFramePromise = value;
+		var old = Animations.cur;		
+		Animations.cur = new Date();
+		Animations.deltaT = (Animations.cur - old) / 1000;
+	}
+
+	static cur = new Date();
+	static deltaT = 1/60;
+
 
     static get nextFrame() {
 		return Animations.nextFramePromise ?? new Promise(resolve => requestAnimationFrame(() => resolve (1/60)));
