@@ -58,8 +58,6 @@ class Terrain extends GameObject {
 		this.position[2] -= this.#gameSettings.terrainSpeed * boostFactor * this.#gameSettings.deltaT;
 		const newZ = ((this.position[2] - this.#gameSettings.terrainChunkSize) % (this.#gameSettings.terrainChunkSize * this.#gameSettings.numberTerrainChunksRows)) + this.#gameSettings.terrainChunkSize;
 		if (newZ > this.position[2] + esp) {
-			if(this.position[0]===0)
-				console.log(this.position[0], newZ, this.position[2], this.#gameSettings.terrainChunkSize * this.#gameSettings.numberTerrainChunksRows);
 			this.rowNumber += this.#gameSettings.numberTerrainChunksRows;
 			//this.rowNumber += 1;
 		}
