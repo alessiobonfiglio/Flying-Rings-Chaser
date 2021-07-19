@@ -69,7 +69,7 @@ class Explosion extends GameObject {
 			const dry = (rs[1] * this.#gameSettings.deltaT) % 360;
 			const drz = (rs[2] * this.#gameSettings.deltaT) % 360;
 			ret.rotationSpeed = Quaternion.fromEuler(utils.degToRad(drx), utils.degToRad(dry), utils.degToRad(drz), "XYZ");
-
+			ret.isVisible = false;
 			return ret;
 		}
 		const particles = this.#particleEmitter.emit(
