@@ -76,6 +76,8 @@ class Explosion extends GameObject {
 			newParticle,
 			ast => {
 				ast.center = MathUtils.sum(ast.center, [0, 0, 30]);
+				if(!ast.isVisible)
+					ast.isVisible = true;
 				ast.rotateForward();
 			}
 		);
