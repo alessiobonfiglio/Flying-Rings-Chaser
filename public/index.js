@@ -149,7 +149,7 @@ async function init() {
 		maxOscillation: [7, 7, 7],
 		cameraOscillationReduction: [1.0, 1.0, 0.5],
 		pointsPerSecond: 80,
-		damagePerSecond: 2,
+		damagePerSecond: 5,
 		cockpitScreenAnimationSpeed: 3,
 
 		// Asteroids
