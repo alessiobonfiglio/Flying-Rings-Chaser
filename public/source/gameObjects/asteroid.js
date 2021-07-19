@@ -112,9 +112,9 @@ class Asteroid extends GameObject {
 
 	#onAsteroidDeath(hitCenter) {
 		this.death.invoke(this, hitCenter);
+		this.initialize(this.#gameSettings);
 
 		// initialization should be called after the event handling
-		this.initialize(this.#gameSettings);
 	}
 }
 

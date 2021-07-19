@@ -20,6 +20,7 @@ class ParticlesEmitter {
 
     #createParticle(objBuilder) {
         let particle = objBuilder();        
+        particle.center = this.center;
         particle.instantiate();        
         return particle;
     }
