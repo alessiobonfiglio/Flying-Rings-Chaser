@@ -20,7 +20,7 @@ class ParticlesEmitter {
 
     #createParticle(objBuilder) {
         let particle = objBuilder();        
-        particle.center = this.center;
+        particle.isVisible = false;                
         particle.instantiate();        
         return particle;
     }
@@ -35,10 +35,11 @@ class ParticlesEmitter {
         const realSpeed = this.particlesSpeed * MathUtils.getRandomInRange(0.6,1.3);  
         // deltaPos = vt * dir 
         const deltaPos = t => MathUtils.mul(t * realSpeed, direction);    
-        await Animations.lerp(t => {
+        await Animations.lerp(t => {            
             particle.center = MathUtils.sum(this.center, deltaPos(Math.log(t + 1)));
             if(onUpdate)
-                onUpdate(particle);
+                onUpdate(particle);            
+            particle.isVisible = true;
         }, this.timeBeforeDestroy , 0, this.timeBeforeDestroy);
     }
     

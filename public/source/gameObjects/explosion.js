@@ -56,6 +56,7 @@ class Explosion extends GameObject {
 		console.log("Explode")
 		this.#particleEmitter = new ParticlesEmitter();
 
+		this.#particleEmitter.center = this.center;
 		const newParticle = () => {
 			const ret = new asteroid.constructor();
 			ret.scale = asteroid.scale * MathUtils.getRandomInRange(0.1, 0.25);
@@ -74,8 +75,8 @@ class Explosion extends GameObject {
 		}
 		const particles = this.#particleEmitter.emit(
 			newParticle,
-			ast => {
-				// ast.center = MathUtils.sum(ast.center, [0, 0, 30]);
+			ast => {				
+				ast.center = MathUtils.sum(ast.center, [0, 0, 30]);
 				ast.rotateForward();
 			}
 		);
