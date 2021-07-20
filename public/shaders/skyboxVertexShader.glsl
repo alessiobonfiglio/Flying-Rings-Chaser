@@ -1,8 +1,8 @@
 #version 300 es
 
-in vec3 inPosition;					// vertex coordinates (screen space)
+in vec3 inPosition;					// vertex coordinates (clip space)
      
-out vec3 sampleDir;                 // direction to sample the cube map (screen space)
+out vec3 sampleDir;                 // direction to sample the cube map (clip space)
      
 void main() {
 
